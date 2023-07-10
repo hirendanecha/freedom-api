@@ -10,7 +10,7 @@ var User = function (user) {
   this.Password = user.Password;
   this.IsActive = user.IsActive;
   this.DateCreation = user.DateCreation;
-  this.IsAdmin = user.IsAdmin;
+  this.IsAdmin = user.IsAdmin || "N";
   this.PartnerId = user.PartnerId;
   this.IsSuspended = user.IsSuspended;
   this.FirstName = user.FirstName;
@@ -36,7 +36,7 @@ User.login = function (username, password, result) {
         const user = res[0];
         console.log(user);
 
-        if (user?.isActive == 0) {
+        if (user?.IsActive === "N") {
           return result(
             {
               message:
@@ -95,23 +95,19 @@ User.findAll = function (result) {
 };
 
 User.findById = function (user_id, result) {
-  db.query(
-    "SELECT * from users WHERE userId = ? ",
-    user_id,
-    function (err, res) {
-      if (err) {
-        console.log("error", err);
-        result(err, null);
-      } else {
-        console.log("user: ", res);
-        result(null, res);
-      }
+  db.query("SELECT * from users WHERE Id = ? ", user_id, function (err, res) {
+    if (err) {
+      console.log("error", err);
+      result(err, null);
+    } else {
+      console.log("user: ", res);
+      result(null, res);
     }
-  );
+  });
 };
 
 User.findByEmail = async function (userName) {
-  const query = `SELECT * from users WHERE UserName = ? AND IsAdmin !='N'`;
+  const query = `SELECT * from users WHERE UserName = ? and IsActive ='Y'`;
   const values = [userName];
   const user = await executeQuery(query, values);
   return user;
@@ -134,19 +130,15 @@ User.update = function (user_id, user, result) {
 };
 
 User.delete = function (user_id, result) {
-  db.query(
-    "DELETE FROM users WHERE Id = ?",
-    [user_id],
-    function (err, res) {
-      if (err) {
-        console.log("error", err);
-        result(err, null);
-      } else {
-        console.log("user deleted", res);
-        result(null, res);
-      }
+  db.query("DELETE FROM users WHERE Id = ?", [user_id], function (err, res) {
+    if (err) {
+      console.log("error", err);
+      result(err, null);
+    } else {
+      console.log("user deleted", res);
+      result(null, res);
     }
-  );
+  });
 };
 
 // ------------------- Zip Data ------------------
@@ -206,13 +198,12 @@ User.verification = function (token, result) {
     }
     try {
       const updateQuery = await executeQuery(
-        "UPDATE users SET isActive = ? WHERE userId = ?",
-        ['Y', decoded.userId]
+        "UPDATE users SET IsActive = ? WHERE Id = ?",
+        ["Y", decoded.userId]
       );
-      const fetchUser = await executeQuery(
-        "select * from users where userId = ?",
-        [decoded.userId]
-      );
+      const fetchUser = await executeQuery("select * from users where Id = ?", [
+        decoded.userId,
+      ]);
       return result(null, fetchUser[0]);
     } catch (error) {
       return result(err, null);
@@ -223,7 +214,7 @@ User.verification = function (token, result) {
 User.resendVerification = async function (email, result) {
   try {
     const findUserByEmail = await executeQuery(
-      `select * from users where userName = ?`,
+      `select * from users where UserName = ?`,
       [email]
     );
     if (!findUserByEmail?.length) {

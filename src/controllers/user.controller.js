@@ -70,7 +70,7 @@ exports.update = function (req, res) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const userToUpdate = new User(req.body);
-
+    console.log(req.params.id, userToUpdate);
     User.update(req.params.id, userToUpdate, function (err, result) {
       if (err) return utils.send500(res, err);
       res.json({
@@ -102,13 +102,15 @@ exports.forgotPassword = async function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
-    const userName = req.body.userName;
-    const user = await User.findByEmail(userName);
-    const data = await utils.forgotPasswordMail(user);
-    if (data.messageId) {
-      return res.json({ error: false, message: "success" });
-    } else {
-      return res.json({ error: "error", message: data.error });
+    const username = req.body.username;
+    const user = await User.findByEmail(username);
+    if (user) {
+      const data = await utils.forgotPasswordMail(user);
+      if (data.messageId) {
+        return res.json({ error: false, message: "success" });
+      } else {
+        return res.json({ error: "error", message: data.error });
+      }
     }
   }
 };
@@ -148,10 +150,11 @@ exports.verification = function (req, res) {
       }
       return utils.send500(res, err);
     }
-    if (data.user_type === "Partner") {
-      return res.redirect(`${environments.ADMIN_URL}/auth/partner-login`);
-    }
-    return res.redirect(`${environments.FRONTEND_URL}/login?verified=true`);
+    console.log(data);
+    // if (data.IsAdmin === "Y") {
+    //   return res.redirect(`${environments.ADMIN_URL}/auth/partner-login`);
+    // }
+    return res.redirect(`${environments.FRONTEND_URL}/login`);
   });
 };
 
@@ -163,7 +166,7 @@ exports.resendVerification = function (req, res) {
   }
   User.resendVerification(req.body?.email?.trim(), async function (err, data) {
     if (err) return utils.send500(res, err);
-    if (data.user_type === "Partner") {
+    if (data.IsAdmin === "Y") {
       await utils.partnerRegistrationMail({ ...data }, data?.user_id);
     } else {
       await utils.registrationMail({ ...data }, data?.user_id);
