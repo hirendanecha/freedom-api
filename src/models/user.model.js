@@ -9,7 +9,7 @@ var User = function (user) {
   this.UserName = user.UserName;
   this.Password = user.Password;
   this.IsActive = user.IsActive;
-  this.DateCreation = user.DateCreation;
+  this.DateCreation = user.DateCreation || new Date();
   this.IsAdmin = user.IsAdmin || "N";
   this.PartnerId = user.PartnerId;
   this.IsSuspended = user.IsSuspended;
@@ -245,7 +245,7 @@ User.search = async function (query) {
 };
 
 User.setPassword = async function (user_id, password, result) {
-  const query = `UPDATE users SET password=? WHERE userId=?`;
+  const query = `UPDATE users SET password=? WHERE Id=?`;
   const values = [password, user_id];
   const user = await executeQuery(query, values);
   return user;

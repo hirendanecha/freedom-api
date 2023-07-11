@@ -85,12 +85,12 @@ exports.setPassword = function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
-    const token = req.body.token;
+    const userId = req.body.userId;
     const newPassword = req.body.password;
-    let jwtSecretKey = environments.JWT_SECRET_KEY;
-    const decoded = jwt.verify(token, jwtSecretKey);
-    if (decoded) {
-      User.setPassword(decoded.userId, newPassword);
+    // let jwtSecretKey = environments.JWT_SECRET_KEY;
+    // const decoded = jwt.verify(token, jwtSecretKey);
+    if (userId) {
+      User.setPassword(userId, newPassword);
       res.json({ error: false, message: "success" });
     } else {
       res.json({ error: true, message: "Error occurred" });
