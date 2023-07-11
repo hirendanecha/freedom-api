@@ -54,6 +54,7 @@ app.options("*", cors(corsOptions));
 // All routes for the APIs //
 const authRoutes = require("./src/routes/user.routes");
 const utilsRoutes = require("./src/routes/utils.routes");
+const postRoutes = require("./src/routes/post.routes");
 const adminRouter = require("./src/routes/admin.routes");
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
@@ -68,6 +69,7 @@ try {
   app.use("/api/v1/customers", authRoutes);
   app.use("/api/v1/admin", adminRouter);
   app.use("/api/v1/utils", utilsRoutes);
+  app.use("/api/v1/posts", postRoutes);
 } catch (e) {
   console.log(e);
 }
