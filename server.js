@@ -9,9 +9,7 @@ const https = require("https"),
 
 const app = express();
 
-var originsWhitelist = [
-  "http://localhost:4200/",
-];
+var originsWhitelist = ["*"];
 var corsOptions = {
   origin: function (origin, callback) {
     var isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
