@@ -60,11 +60,11 @@ app.get("/", (req, res) => {
 
 try {
   // Initiate the API //
-  app.use("/api/v1/login", authRoutes);
-  app.use("/api/v1/customers", authRoutes);
-  app.use("/api/v1/admin", adminRouter);
-  app.use("/api/v1/utils", utilsRoutes);
-  app.use("/api/v1/posts", postRoutes);
+  app.use("/freedom/api/v1/login", authRoutes);
+  app.use("/freedom/api/v1/customers", authRoutes);
+  app.use("/freedom/api/v1/admin", adminRouter);
+  app.use("/freedom/api/v1/utils", utilsRoutes);
+  app.use("/freedom/api/v1/posts", postRoutes);
 } catch (e) {
   console.log(e);
 }
