@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
+require("dotenv").config();
 
 const https = require("https"),
   fs = require("fs"),
@@ -69,7 +70,7 @@ try {
   console.log(e);
 }
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 
 app.listen(port, "127.0.0.1", function () {
   console.log(`Server listening on port ${port}`);

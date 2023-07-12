@@ -1,17 +1,18 @@
+require("dotenv").config();
 const environment = {
   production: false,
-  BASE_URL2: 'http://localhost:8080/',
-  BASE_URL: 'https://lamarslist.com:8080/',
-  API_URL2: 'http://localhost:8080/api/v1/',
-  API_URL: 'https://lamarslist.com:8080/api/v1',
-  UPLOAD_DIR: "D://storage//freedom//",
-  FRONTEND_URL: "http://localhost:4200",
-  SMTP_USER: "auto@localfoods.market",
-  SMTP_PASS: "Money1111!",
-  JWT_SECRET_KEY: "secret",
-  JWT_EXPIRED: 60 * 60,
-  STRIPE_SECRET_KEY: "sk_test_51MwOHTSJJZB3pTDyVEDwvi8IW9gQ17A1VMhrMJ6Oi7fbsL5ZzFgt4Un2BJnsVPeealZeMBkp4RSQ3QYsTBhyBGHM00vPVONN1o",
-  X_CMC_PRO_API_KEY:"f2fa9f55-af4e-400d-8c1a-edc878f84c98",
-}
+  BASE_URL2: process.env.BASE_URL2,
+  BASE_URL: process.env.BASE_URL,
+  API_URL2: process.env.API_URL2,
+  API_URL: process.env.API_URL,
+  UPLOAD_DIR: process.env.UPLOAD_DIR,
+  FRONTEND_URL: process.env.FRONTEND_URL,
+  SMTP_USER: process.env.SMTP_USER,
+  SMTP_PASS: process.env.SMTP_PASS,
+  JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
+  JWT_EXPIRED: process.env.JWT_EXPIRED,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  X_CMC_PRO_API_KEY: process.env.X_CMC_PRO_API_KEY,
+};
 
 module.exports = environment;
