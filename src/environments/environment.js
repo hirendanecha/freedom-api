@@ -1,9 +1,9 @@
 const environment = {
   production: false,
-  BASE_URL2: 'http://localhost:5000/',
-  BASE_URL: 'https://lamarslist.com:5000/',
-  API_URL2: 'http://localhost:5000/api/v1/',
-  API_URL: 'https://lamarslist.com:8443/freedom/api/v1',
+  BASE_URL2: 'http://localhost:8080/',
+  BASE_URL: 'https://lamarslist.com:8080/',
+  API_URL2: 'http://localhost:8080/api/v1/',
+  API_URL: 'https://lamarslist.com:8080/api/v1',
   UPLOAD_DIR: "D://storage//freedom//",
   FRONTEND_URL: "http://localhost:4200",
   SMTP_USER: "auto@localfoods.market",
