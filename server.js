@@ -10,10 +10,7 @@ const https = require("https"),
 const app = express();
 
 var originsWhitelist = [
-  "https://www.localfoods.market/",
-  "https://www.localfoods.market",
-  "https://localfoods.market/",
-  "https://localfoods.market",
+  "http://localhost:4200/",
 ];
 var corsOptions = {
   origin: function (origin, callback) {
@@ -23,8 +20,7 @@ var corsOptions = {
   credentials: true,
   methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH", "OPTIONS"],
 };
-// app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
