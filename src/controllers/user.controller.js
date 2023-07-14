@@ -10,7 +10,7 @@ exports.login = async function (req, res) {
   console.log("jkfhguysdhfgbdf");
   const { username, password } = req.body;
   const user = await User.findByEmail(username);
-  // console.log(user);
+  console.log(user);
   if (user) {
     bcrypt.compare(password, user.Password, (error, isMatch) => {
       if (error) {
@@ -39,7 +39,7 @@ exports.login = async function (req, res) {
       }
     });
   } else {
-    return res.status(400).send({ error: true, message: error });
+    return res.status(400).send({ error: true, message: 'User not found' });
   }
 };
 
