@@ -17,7 +17,7 @@ exports.login = async function (req, res) {
         console.log(error);
         return res.status(400).send({ error: true, message: error });
       }
-      // console.log(isMatch);
+      console.log(isMatch);
       if (isMatch) {
         User.login(username, user.Id, function (err, token) {
           if (err) {
