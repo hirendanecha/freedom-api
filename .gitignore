@@ -42,6 +42,7 @@ build/Release
 node_modules/
 jspm_packages/
 
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -131,3 +132,6 @@ dist
 
 # db config 
 config/db.config.js
+
+# pachkage lock
+package-lock.json
