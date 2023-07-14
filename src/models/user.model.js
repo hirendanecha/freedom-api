@@ -8,7 +8,7 @@ const { executeQuery } = require("../helpers/utils");
 var User = function (user) {
   this.UserName = user.UserName;
   this.Password = user.Password;
-  this.IsActive = user.IsActive;
+  this.IsActive = user.IsActive || "N";
   this.DateCreation = user.DateCreation || new Date();
   this.IsAdmin = user.IsAdmin || "N";
   this.PartnerId = user.PartnerId;
@@ -17,17 +17,30 @@ var User = function (user) {
   this.LastName = user.LastName;
   this.Address = user.Address;
   this.Country = user.Country;
-  this.City = user.City;
-  this.State = user.State;
   this.ZipCode = user.ZipCode;
+  this.State = user.State;
+  this.City = user.City;
   this.Place = user.Place;
 };
 
-User.login = function (username, password, result) {
-  console.log("User Name = " + username + " and Password :" + password);
+User.login = function (username, Id, result) {
+  console.log("User Name = " + username);
   db.query(
-    "SELECT * FROM users WHERE UserName = ? AND Password = ?",
-    [username, password],
+    `SELECT Id,
+            UserName,
+            IsActive,
+            DateCreation,
+            IsAdmin,
+            FirstName,
+            LastName,
+            Address,
+            Country,
+            City,
+            State,
+            Place,
+            ZipCode
+     FROM users WHERE UserName = ? AND Id = ?`,
+    [username, Id],
     async function (err, res) {
       if (err) {
         console.log("error login", err);
@@ -60,7 +73,7 @@ User.login = function (username, password, result) {
           console.log(user);
           const token = await generateJwtToken(res[0]);
           return result(null, {
-            userId: user.userId,
+            userId: user.Id,
             user: user,
             accessToken: token,
           });
@@ -107,10 +120,10 @@ User.findById = function (user_id, result) {
 };
 
 User.findByEmail = async function (userName) {
-  const query = `SELECT * from users WHERE UserName = ? and IsActive ='Y'`;
+  const query = `SELECT * from users WHERE UserName = ?`;
   const values = [userName];
   const user = await executeQuery(query, values);
-  return user;
+  return user[0];
 };
 
 User.update = function (user_id, user, result) {

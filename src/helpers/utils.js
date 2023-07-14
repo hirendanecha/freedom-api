@@ -22,7 +22,7 @@ exports.isWithinRange = function (text, min, max) {
 exports.getactualfilename = (fname, folder, id) => {
   var fileName = fname;
   const dir = __upload_dir + "/" + folder + "/" + id;
-
+  console.log(dir);
   let files = fs.readdirSync(dir);
   if (files && files.length > 0) {
     files.forEach((file) => {

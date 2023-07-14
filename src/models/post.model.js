@@ -16,7 +16,7 @@ Post.findAll = function (result) {
         console.log("error", err);
         result(err, null);
       } else {
-        console.log("post: ", res);
+        // console.log("post: ", res);
         result(null, res);
       }
     }

@@ -4,34 +4,53 @@ const User = require("../models/user.model");
 const utils = require("../helpers/utils");
 const environments = require("../environments/environment");
 const jwt = require("jsonwebtoken");
-exports.login = function (req, res) {
+const bcrypt = require("bcrypt");
+
+exports.login = async function (req, res) {
   console.log("jkfhguysdhfgbdf");
   const { username, password } = req.body;
-
-  User.login(username, password, function (err, token) {
-    console.log(username, password);
-    if (err) {
-      console.log(err);
-      if (err?.errorCode) {
-        return res.status(400).send({
-          error: true,
-          message: err?.message,
-          errorCode: err?.errorCode,
-        });
+  const user = await User.findByEmail(username);
+  // console.log(user);
+  if (user) {
+    bcrypt.compare(password, user.Password, (error, isMatch) => {
+      if (error) {
+        console.log(error);
+        return res.status(400).send({ error: true, message: error });
       }
-      return res.status(400).send({ error: true, message: err });
-    } else {
-      return res.json(token);
-    }
-  });
+      // console.log(isMatch);
+      if (isMatch) {
+        User.login(username, user.Id, function (err, token) {
+          if (err) {
+            console.log(err);
+            if (err?.errorCode) {
+              return res.status(400).send({
+                error: true,
+                message: err?.message,
+                errorCode: err?.errorCode,
+              });
+            }
+            return res.status(400).send({ error: true, message: err });
+          } else {
+            return res.json(token);
+          }
+        });
+      } else {
+        return res.status(400).send({ error: true, message: error });
+      }
+    });
+  } else {
+    return res.status(400).send({ error: true, message: error });
+  }
 };
 
-exports.create = function (req, res) {
-  console.log(req.body);
+exports.create = async function (req, res) {
+  // console.log(req.body);
   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const user = new User({ ...req.body });
+    const encryptedPassword = await bcrypt.hash(user.Password, 10);
+    user.Password = encryptedPassword;
     User.create(user, async function (err, user) {
       if (err) return utils.send500(res, err);
       await utils.registrationMail({ ...req.body }, user);
@@ -70,7 +89,7 @@ exports.update = function (req, res) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const userToUpdate = new User(req.body);
-    console.log(req.params.id, userToUpdate);
+    // console.log(req.params.id, userToUpdate);
     User.update(req.params.id, userToUpdate, function (err, result) {
       if (err) return utils.send500(res, err);
       res.json({
@@ -150,7 +169,7 @@ exports.verification = function (req, res) {
       }
       return utils.send500(res, err);
     }
-    console.log(data);
+    // console.log(data);
     // if (data.IsAdmin === "Y") {
     //   return res.redirect(`${environments.ADMIN_URL}/auth/partner-login`);
     // }
