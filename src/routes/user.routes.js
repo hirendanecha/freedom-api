@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
+const profileController = require("./../controllers/profile.controller");
 
 router.post("/", userController.login);
 router.post("/register", userController.create);
+router.post("/profile", profileController.create);
 router.post("/forgot-password", userController.forgotPassword);
 router.post("/set-password", userController.setPassword);
 router.get("/countries", userController.getZipCountries);
