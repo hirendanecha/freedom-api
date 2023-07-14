@@ -8,7 +8,7 @@ const { executeQuery } = require("../helpers/utils");
 var User = function (user) {
   this.UserName = user.UserName;
   this.Password = user.Password;
-  this.IsActive = user.IsActive;
+  this.IsActive = user.IsActive || "N";
   this.DateCreation = user.DateCreation || new Date();
   this.IsAdmin = user.IsAdmin || "N";
   this.PartnerId = user.PartnerId;
@@ -120,7 +120,7 @@ User.findById = function (user_id, result) {
 };
 
 User.findByEmail = async function (userName) {
-  const query = `SELECT * from users WHERE UserName = ? and IsActive ='Y'`;
+  const query = `SELECT * from users WHERE UserName = ?`;
   const values = [userName];
   const user = await executeQuery(query, values);
   return user[0];

@@ -10,14 +10,14 @@ exports.login = async function (req, res) {
   console.log("jkfhguysdhfgbdf");
   const { username, password } = req.body;
   const user = await User.findByEmail(username);
-  console.log(user);
+  // console.log(user);
   if (user) {
     bcrypt.compare(password, user.Password, (error, isMatch) => {
       if (error) {
         console.log(error);
         return res.status(400).send({ error: true, message: error });
       }
-      console.log(isMatch);
+      // console.log(isMatch);
       if (isMatch) {
         User.login(username, user.Id, function (err, token) {
           if (err) {
@@ -39,15 +39,12 @@ exports.login = async function (req, res) {
       }
     });
   } else {
-    return res.json({
-      message: "User Not found",
-      errorCode: "bad_credentials",
-    });
+    return res.status(400).send({ error: true, message: error });
   }
 };
 
 exports.create = async function (req, res) {
-  console.log(req.body);
+  // console.log(req.body);
   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
@@ -92,7 +89,7 @@ exports.update = function (req, res) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const userToUpdate = new User(req.body);
-    console.log(req.params.id, userToUpdate);
+    // console.log(req.params.id, userToUpdate);
     User.update(req.params.id, userToUpdate, function (err, result) {
       if (err) return utils.send500(res, err);
       res.json({
@@ -172,7 +169,7 @@ exports.verification = function (req, res) {
       }
       return utils.send500(res, err);
     }
-    console.log(data);
+    // console.log(data);
     // if (data.IsAdmin === "Y") {
     //   return res.redirect(`${environments.ADMIN_URL}/auth/partner-login`);
     // }
