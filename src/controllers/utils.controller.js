@@ -2,7 +2,7 @@
 
 const formidable = require("formidable");
 var fs = require("fs");
-const path = require("path")
+const path = require("path");
 const utils = require("../helpers/utils");
 const environment = require("../environments/environment");
 const apiUrl = environment.API_URL + "utils";
@@ -18,7 +18,7 @@ exports.fileupload = function (req, res) {
     var id = fields.id;
     var index = parts[0];
     var folder = fields.folder;
-    var new_dir = __upload_dir + folder + "//" + id;
+    var new_dir = __upload_dir + "/" + folder + "/" + id;
 
     if (!fs.existsSync(new_dir)) {
       fs.mkdirSync(new_dir, { recursive: true });
@@ -30,7 +30,7 @@ exports.fileupload = function (req, res) {
       // index = n + parseInt(index);
     }
 
-    var newpath = new_dir + "//" + index + "." + extn;
+    var newpath = new_dir + "/" + index + "." + extn;
     try {
       fs.statSync(newpath);
       console.log("Deleting " + newpath);
@@ -93,13 +93,7 @@ exports.getFiles = (req, res) => {
         fileInfos.push({
           name: file,
           url:
-          apiUrl +
-            "/" +
-            req.params.folder +
-            "/" +
-            req.params.id +
-            "/" +
-            file,
+            apiUrl + "/" + req.params.folder + "/" + req.params.id + "/" + file,
         });
       });
     }
@@ -164,12 +158,16 @@ exports.fileuploadForPartnerProfile = async function (req, res) {
 
 exports.readFile = async (req, res) => {
   try {
-    const filepath = path.join(__upload_dir, req.params.folder, req.params.id, req.params.filename);
+    const filepath = path.join(
+      __upload_dir,
+      req.params.folder,
+      req.params.id,
+      req.params.filename
+    );
 
-    console.log({filepath});
+    console.log({ filepath });
     res.sendFile(filepath);
-    
   } catch (error) {
     console.log("Readfile Error:", error);
   }
-}
+};
