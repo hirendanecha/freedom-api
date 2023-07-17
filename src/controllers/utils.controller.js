@@ -166,7 +166,17 @@ exports.readFile = async (req, res) => {
     );
 
     console.log({ filepath });
-    res.sendFile(filepath);
+    // Set CORS headers
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+      // Send the file
+  res.sendFile(filepath, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(err.status).end();
+    } else {
+      console.log('File sent successfully');
+    }
+  });
   } catch (error) {
     console.log("Readfile Error:", error);
   }
