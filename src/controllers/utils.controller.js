@@ -19,25 +19,19 @@ exports.fileupload = function (req, res) {
     var index = parts[0];
     var folder = fields.folder;
     var new_dir = __upload_dir + "/" + folder + "/" + id;
-
+    console.log("oldpath", oldpath);
     if (!fs.existsSync(new_dir)) {
       fs.mkdirSync(new_dir, { recursive: true });
     } else {
       let files = fs.readdirSync(new_dir);
       let n = files.length;
-      console.log("new_dir", new_dir, " files: ", n);
-      // if (n === 4) n = 0;
-      // index = n + parseInt(index);
     }
 
     var newpath = new_dir + "/" + index + "." + extn;
     try {
-      fs.statSync(newpath);
-      console.log("Deleting " + newpath);
       fs.unlinkSync(newpath);
-    } catch (e) {
-      console.log("File does not exist - " + newpath);
-    }
+      fs.statSync(newpath);
+    } catch (e) {}
 
     // copy the file to a new location
     fs.copyFile(oldpath, newpath, function (err) {
@@ -79,17 +73,15 @@ exports.fileupload2 = async (req, res) => {
 
 exports.getFiles = (req, res) => {
   const dir = __upload_dir + "/" + req.params.folder + "/" + req.params.id;
-  console.log(dir);
+  // console.log(dir);
   fs.readdir(dir, function (err, files) {
     if (err) {
       return res.status(500).send({ message: "Unable to scan files!" });
     }
-    console.log(files);
     let fileInfos = [];
 
     if (files && files.length > 0) {
       files.forEach((file) => {
-        console.log(file);
         fileInfos.push({
           name: file,
           url:
@@ -164,19 +156,17 @@ exports.readFile = async (req, res) => {
       req.params.id,
       req.params.filename
     );
-
-    console.log({ filepath });
     // Set CORS headers
-  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-      // Send the file
-  res.sendFile(filepath, (err) => {
-    if (err) {
-      console.error(err);
-      res.status(err.status).end();
-    } else {
-      console.log('File sent successfully');
-    }
-  });
+    res.header("Cross-Origin-Resource-Policy", "cross-origin");
+    // Send the file
+    res.sendFile(filepath, (err) => {
+      if (err) {
+        console.error(err);
+        res.status(err.status).end();
+      } else {
+        console.log("File sent successfully");
+      }
+    });
   } catch (error) {
     console.log("Readfile Error:", error);
   }
