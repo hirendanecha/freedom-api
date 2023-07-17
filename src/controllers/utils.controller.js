@@ -83,7 +83,7 @@ exports.getFiles = (req, res) => {
     if (err) {
       return res.status(500).send({ message: "Unable to scan files!" });
     }
-
+    console.log(files);
     let fileInfos = [];
 
     if (files && files.length > 0) {
