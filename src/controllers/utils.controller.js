@@ -92,7 +92,7 @@ exports.getFiles = (req, res) => {
           name: file,
           url:
             baseUrl +
-            "/download/" +
+            "/" +
             req.params.folder +
             "/" +
             req.params.id +
