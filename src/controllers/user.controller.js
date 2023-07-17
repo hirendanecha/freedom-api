@@ -35,11 +35,13 @@ exports.login = async function (req, res) {
           }
         });
       } else {
-        return res.status(400).send({ error: true, message: 'Password not matched!' });
+        return res
+          .status(400)
+          .send({ error: true, message: "Password not matched!" });
       }
     });
   } else {
-    return res.status(400).send({ error: true, message: 'User not found' });
+    return res.status(400).send({ error: true, message: "User not found" });
   }
 };
 
@@ -173,7 +175,7 @@ exports.verification = function (req, res) {
     // if (data.IsAdmin === "Y") {
     //   return res.redirect(`${environments.ADMIN_URL}/auth/partner-login`);
     // }
-    return res.redirect(`${environments.FRONTEND_URL}/login`);
+    return res.redirect(`${environments.FRONTEND_URL}/login?isVerify=true`);
   });
 };
 
