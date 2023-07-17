@@ -4,7 +4,7 @@ const formidable = require("formidable");
 var fs = require("fs");
 const utils = require("../helpers/utils");
 const environment = require("../environments/environment");
-const baseUrl = environment.API_URL + "utils";
+const baseUrl = environment.BASE_URL;
 const __upload_dir = environment.UPLOAD_DIR;
 
 exports.fileupload = function (req, res) {
@@ -93,7 +93,6 @@ exports.getFiles = (req, res) => {
           name: file,
           url:
             baseUrl +
-            "/" +
             req.params.folder +
             "/" +
             req.params.id +
