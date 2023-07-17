@@ -2,9 +2,10 @@
 
 const formidable = require("formidable");
 var fs = require("fs");
+const path = require("path")
 const utils = require("../helpers/utils");
 const environment = require("../environments/environment");
-const baseUrl = environment.BASE_URL + "utils";
+const apiUrl = environment.API_URL + "utils";
 const __upload_dir = environment.UPLOAD_DIR;
 
 exports.fileupload = function (req, res) {
@@ -92,7 +93,7 @@ exports.getFiles = (req, res) => {
         fileInfos.push({
           name: file,
           url:
-            baseUrl +
+          apiUrl +
             "/" +
             req.params.folder +
             "/" +
@@ -160,3 +161,15 @@ exports.fileuploadForPartnerProfile = async function (req, res) {
     res.send({ success: true });
   });
 };
+
+exports.readFile = async (req, res) => {
+  try {
+    const filepath = path.join(__upload_dir, req.params.folder, req.params.id, req.params.filename);
+
+    console.log({filepath});
+    res.sendFile(filepath);
+    
+  } catch (error) {
+    console.log("Readfile Error:", error);
+  }
+}

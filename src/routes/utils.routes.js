@@ -8,5 +8,6 @@ router.get('/files/:folder/:id', utilsController.getFiles);
 router.get("/download/partner/:name", utilsController.downloadPartner)
 router.get("/download/:folder/:id/:name", utilsController.download)
 router.post('/upload-partner-profile',utilsController.fileuploadForPartnerProfile)
+router.get('/:folder/:id/:filename', utilsController.readFile);
 
 module.exports = router;
