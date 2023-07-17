@@ -35,7 +35,7 @@ exports.login = async function (req, res) {
           }
         });
       } else {
-        return res.status(400).send({ error: true, message: error });
+        return res.status(400).send({ error: true, message: 'Password not matched!' });
       }
     });
   } else {
