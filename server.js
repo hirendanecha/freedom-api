@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config();
+var indexRouter = require("./src/routes");
 
 const https = require("https"),
   fs = require("fs"),
@@ -52,10 +53,7 @@ app.use(bodyParser.json());
 app.options("*", cors(corsOptions));
 
 // All routes for the APIs //
-const authRoutes = require("./src/routes/user.routes");
-const utilsRoutes = require("./src/routes/utils.routes");
-const postRoutes = require("./src/routes/post.routes");
-const adminRouter = require("./src/routes/admin.routes");
+
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
 app.get("/", (req, res) => {
@@ -65,11 +63,7 @@ app.get("/", (req, res) => {
 
 try {
   // Initiate the API //
-  app.use("/api/v1/login", authRoutes);
-  app.use("/api/v1/customers", authRoutes);
-  app.use("/api/v1/admin", adminRouter);
-  app.use("/api/v1/utils", utilsRoutes);
-  app.use("/api/v1/posts", postRoutes);
+  app.use("/api/v1/", indexRouter);
 } catch (e) {
   console.log(e);
 }

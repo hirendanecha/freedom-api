@@ -10,7 +10,8 @@ var Post = function (post) {
 
 Post.findAll = function (result) {
   db.query(
-    "SELECT * from posts where isdeleted ='N' order by postcreationdate limit 15",
+    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
+    "SELECT p.*, pr.ProfilePicName, pr.Username from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' order by p.postcreationdate DESC limit 15;",
     function (err, res) {
       if (err) {
         console.log("error", err);

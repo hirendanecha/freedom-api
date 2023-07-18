@@ -1,11 +1,9 @@
 const environment = require("../environments/environment");
 const email = require("./email");
 const jwt = require("jsonwebtoken");
-
 const __upload_dir = environment.UPLOAD_DIR;
 var fs = require("fs");
 const db = require("../../config/db.config");
-const baseUrl = environment.API_URL + "utils";
 
 exports.send404 = function (res, err) {
   res.status(404).send({ error: true, message: err });
@@ -36,85 +34,6 @@ exports.getactualfilename = (fname, folder, id) => {
   return [dir, fileName];
 };
 
-exports.orderAutoMail = async (items) => {
-  let totalAmount = 0;
-  let buyerArray = [];
-
-  const sellerObject = items.reduce((prev, current) => {
-    buyerArray.push({
-      productName: current.product_title,
-      sellerName: current.user_first_name + " " + current.user_last_name,
-      buyerName:
-        current.buyer.user_first_name + " " + current.buyer.user_last_name,
-      sellerEmail: current.user_email,
-      unitPrice: current.sell_currency + current.sell_unit_price,
-      qty: current.sell_quantity + " " + current.product_unit,
-      totalCost: current.sell_currency + current.sell_total_cost,
-      sell_currency: current.sell_currency,
-      product_img: `${baseUrl}/download/product/${current.product_id}/0.jpg`,
-      orderItem: current,
-    });
-    totalAmount = totalAmount + current.sell_total_cost;
-    const objectToAdd = {
-      buyerEmail: current.user_email,
-      sellerName: current.user_first_name + " " + current.user_last_name,
-      buyerName:
-        current.buyer.user_first_name + " " + current.buyer.user_last_name,
-      unitPrice:
-        current.sell_currency +
-        current.sell_unit_price +
-        " per " +
-        current.product_unit,
-      qty: current.sell_quantity,
-      totalCost: current.sell_total_cost,
-      sell_currency: current.sell_currency,
-      product_img: `${baseUrl}/download/product/${current.product_id}/0.jpg`,
-      orderItem: current,
-    };
-
-    if (prev[current.user_id] && prev[current.user_id].length) {
-      prev[current.user_id].push(objectToAdd);
-    } else {
-      prev[current.user_id] = [objectToAdd];
-    }
-    return prev;
-  }, {});
-
-  const mailsArray = [];
-  mailsArray.push({
-    email: items[0].buyer.user_email,
-    subject: "Product purchased",
-    root: "../email-templates/product-purchased.ejs",
-    templateData: {
-      name: buyerArray[0].buyerName,
-      totalAmount: `${buyerArray[0].sell_currency}${totalAmount}`,
-      orders: buyerArray,
-    },
-  });
-
-  Object.keys(sellerObject).forEach((key) => {
-    let finalAmount;
-    sellerObject[key].forEach((obj) => {
-      finalAmount = (finalAmount || 0) + obj["totalCost"];
-    });
-
-    mailsArray.push({
-      email: sellerObject[key][0].buyerEmail,
-      subject: "Product sold",
-      root: "../email-templates/product-sold.ejs",
-      templateData: {
-        name: sellerObject[key][0].sellerName,
-        finalAmount: `${sellerObject[key][0].sell_currency}${finalAmount}`,
-        orders: sellerObject[key],
-      },
-    });
-  });
-  const promises = mailsArray.map((ele) => email.sendMail(ele));
-  const results = await Promise.all(promises);
-
-  return;
-};
-
 exports.registrationMail = async (userData, userId) => {
   let jwtSecretKey = environment.JWT_SECRET_KEY;
   let name = userData.FirstName + " " + userData.LastName;
@@ -140,6 +59,7 @@ exports.registrationMail = async (userData, userId) => {
   await email.sendMail(mailObj);
   return;
 };
+
 exports.partnerRegistrationMail = async (userData, userId) => {
   let jwtSecretKey = environment.JWT_SECRET_KEY;
   let name = userData.user_full_name;
