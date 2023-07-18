@@ -96,7 +96,7 @@ exports.update = function (req, res) {
       if (err) return utils.send500(res, err);
       res.json({
         error: false,
-        message: "Asesor actualizado satisfactoriamente",
+        message: "User update successfully",
       });
     });
   }
@@ -139,7 +139,7 @@ exports.forgotPassword = async function (req, res) {
 exports.delete = function (req, res) {
   User.delete(req.params.id, function (err, result) {
     if (err) return utils.send500(res, err);
-    res.json({ error: false, message: "Asesor eliminado" });
+    res.json({ error: false, message: "User deleted" });
   });
 };
 

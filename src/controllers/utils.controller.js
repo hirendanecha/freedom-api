@@ -19,12 +19,12 @@ exports.fileupload = function (req, res) {
     var index = parts[0];
     var folder = fields.folder;
     var new_dir = __upload_dir + "/" + folder + "/" + id;
-    console.log("oldpath", oldpath);
     if (!fs.existsSync(new_dir)) {
       fs.mkdirSync(new_dir, { recursive: true });
     } else {
       let files = fs.readdirSync(new_dir);
-      let n = files.length;
+      const oldImage = new_dir + "/" + files[0];
+      fs.unlinkSync(oldImage);
     }
 
     var newpath = new_dir + "/" + index + "." + extn;

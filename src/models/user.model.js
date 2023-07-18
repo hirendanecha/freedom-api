@@ -6,7 +6,7 @@ const environment = require("../environments/environment");
 const { executeQuery } = require("../helpers/utils");
 
 var User = function (user) {
-  this.UserName = user.UserName;
+  this.UserName = user.Username;
   this.Password = user.Password;
   this.IsActive = user.IsActive || "N";
   this.DateCreation = new Date();
@@ -17,7 +17,7 @@ var User = function (user) {
   this.LastName = user.LastName;
   this.Address = user.Address;
   this.Country = user.Country;
-  this.ZipCode = user.ZipCode;
+  this.ZipCode = user.Zip;
   this.State = user.State;
   this.City = user.City;
   this.Place = user.Place;
@@ -108,15 +108,32 @@ User.findAll = function (result) {
 };
 
 User.findById = function (user_id, result) {
-  db.query("SELECT * from users WHERE Id = ? ", user_id, function (err, res) {
-    if (err) {
-      console.log("error", err);
-      result(err, null);
-    } else {
-      console.log("user: ", res);
-      result(null, res);
+  db.query(
+    `SELECT Id,
+            UserName,
+            IsActive,
+            DateCreation,
+            IsAdmin,
+            FirstName,
+            LastName,
+            Address,
+            Country,
+            City,
+            State,
+            Place,
+            ZipCode
+    FROM users WHERE Id = ? `,
+    user_id,
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {  
+        // console.log("user: ", res);
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 User.findByEmail = async function (userName) {

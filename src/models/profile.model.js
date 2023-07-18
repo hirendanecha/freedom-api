@@ -8,11 +8,12 @@ var Profile = function (profile) {
   this.UserName = profile.UserName;
   this.FirstName = profile.FirstName;
   this.LastName = profile.LastName;
-  this.Address = profile.Place;
+  this.Address = profile.Address;
   this.Country = profile.Country;
   this.City = profile.City;
   this.State = profile.State;
   this.Zip = profile.ZipCode;
+  this.Place = profile.Place;
   this.UserID = profile.Id;
   this.DateofBirth = profile.DateofBirth;
   this.Gender = profile.Gender;
@@ -35,6 +36,57 @@ Profile.create = function (profileData, result) {
       result(null, res.insertId);
     }
   });
+};
+
+Profile.FindById = function (profileId, result) {
+  db.query(
+    `SELECT ID,
+            FirstName,  
+            LastName,
+            UserID,
+            MobileNo,
+            Gender,
+            DateofBirth,
+            Address,
+            City,
+            State,
+            Zip,
+            Country,
+            Business_NP_TypeID,
+            CoverPicName,
+            IsActivated,
+            Username,
+            ProfilePicName,
+            EmailVerified
+            CreatedOn,
+            Place
+    FROM profile WHERE ID=? `,
+    profileId,
+    function (err, res) {
+      if (err) {
+        console.log(err);
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+};
+
+Profile.update = function (profileId, profileData, result) {
+  db.query(
+    "UPDATE profile SET ? WHERE ID=?",
+    [profileData, profileId],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("update: ", res);
+        result(null, res);
+      }
+    }
+  );
 };
 
 module.exports = Profile;
