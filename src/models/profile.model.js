@@ -5,7 +5,7 @@ const environment = require("../environments/environment");
 const { executeQuery } = require("../helpers/utils");
 
 var Profile = function (profile) {
-  this.UserName = profile.UserName;
+  this.UserName = profile.Username;
   this.FirstName = profile.FirstName;
   this.LastName = profile.LastName;
   this.Address = profile.Address;
