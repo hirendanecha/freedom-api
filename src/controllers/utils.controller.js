@@ -118,36 +118,41 @@ exports.downloadPartner = (req, res) => {
     }
   });
 };
-
-exports.fileuploadForPartnerProfile = async function (req, res) {
+exports.uploadPostImage = function (req, res) {
   const form = formidable({ multiples: true });
-  form.parse(req, async (err, fields, files) => {
-    const { domain } = fields;
-    let partner = await Partner.findOneByDomain(domain);
-    var id = partner[0]?.user_id;
+  form.parse(req, (err, fields, files) => {
     var oldpath = files.file.filepath;
-    var new_dir = __upload_dir + "partner";
-    var timestamp = new Date().getTime();
     var parts = files.file.originalFilename.split(".");
     var extn = parts[parts.length - 1];
-    var filenameNew = id + "-" + timestamp + "." + extn;
-    if (partner[0].user_partner_image) {
-      let filename = partner[0].user_partner_image;
-      var existing_file_path = new_dir + "//" + filename;
-      fs.unlinkSync(existing_file_path);
+    var id = fields.id;
+    var index = parts[0];
+    var folder = fields.folder;
+    var new_dir = __upload_dir + "/" + folder + "/" + id;
+    if (!fs.existsSync(new_dir)) {
+      fs.mkdirSync(new_dir, { recursive: true });
+    } else {
+      let files = fs.readdirSync(new_dir);
+      const oldImage = new_dir + "/" + files[0];
+      fs.unlinkSync(oldImage);
     }
-    var existing_file_path = new_dir + "//" + filenameNew;
-    fs.mkdirSync(new_dir, { recursive: true });
-    await Partner.updateProfilePicture(filenameNew, partner[0].user_id);
-    var newpath = new_dir + "//" + filenameNew;
 
-    fs.rename(oldpath, newpath, function (err) {
+    var newpath = new_dir + "/" + index + "." + extn;
+    // try {
+    //   fs.unlinkSync(newpath);
+    //   fs.statSync(newpath);
+    // } catch (e) {}
+
+    // copy the file to a new location
+    fs.copyFile(oldpath, newpath, function (err) {
       if (err) throw err;
+      // // you may respond with another html page
+      // res.write('File uploaded and moved!');
+      // res.end();
     });
+
     res.send({ success: true });
   });
 };
-
 exports.readFile = async (req, res) => {
   try {
     const filepath = path.join(

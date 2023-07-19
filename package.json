@@ -24,6 +24,8 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.3.2",
     "nodemailer": "^6.9.1",
+    "open-graph": "^0.2.6",
+    "socket.io": "^4.7.1",
     "stripe": "^12.2.0"
   },
   "devDependencies": {
