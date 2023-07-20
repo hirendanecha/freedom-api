@@ -10,14 +10,14 @@ exports.login = async function (req, res) {
   console.log("jkfhguysdhfgbdf");
   const { username, password } = req.body;
   const user = await User.findByEmail(username);
-  console.log(user);
+  // console.log(user);
   if (user) {
     bcrypt.compare(password, user.Password, (error, isMatch) => {
       if (error) {
         console.log(error);
         return res.status(400).send({ error: true, message: error });
       }
-      console.log(isMatch);
+      // console.log(isMatch);
       if (isMatch) {
         User.login(username, user.Id, function (err, token) {
           if (err) {

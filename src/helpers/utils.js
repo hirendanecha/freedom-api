@@ -41,7 +41,7 @@ exports.registrationMail = async (userData, userId) => {
   const token = jwt.sign(
     {
       userId: userId,
-      email: userData.UserName,
+      email: userData.Username,
     },
     jwtSecretKey,
     { expiresIn: "730 days" }
@@ -50,7 +50,7 @@ exports.registrationMail = async (userData, userId) => {
   let registerUrl = `${environment.API_URL}customers/user/verification/${token}`;
 
   const mailObj = {
-    email: userData.UserName,
+    email: userData.Username,
     subject: "Registration",
     root: "../email-templates/registration.ejs",
     templateData: { name: name, url: registerUrl },
@@ -67,7 +67,7 @@ exports.partnerRegistrationMail = async (userData, userId) => {
   const token = jwt.sign(
     {
       userId: userId,
-      email: userData.UserName,
+      email: userData.Username,
     },
     jwtSecretKey,
     { expiresIn: "730 days" }
@@ -76,7 +76,7 @@ exports.partnerRegistrationMail = async (userData, userId) => {
   let registerUrl = `${environment.API_URL}customers/user/verification/${token}`;
 
   const mailObj = {
-    email: userData.UserName,
+    email: userData.Username,
     subject: "Registration",
     root: "../email-templates/partner-registration.ejs",
     templateData: { name: name, url: registerUrl },
@@ -101,7 +101,7 @@ exports.forgotPasswordMail = async (user) => {
 
     let forgotPasswordUrl = `${environment.API_URL}/set-password/user?accesstoken=${token}`;
     const mailObj = {
-      email: user[0]?.UserName,
+      email: user[0]?.Username,
       subject: "forgot password",
       root: "../email-templates/forgot-password.ejs",
       templateData: { name: name, url: forgotPasswordUrl },
