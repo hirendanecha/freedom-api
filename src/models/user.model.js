@@ -47,7 +47,7 @@ User.login = function (username, Id, result) {
         return result(err, null);
       } else {
         const user = res[0];
-        console.log(user);
+        // console.log(user);
 
         if (user?.IsActive === "N") {
           return result(
@@ -229,14 +229,16 @@ User.verification = function (token, result) {
     }
     try {
       const updateQuery = await executeQuery(
-        "UPDATE users SET IsActive = ? WHERE Id = ?",
-        ["Y", decoded.userId]
+        "UPDATE users SET IsActive ='Y' WHERE Id = ?",
+        [decoded.userId]
       );
       const fetchUser = await executeQuery("select * from users where Id = ?", [
         decoded.userId,
       ]);
+      console.log("fetchUser", updateQuery, fetchUser);
       return result(null, fetchUser[0]);
     } catch (error) {
+      console.log(error);
       return result(err, null);
     }
   });
