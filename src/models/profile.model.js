@@ -12,9 +12,8 @@ var Profile = function (profile) {
   this.Country = profile.Country;
   this.City = profile.City;
   this.State = profile.State;
-  this.Zip = profile.ZipCode;
-  this.Place = profile.Place;
-  this.UserID = profile.Id;
+  this.Zip = profile.Zip;
+  this.UserID = profile.Id || profile.UserID;
   this.DateofBirth = profile.DateofBirth;
   this.Gender = profile.Gender;
   this.MobileNo = profile.MobileNo;
@@ -23,7 +22,7 @@ var Profile = function (profile) {
   this.CoverPicName = profile.CoverPicName;
   this.ProfilePicName = profile.ProfilePicName;
   this.IsActivated = profile.IsActive;
-  this.CreatedOn = profile.CreatedOn || new Date();
+  this.CreatedOn = new Date();
 };
 
 Profile.create = function (profileData, result) {
@@ -58,8 +57,7 @@ Profile.FindById = function (profileId, result) {
             Username,
             ProfilePicName,
             EmailVerified
-            CreatedOn,
-            Place
+            CreatedOn
     FROM profile WHERE ID=? `,
     profileId,
     function (err, res) {
