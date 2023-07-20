@@ -6,6 +6,7 @@ const environment = require("../environments/environment");
 const { executeQuery } = require("../helpers/utils");
 
 var User = function (user) {
+  this.Email = user.Email;
   this.Username = user.Username;
   this.Password = user.Password;
   this.IsActive = user.IsActive || "N";
@@ -20,13 +21,13 @@ var User = function (user) {
   this.Zip = user.Zip;
   this.State = user.State;
   this.City = user.City;
-  this.Place = user.Place;
 };
 
-User.login = function (username, Id, result) {
-  console.log("User Name = " + username);
+User.login = function (email, Id, result) {
+  console.log("email = " + email);
   db.query(
     `SELECT Id,
+            Email,
             Username,
             IsActive,
             DateCreation,
@@ -37,10 +38,9 @@ User.login = function (username, Id, result) {
             Country,
             City,
             State,
-            Place,
             Zip
-     FROM users WHERE Username = ? AND Id = ?`,
-    [username, Id],
+     FROM users WHERE Email = ? AND Id = ?`,
+    [email, Id],
     async function (err, res) {
       if (err) {
         console.log("error login", err);
@@ -63,7 +63,7 @@ User.login = function (username, Id, result) {
         if (!user) {
           return result(
             {
-              message: "Invalid Username and Password. Kindly try again !!!!",
+              message: "Invalid Email and Password. Kindly try again !!!!",
               errorCode: "bad_credentials",
             },
             null
@@ -96,7 +96,7 @@ User.create = function (userData, result) {
 };
 
 User.findAll = function (result) {
-  db.query("SELECT * from users order by Username", function (err, res) {
+  db.query("SELECT * from users order by Email", function (err, res) {
     if (err) {
       console.log("error", err);
       result(err, null);
@@ -110,6 +110,7 @@ User.findAll = function (result) {
 User.findById = function (user_id, result) {
   db.query(
     `SELECT u.Id,
+            u.Email,
             u.Username,
             u.IsActive,
             u.DateCreation,
@@ -120,7 +121,6 @@ User.findById = function (user_id, result) {
             u.Country,
             u.City,
             u.State,
-            u.Place,
             u.Zip,
             p.ID as profileId
     FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Id = ? `,
@@ -138,7 +138,7 @@ User.findById = function (user_id, result) {
 };
 
 User.findByEmail = async function (userName) {
-  const query = `SELECT * from users WHERE Username = ?`;
+  const query = `SELECT * from users WHERE Email = ?`;
   const values = [userName];
   const user = await executeQuery(query, values);
   return user[0];

@@ -8,8 +8,8 @@ const bcrypt = require("bcrypt");
 
 exports.login = async function (req, res) {
   console.log("jkfhguysdhfgbdf");
-  const { username, password } = req.body;
-  const user = await User.findByEmail(username);
+  const { email, password } = req.body;
+  const user = await User.findByEmail(email);
   // console.log(user);
   if (user) {
     bcrypt.compare(password, user.Password, (error, isMatch) => {
@@ -19,7 +19,7 @@ exports.login = async function (req, res) {
       }
       // console.log(isMatch);
       if (isMatch) {
-        User.login(username, user.Id, function (err, token) {
+        User.login(email, user.Id, function (err, token) {
           if (err) {
             console.log(err);
             if (err?.errorCode) {
@@ -123,8 +123,8 @@ exports.forgotPassword = async function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
-    const username = req.body.username;
-    const user = await User.findByEmail(username);
+    const email = req.body.email;
+    const user = await User.findByEmail(email);
     if (user) {
       const data = await utils.forgotPasswordMail(user);
       if (data.messageId) {
