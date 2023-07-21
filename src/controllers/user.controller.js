@@ -118,11 +118,20 @@ exports.getUserList = function (req, res) {
   });
 };
 
-exports.findById = function (req, res) {
-  User.findById(req.params.id, function (err, user) {
-    if (err) return utils.send500(res, err);
+exports.findById = async function (req, res) {
+  const user = await User.findById(req.params.id);
+  if (user) {
     res.send(user);
-  });
+  } else {
+    res.status(400).send({
+      error: true,
+      message: "User not found",
+    });
+  }
+  // , function (err, user) {
+  //   if (err) return utils.send500(res, err);
+  //   res.send(user);
+  // });
 };
 
 exports.update = function (req, res) {
@@ -150,11 +159,12 @@ exports.setPassword = async function (req, res) {
     let jwtSecretKey = environments.JWT_SECRET_KEY;
     const decoded = jwt.verify(token, jwtSecretKey);
     if (decoded) {
-      const user = await User.findById(decoded.userId);
+      const user = await User.findById(decoded.userId, res);
+      console.log("user=>", user);
       if (user) {
         const encryptedPassword = Encrypt(
           newPassword,
-          user?.Email.substring(0, 3)
+          user[0]?.Email.substring(0, 3)
         );
         // const encryptedPassword = await bcrypt.hash(newPassword, 10);
         User.setPassword(decoded.userId, encryptedPassword);
