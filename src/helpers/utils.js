@@ -88,20 +88,20 @@ exports.partnerRegistrationMail = async (userData, userId) => {
 
 exports.forgotPasswordMail = async (user) => {
   console.log(user);
-  if (user.length) {
+  if (user) {
     let jwtSecretKey = environment.JWT_SECRET_KEY;
-    let name = user[0]?.FirstName + " " + user[0]?.LastName;
+    let name = user?.FirstName + " " + user?.LastName;
     const token = jwt.sign(
       {
-        userId: user[0]?.Id,
+        userId: user?.Id,
       },
       jwtSecretKey,
-      { expiresIn: environment.JWT_EXPIRED }
+      { expiresIn: "1 day" }
     );
 
-    let forgotPasswordUrl = `${environment.API_URL}/set-password/user?accesstoken=${token}`;
+    let forgotPasswordUrl = `${environment.FRONTEND_URL}reset-password/user?accesstoken=${token}`;
     const mailObj = {
-      email: user[0]?.Email,
+      email: user?.Email,
       subject: "forgot password",
       root: "../email-templates/forgot-password.ejs",
       templateData: { name: name, url: forgotPasswordUrl },
