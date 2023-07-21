@@ -107,34 +107,53 @@ User.findAll = function (result) {
   });
 };
 
-User.findById = async function (user_id, result) {
-  db.query(
-    `SELECT u.Id,
-            u.Email,
-            u.Username,
-            u.IsActive,
-            u.DateCreation,
-            u.IsAdmin,
-            u.FirstName,
-            u.LastName,
-            u.Address,
-            u.Country,
-            u.City,
-            u.State,
-            u.Zip,
-            p.ID as profileId
-    FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Id = ? `,
-    user_id,
-    function (err, res) {
-      if (err) {
-        console.log("error", err);
-        result(err, null);
-      } else {
-        // console.log("user: ", res);
-        result(null, res);
-      }
-    }
-  );
+User.findById = async function (user_id) {
+  // db.query(
+  //   `SELECT u.Id,
+  //           u.Email,
+  //           u.Username,
+  //           u.IsActive,
+  //           u.DateCreation,
+  //           u.IsAdmin,
+  //           u.FirstName,
+  //           u.LastName,
+  //           u.Address,
+  //           u.Country,
+  //           u.City,
+  //           u.State,
+  //           u.Zip,
+  //           p.ID as profileId
+  //   FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Id = ? `,
+  //   user_id,
+  //   function (err, res) {
+  //     if (err) {
+  //       console.log("error", err);
+  //       result(err, null);
+  //     } else {
+  //       console.log("user: ", res);
+  //       result(null, res[0]);
+  //     }
+  //   }
+  // );
+
+  const query = `SELECT u.Id,
+  u.Email,
+  u.Username,
+  u.IsActive,
+  u.DateCreation,
+  u.IsAdmin,
+  u.FirstName,
+  u.LastName,
+  u.Address,
+  u.Country,
+  u.City,
+  u.State,
+  u.Zip,
+  p.ID as profileId
+FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Id = ? `;
+  const values = [user_id];
+  const user = await executeQuery(query, values);
+  return user;
 };
 
 User.findByEmail = async function (email) {
@@ -278,7 +297,7 @@ User.search = async function (query) {
   }
 };
 
-User.setPassword = async function (user_id, password, result) {
+User.setPassword = async function (user_id, password) {
   const query = `UPDATE users SET password=? WHERE Id=?`;
   const values = [password, user_id];
   const user = await executeQuery(query, values);
