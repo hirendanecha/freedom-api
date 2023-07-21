@@ -107,7 +107,7 @@ User.findAll = function (result) {
   });
 };
 
-User.findById = function (user_id, result) {
+User.findById = async function (user_id, result) {
   db.query(
     `SELECT u.Id,
             u.Email,
@@ -137,9 +137,10 @@ User.findById = function (user_id, result) {
   );
 };
 
-User.findByEmail = async function (userName) {
+User.findByEmail = async function (email) {
+  console.log(email);
   const query = `SELECT * from users WHERE Email = ?`;
-  const values = [userName];
+  const values = [email];
   const user = await executeQuery(query, values);
   return user[0];
 };

@@ -5,6 +5,9 @@ const utils = require("../helpers/utils");
 const environments = require("../environments/environment");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+const { match } = require("assert");
+const { use } = require("../routes");
 
 exports.login = async function (req, res) {
   console.log("jkfhguysdhfgbdf");
@@ -12,34 +15,58 @@ exports.login = async function (req, res) {
   const user = await User.findByEmail(email);
   // console.log(user);
   if (user) {
-    bcrypt.compare(password, user.Password, (error, isMatch) => {
-      if (error) {
-        console.log(error);
-        return res.status(400).send({ error: true, message: error });
-      }
-      // console.log(isMatch);
-      if (isMatch) {
-        User.login(email, user.Id, function (err, token) {
-          if (err) {
-            console.log(err);
-            if (err?.errorCode) {
-              return res.status(400).send({
-                error: true,
-                message: err?.message,
-                errorCode: err?.errorCode,
-              });
-            }
-            return res.status(400).send({ error: true, message: err });
-          } else {
-            return res.json(token);
+    const encryptedPassword = Encrypt(password, email.substring(0, 3));
+    const isMatch = encryptedPassword === user.Password;
+    console.log(isMatch);
+    if (isMatch) {
+      User.login(email, user.Id, function (err, token) {
+        if (err) {
+          console.log(err);
+          if (err?.errorCode) {
+            return res.status(400).send({
+              error: true,
+              message: err?.message,
+              errorCode: err?.errorCode,
+            });
           }
-        });
-      } else {
-        return res
-          .status(400)
-          .send({ error: true, message: "Password not matched!" });
-      }
-    });
+          return res.status(400).send({ error: true, message: err });
+        } else {
+          return res.json(token);
+        }
+      });
+    } else {
+      return res
+        .status(400)
+        .send({ error: true, message: "Password not matched!" });
+    }
+    // bcrypt.compare(password, user.Password, (error, isMatch) => {
+    //   if (error) {
+    //     console.log(error);
+    //     return res.status(400).send({ error: true, message: error });
+    //   }
+    //   console.log(isMatch);
+    //   if (isMatch) {
+    //     User.login(email, user.Id, function (err, token) {
+    //       if (err) {
+    //         console.log(err);
+    //         if (err?.errorCode) {
+    //           return res.status(400).send({
+    //             error: true,
+    //             message: err?.message,
+    //             errorCode: err?.errorCode,
+    //           });
+    //         }
+    //         return res.status(400).send({ error: true, message: err });
+    //       } else {
+    //         return res.json(token);
+    //       }
+    //     });
+    //   } else {
+    //     return res
+    //       .status(400)
+    //       .send({ error: true, message: "Password not matched!" });
+    //   }
+    // });
   } else {
     return res.status(400).send({ error: true, message: "User not found" });
   }
@@ -51,17 +78,29 @@ exports.create = async function (req, res) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const user = new User({ ...req.body });
-    const encryptedPassword = await bcrypt.hash(user.Password, 10);
-    user.Password = encryptedPassword;
-    User.create(user, async function (err, user) {
-      if (err) return utils.send500(res, err);
-      await utils.registrationMail({ ...req.body }, user);
-      return res.json({
-        error: false,
-        message: "Data saved successfully",
-        data: user,
+    const oldUser = await User.findByEmail(user.Email);
+    if (!oldUser) {
+      // const encryptedPassword = await bcrypt.hash(user.Password, 10);
+      const encryptedPassword = Encrypt(
+        user.Password,
+        user.Email.substring(0, 3)
+      );
+      user.Password = encryptedPassword;
+      User.create(user, async function (err, user) {
+        if (err) return utils.send500(res, err);
+        await utils.registrationMail({ ...req.body }, user);
+        return res.json({
+          error: false,
+          message: "Data saved successfully",
+          data: user,
+        });
       });
-    });
+    } else {
+      return res.status(400).send({
+        error: true,
+        message: "User already exist, please try with other email",
+      });
+    }
   }
 };
 
@@ -102,22 +141,53 @@ exports.update = function (req, res) {
   }
 };
 
-exports.setPassword = function (req, res) {
+exports.setPassword = async function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
-    const userId = req.body.userId;
+    const token = req.body.token;
     const newPassword = req.body.password;
-    // let jwtSecretKey = environments.JWT_SECRET_KEY;
-    // const decoded = jwt.verify(token, jwtSecretKey);
-    if (userId) {
-      User.setPassword(userId, newPassword);
-      res.json({ error: false, message: "success" });
+    let jwtSecretKey = environments.JWT_SECRET_KEY;
+    const decoded = jwt.verify(token, jwtSecretKey);
+    if (decoded) {
+      const user = await User.findById(decoded.userId);
+      if (user) {
+        const encryptedPassword = Encrypt(
+          newPassword,
+          user?.Email.substring(0, 3)
+        );
+        // const encryptedPassword = await bcrypt.hash(newPassword, 10);
+        User.setPassword(decoded.userId, encryptedPassword);
+        res.json({ error: false, message: "success" });
+      }
     } else {
       res.json({ error: true, message: "Error occurred" });
     }
   }
 };
+
+// exports.setPassword = async function (req, res) {
+//   if (Object.keys(req.body).length === 0) {
+//     res.status(400).send({ error: true, message: "Error in application" });
+//   } else {
+//     const email = req.body.email;
+//     const newPassword = req.body.password;
+//     const encryptedPassword = await bcrypt.hash(newPassword, 10);
+//     console.log(email, newPassword, encryptedPassword);
+//     // newPassword = encryptedPassword;
+//     // let jwtSecretKey = environments.JWT_SECRET_KEY;
+//     // const decoded = jwt.verify(token, jwtSecretKey);
+//     if (email) {
+//       User.setPassword(email, encryptedPassword);
+//       res.json({
+//         error: false,
+//         message: "password update successfully, please login",
+//       });
+//     } else {
+//       res.json({ error: true, message: "Error occurred" });
+//     }
+//   }
+// };
 
 exports.forgotPassword = async function (req, res) {
   if (Object.keys(req.body).length === 0) {
@@ -128,7 +198,10 @@ exports.forgotPassword = async function (req, res) {
     if (user) {
       const data = await utils.forgotPasswordMail(user);
       if (data.messageId) {
-        return res.json({ error: false, message: "success" });
+        return res.json({
+          error: false,
+          message: "please check your mail for reset password",
+        });
       } else {
         return res.json({ error: "error", message: data.error });
       }
@@ -203,3 +276,51 @@ exports.search = async function (req, res) {
   const data = await User.search(req.query);
   return res.send(data);
 };
+
+function Encrypt(strToEncrypt, Keypart) {
+  const encryptionKey = environments.EncryptionKey + Keypart; // Assuming you have set EncryptionKey as an environment variable
+
+  try {
+    const clearBytes = Buffer.from(strToEncrypt, "utf16le");
+    const salt = Buffer.from([
+      0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65,
+      0x76,
+    ]);
+
+    const key = crypto.pbkdf2Sync(encryptionKey, salt, 10000, 32, "sha1");
+    const iv = crypto.pbkdf2Sync(encryptionKey, salt, 10000, 16, "sha1");
+
+    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+    let encrypted = cipher.update(clearBytes, "utf8", "base64");
+    encrypted += cipher.final("base64");
+
+    return encrypted;
+  } catch (ex) {
+    return "-99";
+  }
+}
+
+function Decrypt(strToDecrypt, Keypart) {
+  const encryptionKey = environments.EncryptionKey + Keypart; // Assuming you have set EncryptionKey as an environment variable
+
+  try {
+    strToDecrypt = strToDecrypt.replace(/\s/g, "+"); // Replace spaces with '+' in the input string
+    const cipherBytes = Buffer.from(strToDecrypt, "base64");
+
+    const salt = Buffer.from([
+      0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65,
+      0x76,
+    ]);
+
+    const key = crypto.pbkdf2Sync(encryptionKey, salt, 10000, 32, "sha1");
+    const iv = crypto.pbkdf2Sync(encryptionKey, salt, 10000, 16, "sha1");
+
+    const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+    let decrypted = decipher.update(cipherBytes, "binary", "utf8");
+    decrypted += decipher.final("utf8");
+
+    return decrypted;
+  } catch (ex) {
+    return "-99";
+  }
+}

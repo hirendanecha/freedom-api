@@ -10,9 +10,10 @@ const environment = {
   SMTP_USER: process.env.SMTP_USER,
   SMTP_PASS: process.env.SMTP_PASS,
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
-  JWT_EXPIRED: process.env.JWT_EXPIRED,
+  JWT_EXPIRED: 60 * 60,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   X_CMC_PRO_API_KEY: process.env.X_CMC_PRO_API_KEY,
+  EncryptionKey: process.env.EncryptionKey,
 };
 
 module.exports = environment;
