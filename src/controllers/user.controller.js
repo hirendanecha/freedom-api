@@ -6,16 +6,15 @@ const environments = require("../environments/environment");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const { match } = require("assert");
-const { use } = require("../routes");
+const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 
 exports.login = async function (req, res) {
   console.log("jkfhguysdhfgbdf");
   const { email, password } = req.body;
-  const user = await User.findByEmail(email);
+  const user = await User.findByUsernameAndEmail(email);
   // console.log(user);
   if (user) {
-    const encryptedPassword = Encrypt(password, email.substring(0, 3));
+    const encryptedPassword = Encrypt(password);
     const isMatch = encryptedPassword === user.Password;
     console.log(isMatch);
     if (isMatch) {
@@ -37,7 +36,7 @@ exports.login = async function (req, res) {
     } else {
       return res
         .status(400)
-        .send({ error: true, message: "Password not matched!" });
+        .send({ error: true, message: "Password is incorrect" });
     }
     // bcrypt.compare(password, user.Password, (error, isMatch) => {
     //   if (error) {
@@ -79,35 +78,44 @@ exports.create = async function (req, res) {
   } else {
     const user = new User({ ...req.body });
     const oldUser = await User.findByEmail(user.Email);
-    if (!oldUser) {
-      // const encryptedPassword = await bcrypt.hash(user.Password, 10);
-      const encryptedPassword = Encrypt(
-        user.Password,
-        user.Email.substring(0, 3)
-      );
-      user.Password = encryptedPassword;
-      User.create(user, async function (err, user) {
-        if (err) return utils.send500(res, err);
-        await utils.registrationMail({ ...req.body }, user);
-        return res.json({
-          error: false,
-          message: "Data saved successfully",
-          data: user,
+    const oldUserName = await User.findByUsername(user.Username);
+    console.log(oldUserName);
+    if (!oldUserName) {
+      if (!oldUser) {
+        // const encryptedPassword = await bcrypt.hash(user.Password, 10);
+        const encryptedPassword = Encrypt(user.Password);
+        user.Password = encryptedPassword;
+        User.create(user, async function (err, user) {
+          if (err) return utils.send500(res, err);
+          await utils.registrationMail({ ...req.body }, user);
+          return res.json({
+            error: false,
+            message: "Data saved successfully",
+            data: user,
+          });
         });
-      });
+      } else {
+        return res.status(400).send({
+          error: true,
+          message: "End user already exist, please enter a different email",
+        });
+      }
     } else {
       return res.status(400).send({
         error: true,
-        message: "User already exist, please try with other email",
+        message: "End user already exist, please enter a different username",
       });
     }
   }
 };
 
-exports.findAll = function (req, res) {
-  User.findAll(function (err, user) {
+exports.findAll = async function (req, res) {
+  const { page, size } = req.query;
+  const { limit, offset } = getPagination(page, size);
+  const count = await getCount("users");
+  User.findAll(limit, offset, function (err, users) {
     if (err) return utils.send500(res, err);
-    res.send(user);
+    res.send(getPaginationData({ count, docs: users }, page, limit));
   });
 };
 
@@ -162,10 +170,7 @@ exports.setPassword = async function (req, res) {
       const user = await User.findById(decoded.userId, res);
       console.log("user=>", user);
       if (user) {
-        const encryptedPassword = Encrypt(
-          newPassword,
-          user[0]?.Email.substring(0, 3)
-        );
+        const encryptedPassword = Encrypt(newPassword);
         // const encryptedPassword = await bcrypt.hash(newPassword, 10);
         User.setPassword(decoded.userId, encryptedPassword);
         res.json({ error: false, message: "success" });
@@ -219,11 +224,71 @@ exports.forgotPassword = async function (req, res) {
   }
 };
 
+exports.changeActiveStatus = function (req, res) {
+  console.log(req.params.id, req.query.IsActive);
+  User.changeStatus(req.params.id, req.query.IsActive, function (err, result) {
+    if (err) {
+      return utils.send500(res, err);
+    } else {
+      res.json({ error: false, message: "User status changed successfully" });
+    }
+  });
+};
+exports.userSuspend = function (req, res) {
+  console.log(req.params.id, req.query.IsSuspended);
+  User.suspendUser(
+    req.params.id,
+    req.query.IsSuspended,
+    function (err, result) {
+      if (err) {
+        return utils.send500(res, err);
+      } else {
+        res.json({ error: false, message: "User suspended successfully" });
+      }
+    }
+  );
+};
+
 exports.delete = function (req, res) {
   User.delete(req.params.id, function (err, result) {
     if (err) return utils.send500(res, err);
-    res.json({ error: false, message: "User deleted" });
+    res.json({ error: false, message: "User deleted successfully" });
   });
+};
+
+exports.adminLogin = async function (req, res) {
+  console.log("jkfhguysdhfgbdf");
+  const { email, password } = req.body;
+  const user = await User.findByUsernameAndEmail(email);
+  console.log(user);
+  if (user) {
+    const encryptedPassword = Encrypt(password);
+    const isMatch = encryptedPassword === user.Password;
+    console.log(isMatch);
+    if (isMatch) {
+      User.adminLogin(email, function (err, token) {
+        if (err) {
+          console.log(err);
+          if (err?.errorCode) {
+            return res.status(400).send({
+              error: true,
+              message: err?.message,
+              errorCode: err?.errorCode,
+            });
+          }
+          return res.status(400).send({ error: true, message: err });
+        } else {
+          return res.json(token);
+        }
+      });
+    } else {
+      return res
+        .status(400)
+        .send({ error: true, message: "Password is incorrect" });
+    }
+  } else {
+    return res.status(400).send({ error: true, message: "User not found" });
+  }
 };
 
 // ------------------- Zip Data ------------------
@@ -287,8 +352,8 @@ exports.search = async function (req, res) {
   return res.send(data);
 };
 
-function Encrypt(strToEncrypt, Keypart) {
-  const encryptionKey = environments.EncryptionKey + Keypart; // Assuming you have set EncryptionKey as an environment variable
+function Encrypt(strToEncrypt) {
+  const encryptionKey = environments.EncryptionKey; // Assuming you have set EncryptionKey as an environment variable
 
   try {
     const clearBytes = Buffer.from(strToEncrypt, "utf16le");
@@ -310,8 +375,8 @@ function Encrypt(strToEncrypt, Keypart) {
   }
 }
 
-function Decrypt(strToDecrypt, Keypart) {
-  const encryptionKey = environments.EncryptionKey + Keypart; // Assuming you have set EncryptionKey as an environment variable
+function Decrypt(strToDecrypt) {
+  const encryptionKey = environments.EncryptionKey; // Assuming you have set EncryptionKey as an environment variable
 
   try {
     strToDecrypt = strToDecrypt.replace(/\s/g, "+"); // Replace spaces with '+' in the input string

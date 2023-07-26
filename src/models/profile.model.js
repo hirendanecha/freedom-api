@@ -23,6 +23,7 @@ var Profile = function (profile) {
   this.ProfilePicName = profile.ProfilePicName;
   this.IsActivated = profile.IsActive;
   this.CreatedOn = new Date();
+  this.AccountType = 'I'
 };
 
 Profile.create = function (profileData, result) {
