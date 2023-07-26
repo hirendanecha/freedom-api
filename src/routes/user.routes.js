@@ -3,7 +3,11 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 const profileController = require("./../controllers/profile.controller");
 
+router.get("/", userController.findAll);
+router.get("/change-status/:id", userController.changeActiveStatus);
+router.get("/suspend-user/:id", userController.userSuspend);
 router.post("/", userController.login);
+router.post("/login", userController.adminLogin);
 router.post("/register", userController.create);
 router.post("/profile", profileController.create);
 router.post("/forgot-password", userController.forgotPassword);

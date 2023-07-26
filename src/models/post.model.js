@@ -6,9 +6,9 @@ const { executeQuery } = require("../helpers/utils");
 var Post = function (post) {
   this.postdescription = post.postdescription;
   this.imageUrl = post.imageUrl;
-  this.posttype = post.posttype || 'S';
+  this.posttype = post.posttype || "S";
   this.profileid = post.profileid;
-  this.isdeleted = 'N';
+  this.isdeleted = "N";
   this.postcreationdate = new Date();
 };
 

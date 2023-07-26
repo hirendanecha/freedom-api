@@ -38,9 +38,10 @@ User.login = function (email, Id, result) {
             Country,
             City,
             State,
-            Zip
-     FROM users WHERE Email = ? AND Id = ?`,
-    [email, Id],
+            Zip,
+            AccountType
+     FROM users WHERE Email = ? OR Username = ? AND Id = ?`,
+    [email, email, Id],
     async function (err, res) {
       if (err) {
         console.log("error login", err);
@@ -95,16 +96,36 @@ User.create = function (userData, result) {
   });
 };
 
-User.findAll = function (result) {
-  db.query("SELECT * from users order by Email", function (err, res) {
-    if (err) {
-      console.log("error", err);
-      result(err, null);
-    } else {
-      console.log("user: ", res);
-      result(null, res);
+User.findAll = function (limit, offset, result) {
+  db.query(
+    `SELECT 
+          Id,
+          Email,
+          Username,
+          IsActive,
+          DateCreation,
+          IsAdmin,
+          FirstName,
+          LastName,
+          Address,
+          Country,
+          City,
+          State,
+          Zip,
+          AccountType,
+          IsSuspended
+   from users where AccountType= 'user' order by DateCreation desc limit ? offset ? `,
+    [limit, offset],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        // console.log("user: ", res);
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 User.findById = async function (user_id) {
@@ -138,7 +159,6 @@ User.findById = async function (user_id) {
 
   const query = `SELECT u.Id,
   u.Email,
-  u.Username,
   u.IsActive,
   u.DateCreation,
   u.IsAdmin,
@@ -149,6 +169,9 @@ User.findById = async function (user_id) {
   u.City,
   u.State,
   u.Zip,
+  u.Username,
+  u.AccountType,
+  u.IsSuspended,
   p.ID as profileId
 FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Id = ? `;
   const values = [user_id];
@@ -156,10 +179,25 @@ FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Id = ? `;
   return user;
 };
 
+User.findByUsernameAndEmail = async function (email) {
+  const query = `SELECT * from users WHERE Email = ? or Username = ?`;
+  const values = [email, email];
+  const user = await executeQuery(query, values);
+  console.log(user);
+  return user[0];
+};
+
 User.findByEmail = async function (email) {
   console.log(email);
-  const query = `SELECT * from users WHERE Email = ?`;
+  const query = `SELECT Username from users WHERE Email = ?`;
   const values = [email];
+  const user = await executeQuery(query, values);
+  return user[0];
+};
+
+User.findByUsername = async function (username) {
+  const query = `SELECT Username from users WHERE Username = ?`;
+  const values = [username];
   const user = await executeQuery(query, values);
   return user[0];
 };
@@ -192,6 +230,103 @@ User.delete = function (user_id, result) {
   });
 };
 
+User.changeAccountType = function (userId, result) {
+  db.query(
+    "UPDATE users SET AccountType = 'communityAdmin' WHERE Id=?",
+    [userId],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("update: ", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
+User.adminLogin = function (email, result) {
+  db.query(
+    `SELECT Id,
+            Email,
+            Username,
+            IsActive,
+            DateCreation,
+            IsAdmin,
+            FirstName,
+            LastName,
+            Address,
+            Country,
+            City,
+            State,
+            Zip,
+            AccountType
+     FROM users WHERE Email = ?`,
+    email,
+    async function (err, res) {
+      if (err) {
+        console.log("error login", err);
+        return result(err, null);
+      } else {
+        const user = res[0];
+        // console.log(user);
+
+        if (user?.IsAdmin === "N") {
+          return result(
+            {
+              message: "Invalid Email and Password. Kindly try again !!!!",
+              errorCode: "bad_credentials",
+            },
+            null
+          );
+        } else {
+          console.log("Login Data");
+          console.log(user);
+          const token = await generateJwtToken(res[0]);
+          return result(null, {
+            userId: user.Id,
+            user: user,
+            accessToken: token,
+          });
+        }
+      }
+    }
+  );
+};
+
+User.changeStatus = function (userId, status, result) {
+  db.query(
+    "UPDATE users SET IsActive = ? WHERE Id= ?",
+    [status, userId],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("update: ", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
+User.suspendUser = function (userId, status, result) {
+  db.query(
+    "UPDATE users SET IsSuspended = ? WHERE Id= ?",
+    [status, userId],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("update: ", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
 // ------------------- Zip Data ------------------
 
 User.getZipData = function (zip, country, result) {
@@ -211,8 +346,8 @@ User.getZipData = function (zip, country, result) {
         response.country_code = el.country_code;
         response.state = el.state;
         response.city = el.city;
-        response.places =
-          (response.places ? response.places + "," : "") + el.place;
+        // response.places =
+        //   (response.places ? response.places + "," : "") + el.place;
         response.country = el.country;
         return response;
       });
