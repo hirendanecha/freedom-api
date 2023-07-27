@@ -13,14 +13,31 @@ var Community = function (community) {
   this.creationDate = new Date();
 };
 
-Community.findAll = function (result) {
-  db.query("select * from community where isApprove='Y'", function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res);
+Community.findApproveCommunity = function (limit, offset, result) {
+  db.query(
+    "select * from community where isApprove='Y' order by creationDate desc limit ? offset ?",
+    [limit, offset],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
+};
+Community.findUnApproveCommunity = function (limit, offset, result) {
+  db.query(
+    "select * from community where isApprove='N' order by creationDate desc limit ? offset ?",
+    [limit, offset],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
 };
 
 Community.create = function (communityData, result) {
@@ -33,10 +50,10 @@ Community.create = function (communityData, result) {
   });
 };
 
-Community.approveCommunity = function (communityId, result) {
+Community.approveCommunity = function (communityId, IsApprove, result) {
   db.query(
-    "UPDATE community SET isApprove='Y' where Id=?",
-    communityId,
+    "UPDATE community SET isApprove=? where Id=?",
+    [IsApprove, communityId],
     function (err, res) {
       if (err) {
         result(err, null);
@@ -45,5 +62,23 @@ Community.approveCommunity = function (communityId, result) {
       }
     }
   );
+};
+
+Community.deleteCommunity = function (id, result) {
+  db.query("delete from community where Id=?", id, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
+Community.findCommunityById = async function (id, result) {
+  const query =
+    "select c.*,u.Username,u.Email from community as c left join users as u on u.Id = c.userId where c.Id=?";
+  const values = [id];
+  const community = await executeQuery(query, values);
+  return community;
 };
 module.exports = Community;

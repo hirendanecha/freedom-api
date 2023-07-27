@@ -291,6 +291,24 @@ exports.adminLogin = async function (req, res) {
   }
 };
 
+exports.changeAccountType = function (req, res) {
+  if (req.params.id) {
+    const userId = req.params.id;
+    User.changeAccountType(userId, req.query.type, function (err, result) {
+      if (err) {
+        return utils.send500(res, err);
+      } else {
+        res.send({
+          error: false,
+          message: "Account type change successfully",
+        });
+      }
+    });
+  } else {
+    res.status(400).send({ error: true, message: "Error in application" });
+  }
+};
+
 // ------------------- Zip Data ------------------
 
 exports.getZipData = function (req, res) {
@@ -348,8 +366,11 @@ exports.resendVerification = function (req, res) {
 };
 
 exports.search = async function (req, res) {
-  const data = await User.search(req.query);
-  return res.send(data);
+  const { page, size, searchText } = req.query;
+  const { limit, offset } = getPagination(page, size);
+  const count = await getCount("users");
+  const data = await User.search(searchText, limit, offset);
+  return res.send(getPaginationData({ count, docs: data }, page, limit));
 };
 
 function Encrypt(strToEncrypt) {

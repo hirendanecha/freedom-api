@@ -114,7 +114,7 @@ User.findAll = function (limit, offset, result) {
           Zip,
           AccountType,
           IsSuspended
-   from users where AccountType= 'user' order by DateCreation desc limit ? offset ? `,
+   from users where IsAdmin != 'Y' order by DateCreation desc limit ? offset ? `,
     [limit, offset],
     function (err, res) {
       if (err) {
@@ -230,10 +230,10 @@ User.delete = function (user_id, result) {
   });
 };
 
-User.changeAccountType = function (userId, result) {
+User.changeAccountType = function (userId, type, result) {
   db.query(
-    "UPDATE users SET AccountType = 'communityAdmin' WHERE Id=?",
-    [userId],
+    "UPDATE users SET AccountType = ? WHERE Id=?",
+    [type, userId],
     function (err, res) {
       if (err) {
         console.log("error", err);
@@ -414,22 +414,22 @@ User.resendVerification = async function (email, result) {
   }
 };
 
-User.search = async function (query) {
-  const { type, searchField, searchText } = query;
-  if (type) {
-    if (searchField && searchText) {
-      const query = `select *  from ${type}  WHERE ${searchField} LIKE ?`;
-      const values = [`%${searchText}%`];
-      const searchData = await executeQuery(query, values);
-      return searchData;
-    } else {
-      const query = `select *  from ${type}`;
-      const searchData = await executeQuery(query);
-      return searchData;
-    }
+User.search = async function (searchText, limit, offset) {
+  // const { searchText } = query;
+  if (searchText) {
+    const query = `select * from users WHERE Email LIKE ? limit ? offset ?`;
+    const values = [`%${searchText}%`, limit, offset];
+    const searchData = await executeQuery(query, values);
+    return searchData;
   } else {
+    // const query = `select *  from ${type}`;
+    // const searchData = await executeQuery(query);
+    // return searchData;
     return { error: "error" };
   }
+  // } else {
+  //   return { error: "error" };
+  // }
 };
 
 User.setPassword = async function (user_id, password) {
