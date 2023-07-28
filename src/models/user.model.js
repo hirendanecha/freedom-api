@@ -425,7 +425,7 @@ User.search = async function (searchText, limit, offset) {
     // const query = `select *  from ${type}`;
     // const searchData = await executeQuery(query);
     // return searchData;
-    return { error: "error" };
+    return { error: "data not found" };
   }
   // } else {
   //   return { error: "error" };

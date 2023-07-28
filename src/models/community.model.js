@@ -50,14 +50,16 @@ Community.create = function (communityData, result) {
   });
 };
 
-Community.approveCommunity = function (communityId, IsApprove, result) {
+Community.approveCommunity = function (communityId, isApprove, result) {
   db.query(
     "UPDATE community SET isApprove=? where Id=?",
-    [IsApprove, communityId],
+    [isApprove, communityId],
     function (err, res) {
       if (err) {
+        console.log(err);
         result(err, null);
       } else {
+        console.log(res);
         result(null, res);
       }
     }
@@ -80,5 +82,33 @@ Community.findCommunityById = async function (id, result) {
   const values = [id];
   const community = await executeQuery(query, values);
   return community;
+};
+
+Community.search = async function (searchText, limit, offset) {
+  // const { searchText } = query;
+  if (searchText) {
+    const query = `select * from community WHERE Email LIKE ? limit ? offset ?`;
+    const values = [`%${searchText}%`, limit, offset];
+    const searchData = await executeQuery(query, values);
+    return searchData;
+  } else {
+    // const query = `select *  from ${type}`;
+    // const searchData = await executeQuery(query);
+    // return searchData;
+    return { error: "data not found" };
+  }
+  // } else {
+  //   return { error: "error" };
+  // }
+};
+
+Community.createCommunityAdmin = async function (data, result) {
+  db.query("insert into communityMembers set ?", data, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res.insertId);
+    }
+  });
 };
 module.exports = Community;

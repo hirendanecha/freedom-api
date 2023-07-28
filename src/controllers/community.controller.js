@@ -35,6 +35,7 @@ exports.createCommunity = function (req, res) {
         return res.json({
           error: false,
           message: "community created",
+          data: community,
         });
       }
     });
@@ -49,8 +50,9 @@ exports.approveCommunity = function (req, res) {
     req.query.IsApprove,
     function (err, result) {
       if (err) {
-        return utils.send500(res, err);
+        return utils.send500(err, res);
       } else {
+        console.log(result);
         res.json({
           error: false,
           message: "Community approve successfully",
@@ -102,4 +104,26 @@ exports.findCommunityById = async function (req, res) {
       });
     }
   }
+};
+
+exports.search = async function (req, res) {
+  const { page, size, searchText } = req.query;
+  const { limit, offset } = getPagination(page, size);
+  const count = await getCount("users");
+  const data = await Community.search(searchText, limit, offset);
+  return res.send(getPaginationData({ count, docs: data }, page, limit));
+};
+
+exports.createCommunityAdmin = function (req, res) {
+  const data = { ...req.body };
+  Community.createCommunityAdmin(data, function (err, result) {
+    if (err) {
+      return utils.send500(err, res);
+    } else {
+      return res.json({
+        error: false,
+        data: result,
+      });
+    }
+  });
 };
