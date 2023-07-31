@@ -118,7 +118,7 @@ exports.createCommunityAdmin = function (req, res) {
   const data = { ...req.body };
   Community.createCommunityAdmin(data, function (err, result) {
     if (err) {
-      return utils.send500(err, res);
+      return utils.send500(res, err);
     } else {
       return res.json({
         error: false,
