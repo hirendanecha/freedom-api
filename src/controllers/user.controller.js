@@ -119,6 +119,18 @@ exports.findAll = async function (req, res) {
   });
 };
 
+exports.getAll = async function (req, res) {
+  // User.getAll(function (err, users) {
+  //   if (err) return utils.send500(res, err);
+  //   res.send(users);
+  // });
+  const Users = await User.getAll();
+  res.send({
+    error: false,
+    data: Users,
+  });
+};
+
 exports.getUserList = function (req, res) {
   User.getUserList(req.params.id, function (err, user) {
     if (err) return utils.send500(res, err);

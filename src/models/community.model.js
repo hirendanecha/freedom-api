@@ -15,7 +15,7 @@ var Community = function (community) {
 
 Community.findApproveCommunity = function (limit, offset, result) {
   db.query(
-    "select * from community where isApprove='Y' order by creationDate desc limit ? offset ?",
+    "select c.*,count(cm.Id) as members from community as c left join communityMembers as cm on c.Id = c.Id where c.isApprove='Y' GROUP BY c.Id order by c.creationDate desc limit ? offset ?",
     [limit, offset],
     function (err, res) {
       if (err) {
@@ -26,6 +26,7 @@ Community.findApproveCommunity = function (limit, offset, result) {
     }
   );
 };
+
 Community.findUnApproveCommunity = function (limit, offset, result) {
   db.query(
     "select * from community where isApprove='N' order by creationDate desc limit ? offset ?",
@@ -78,7 +79,7 @@ Community.deleteCommunity = function (id, result) {
 
 Community.findCommunityById = async function (id, result) {
   const query =
-    "select c.*,u.Username,u.Email from community as c left join users as u on u.Id = c.userId where c.Id=?";
+    "select c.*,u.Username,u.Email,count(cm.userId) as members from community as c left join users as u on u.Id = c.userId left join communityMembers as cm on cm.communityId = c.Id where c.Id=?";
   const values = [id];
   const community = await executeQuery(query, values);
   return community;
@@ -87,7 +88,7 @@ Community.findCommunityById = async function (id, result) {
 Community.search = async function (searchText, limit, offset) {
   // const { searchText } = query;
   if (searchText) {
-    const query = `select * from community WHERE Email LIKE ? limit ? offset ?`;
+    const query = `select * from community WHERE CommunityName LIKE ? limit ? offset ?`;
     const values = [`%${searchText}%`, limit, offset];
     const searchData = await executeQuery(query, values);
     return searchData;
@@ -103,6 +104,7 @@ Community.search = async function (searchText, limit, offset) {
 };
 
 Community.createCommunityAdmin = async function (data, result) {
+  console.log(data);
   db.query("insert into communityMembers set ?", data, function (err, res) {
     if (err) {
       result(err, null);

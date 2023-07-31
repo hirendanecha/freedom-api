@@ -60,6 +60,16 @@ User.login = function (email, Id, result) {
             null
           );
         }
+        if (user.IsSuspended === "N") {
+          return result(
+            {
+              message:
+                "This user has been suspended by admin",
+              errorCode: "not_verified",
+            },
+            null
+          );
+        }
 
         if (!user) {
           return result(
@@ -325,6 +335,18 @@ User.suspendUser = function (userId, status, result) {
       }
     }
   );
+};
+
+User.getAll = async function () {
+  const query = `SELECT 
+          Id,
+          Username,
+          Email
+   from users where IsActive='Y' AND IsAdmin != 'Y' AND IsSuspended !='Y' order by DateCreation limit 150`;
+  const values = [];
+  const user = await executeQuery(query, values);
+  console.log("users===>", user);
+  return user;
 };
 
 // ------------------- Zip Data ------------------
