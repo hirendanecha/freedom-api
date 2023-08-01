@@ -131,9 +131,9 @@ exports.uploadPostImage = function (req, res) {
     if (!fs.existsSync(new_dir)) {
       fs.mkdirSync(new_dir, { recursive: true });
     } else {
-      let files = fs.readdirSync(new_dir);
-      const oldImage = new_dir + "/" + files[0];
-      fs.unlinkSync(oldImage);
+      // let files = fs.readdirSync(new_dir);
+      // const oldImage = new_dir + "/" + files[0];
+      // fs.unlinkSync(oldImage);
     }
 
     var newpath = new_dir + "/" + index + "." + extn;

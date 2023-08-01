@@ -3,6 +3,7 @@ const User = require("../models/user.model");
 const utils = require("../helpers/utils");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 
+// Admin Api //
 exports.findApproveCommunity = async function (req, res) {
   const { page, size } = req.query;
   const { limit, offset } = getPagination(page, size);
@@ -126,4 +127,20 @@ exports.createCommunityAdmin = function (req, res) {
       });
     }
   });
+};
+
+// Client Api //
+
+exports.getCommunity = async function (req, res) {
+  const userId = req.query.id;
+  console.log(userId);
+  const communityList = await Community.getCommunity(userId);
+  if (!communityList) {
+    return utils.send500(err, res);
+  } else {
+    res.send({
+      error: false,
+      data: communityList,
+    });
+  }
 };

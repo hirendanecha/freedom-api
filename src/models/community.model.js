@@ -15,7 +15,7 @@ var Community = function (community) {
 
 Community.findApproveCommunity = function (limit, offset, result) {
   db.query(
-    "select c.*,count(cm.Id) as members from community as c left join communityMembers as cm on c.Id = c.Id where c.isApprove='Y' GROUP BY c.Id order by c.creationDate desc limit ? offset ?",
+    "select c.*,count(cm.userId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='Y' GROUP BY c.Id order by c.creationDate desc limit ? offset ?",
     [limit, offset],
     function (err, res) {
       if (err) {
@@ -112,5 +112,12 @@ Community.createCommunityAdmin = async function (data, result) {
       result(null, res.insertId);
     }
   });
+};
+
+Community.getCommunity = async function (id) {
+  const query =
+    "select c.*,count(cm.userId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.userId != ? group by c.Id;";
+  const communityList = await executeQuery(query, [id]);
+  return communityList;
 };
 module.exports = Community;
