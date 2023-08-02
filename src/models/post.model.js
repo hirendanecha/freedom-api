@@ -28,6 +28,23 @@ Post.findAll = function (result) {
   );
 };
 
+Post.getPostById = function (profileId, result) {
+  db.query(
+    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? order by p.postcreationdate DESC limit 15;",
+    profileId,
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        // console.log("post: ", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
 Post.create = function (postData, result) {
   db.query("INSERT INTO posts set ?", postData, function (err, res) {
     if (err) {

@@ -9,6 +9,14 @@ exports.findAll = function (req, res) {
   });
 };
 
+exports.getPostById = function (req, res) {
+  console.log(req.params.id);
+  Post.getPostById(req.params.id, function (err, post) {
+    if (err) return utils.send500(res, err);
+    res.send(post);
+  });
+};
+
 exports.createPost = function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });

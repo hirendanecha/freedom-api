@@ -120,4 +120,8 @@ Community.getCommunity = async function (id) {
   const communityList = await executeQuery(query, [id]);
   return communityList;
 };
+
+// Community.getCommunityByUserId = async function (id) {
+//   const query = "select c.*,count(cm.userId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.userId = ? group by c.Id;"
+// }
 module.exports = Community;

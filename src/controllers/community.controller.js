@@ -70,7 +70,7 @@ exports.changeAccountType = function (req, res) {
       if (err) {
         return utils.send500(res, err);
       } else {
-        return res.json({
+        return res.send({
           error: false,
           message: "Account type change successfully",
         });
