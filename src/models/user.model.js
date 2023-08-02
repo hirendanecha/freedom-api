@@ -26,21 +26,22 @@ var User = function (user) {
 User.login = function (email, Id, result) {
   console.log("email = " + email);
   db.query(
-    `SELECT Id,
-            Email,
-            Username,
-            IsActive,
-            DateCreation,
-            IsAdmin,
-            FirstName,
-            LastName,
-            Address,
-            Country,
-            City,
-            State,
-            Zip,
-            AccountType
-     FROM users WHERE Email = ? OR Username = ? AND Id = ?`,
+    `SELECT u.Id,
+            u.Email,
+            u.Username,
+            u.IsActive,
+            u.DateCreation,
+            u.IsAdmin,
+            u.FirstName,
+            u.LastName,
+            u.Address,
+            u.Country,
+            u.City,
+            u.State,
+            u.Zip,
+            u.AccountType,
+            p.ID as profileId
+     FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
     [email, email, Id],
     async function (err, res) {
       if (err) {
