@@ -144,3 +144,17 @@ exports.getCommunity = async function (req, res) {
     });
   }
 };
+
+exports.getCommunityByUserId = async function (req, res) {
+  const userId = req.params.id;
+  console.log(userId);
+  const communityList = await Community.getCommunityByUserId(userId);
+  if (!communityList) {
+    return utils.send500(err, res);
+  } else {
+    res.send({
+      error: false,
+      data: communityList,
+    });
+  }
+};

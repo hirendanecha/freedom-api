@@ -1,9 +1,12 @@
 const Post = require("../models/post.model");
 const utils = require("../helpers/utils");
 const og = require("open-graph");
+const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 
 exports.findAll = function (req, res) {
-  Post.findAll(function (err, post) {
+  const { page, size } = req.query;
+  const { limit, offset } = getPagination(page, size);
+  Post.findAll(limit, offset, function (err, post) {
     if (err) return utils.send500(res, err);
     res.send(post);
   });

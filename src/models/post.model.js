@@ -12,10 +12,10 @@ var Post = function (post) {
   this.postcreationdate = new Date();
 };
 
-Post.findAll = function (result) {
+Post.findAll = function (limit, offset, result) {
   db.query(
-    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' order by p.postcreationdate DESC limit 15;",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' order by p.postcreationdate DESC limit ? offset ?",
+    [limit, offset],
     function (err, res) {
       if (err) {
         console.log("error", err);
