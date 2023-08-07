@@ -78,10 +78,17 @@ Community.deleteCommunity = function (id, result) {
 };
 
 Community.findCommunityById = async function (id, result) {
-  const query =
-    "select c.*,u.Username,u.Email,count(cm.userId) as members from community as c left join users as u on u.Id = c.userId left join communityMembers as cm on cm.communityId = c.Id where c.Id=?";
+  const query1 =
+    "select c.*,u.Username,u.Email,count(cm.userId) as members from community as c left join users as u on u.Id = c.userId left join communityMembers as cm on cm.communityId = c.Id where c.Id=?;";
+  const query2 =
+    "select cm.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName from communityMembers as cm left join profile as p on p.UserID = cm.userId where cm.communityId = ?;";
   const values = [id];
-  const community = await executeQuery(query, values);
+  const community = await executeQuery(query1, values);
+  const members = await executeQuery(query2, values);
+  community.map((e) => {
+    e.memberList = members;
+    return e;
+  });
   return community;
 };
 
