@@ -12,14 +12,14 @@ var originsWhitelist = [
   "https://dev.freedom.opash.in/",
   "https://www.dev.freedom.opash.in/",
   "http://localhost:4200/",
-  "*"
+  "*",
 ];
 var corsOptions = {
   // origin: function (origin, callback) {
   //   var isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
   //   callback(null, isWhitelisted);
   // },
-  origin: "*",
+  origin: originsWhitelist,
   credentials: true,
   methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH", "OPTIONS"],
 };
