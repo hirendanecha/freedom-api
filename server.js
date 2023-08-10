@@ -45,7 +45,7 @@ app.use(morgan("tiny"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.options("*", cors(corsOptions));
+// app.options("*", cors(corsOptions));
 
 // All routes for the APIs //
 
