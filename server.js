@@ -12,6 +12,7 @@ var originsWhitelist = [
   "https://dev.freedom.opash.in/",
   "https://www.dev.freedom.opash.in/",
   "http://localhost:4200/",
+  "*"
 ];
 var corsOptions = {
   origin: function (origin, callback) {
