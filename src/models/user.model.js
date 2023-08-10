@@ -40,8 +40,9 @@ User.login = function (email, Id, result) {
             u.State,
             u.Zip,
             u.AccountType,
-            p.ID as profileId
-     FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
+            p.ID as profileId,
+            cm.communityId
+     FROM users as u left join profile as p on p.UserID = u.Id left join communityMembers as cm on cm.profileId = p.ID WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
     [email, email, Id],
     async function (err, res) {
       if (err) {
@@ -64,8 +65,7 @@ User.login = function (email, Id, result) {
         if (user.IsSuspended === "N") {
           return result(
             {
-              message:
-                "This user has been suspended by admin",
+              message: "This user has been suspended by admin",
               errorCode: "not_verified",
             },
             null

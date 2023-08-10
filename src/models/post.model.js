@@ -12,7 +12,7 @@ var Post = function (post) {
   this.postcreationdate = new Date();
 };
 
-Post.findAll = function (limit, offset, result) {
+Post.findAll = async function (limit, offset, result) {
   db.query(
     "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' order by p.postcreationdate DESC limit ? offset ?",
     [limit, offset],
@@ -52,6 +52,18 @@ Post.create = function (postData, result) {
       result(err, null);
     } else {
       result(null, res.insertId);
+    }
+  });
+};
+
+Post.delete = function (id, result) {
+  db.query("DELETE FROM posts WHERE id = ?", [id], function (err, res) {
+    if (err) {
+      console.log("error", err);
+      result(err, null);
+    } else {
+      console.log("Post deleted", res);
+      result(null, res);
     }
   });
 };
