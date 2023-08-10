@@ -11,5 +11,6 @@ router.post("/create", postController.createPost);
 router.post("/upload-post", utilsController.uploadPostImage);
 router.get("/files/:folder/:id", utilsController.getFiles);
 router.get("/:folder/:id/:filename", utilsController.readFile);
+router.delete("/:id", postController.deletePost);
 
 module.exports = router;

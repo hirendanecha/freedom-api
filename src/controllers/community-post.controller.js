@@ -1,22 +1,20 @@
-const Post = require("../models/post.model");
+const CommunityPost = require("../models/community-post.model");
 const utils = require("../helpers/utils");
 const og = require("open-graph");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
-// const socket = require("../helpers/socket.helper");
-const io = require("socket.io-client");
 
 exports.findAll = function (req, res) {
   const { page, size } = req.query;
   const { limit, offset } = getPagination(page, size);
-  Post.findAll(limit, offset, function (err, post) {
+  CommunityPost.findAll(limit, offset, function (err, post) {
     if (err) return utils.send500(res, err);
     res.send(post);
   });
 };
 
-exports.getPostById = function (req, res) {
+exports.getCommunityPostById = function (req, res) {
   console.log(req.params.id);
-  Post.getPostById(req.params.id, function (err, post) {
+  CommunityPost.getCommunityPostById(req.params.id, function (err, post) {
     if (err) return utils.send500(res, err);
     res.send(post);
   });
@@ -28,7 +26,7 @@ exports.createPost = function (req, res) {
   } else {
     const postData = new Post(req.body);
     console.log(postData);
-    Post.create(postData, function (err, post) {
+    CommunityPost.create(postData, function (err, post) {
       if (err) {
         return utils.send500(res, err);
       } else {
@@ -59,7 +57,7 @@ exports.getMeta = function (req, res) {
 
 exports.deletePost = function (req, res) {
   if (req.params.id) {
-    Post.delete(req.params.id, function (err, result) {
+    CommunityPost.delete(req.params.id, function (err, result) {
       if (err) {
         return utils.send500(res, err);
       } else {

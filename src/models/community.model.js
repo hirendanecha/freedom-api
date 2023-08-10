@@ -4,7 +4,7 @@ const environment = require("../environments/environment");
 const { executeQuery } = require("../helpers/utils");
 
 var Community = function (community) {
-  this.userId = community.userId;
+  this.profileid = community.profileid;
   this.communityName = community.CommunityName;
   this.communityDescription = community.CommunityDescription;
   this.logoImg = community.logoImg;
@@ -15,7 +15,7 @@ var Community = function (community) {
 
 Community.findApproveCommunity = function (limit, offset, result) {
   db.query(
-    "select c.*,count(cm.userId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='Y' GROUP BY c.Id order by c.creationDate desc limit ? offset ?",
+    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='Y' GROUP BY c.Id order by c.creationDate desc limit ? offset ?",
     [limit, offset],
     function (err, res) {
       if (err) {
@@ -79,9 +79,9 @@ Community.deleteCommunity = function (id, result) {
 
 Community.findCommunityById = async function (id, result) {
   const query1 =
-    "select c.*,u.Username,u.Email,count(cm.userId) as members from community as c left join users as u on u.Id = c.userId left join communityMembers as cm on cm.communityId = c.Id where c.Id=?;";
+    "select c.*,p.Username,count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.Id=?;";
   const query2 =
-    "select cm.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName from communityMembers as cm left join profile as p on p.UserID = cm.userId where cm.communityId = ?;";
+    "select cm.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName from communityMembers as cm left join profile as p on p.ID = cm.profileId where cm.communityId = ?;";
   const values = [id];
   const community = await executeQuery(query1, values);
   const members = await executeQuery(query2, values);
@@ -123,14 +123,14 @@ Community.createCommunityAdmin = async function (data, result) {
 
 Community.getCommunity = async function (id) {
   const query =
-    "select c.*,count(cm.userId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.userId != ? group by c.Id;";
+    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.profileId != ? group by c.Id;";
   const communityList = await executeQuery(query, [id]);
   return communityList;
 };
 
 Community.getCommunityByUserId = async function (id) {
   const query =
-    "select c.*,count(cm.userId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.userId =?";
+    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.profileId =?";
   const values = id;
   const communityList = await executeQuery(query, values);
   console.log(communityList);

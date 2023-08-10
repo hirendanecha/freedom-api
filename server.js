@@ -4,12 +4,9 @@ const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config();
 var indexRouter = require("./src/routes");
-
-const https = require("https"),
-  fs = require("fs"),
-  helmet = require("helmet");
-
 const app = express();
+// const https = require("https"),
+(fs = require("fs")), (helmet = require("helmet"));
 
 var originsWhitelist = [
   "https://dev.freedom.opash.in/",
@@ -70,13 +67,15 @@ try {
 
 const port = process.env.PORT || 8080;
 
-app.listen(port, "127.0.0.1", function () {
-  console.log(`Server listening on port ${port}`);
-});
+// app.listen(port, "127.0.0.1", function () {
+//   console.log(`Server listening on port ${port}`);
+// });
 
-/*const sport = process.env.PORT || 5050;
+// const sport = process.env.PORT || 5050;
 
-https.createServer(app).listen(sport, function () {
-  console.log(`Https Server listening on port ${sport}`);
-});
-*/
+// http.createServer(app).listen(sport, function () {
+//   console.log(`Https Server listening on port ${sport}`);
+//   socket.config(app);
+// });
+
+module.exports = app;
