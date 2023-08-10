@@ -38,11 +38,7 @@ app.use(cors());
 //   next();
 // });
 
-app.use(
-  helmet({
-    crossOriginEmbedderPolicy: false,
-  })
-); // Add Helmet as a middleware
+app.use(helmet()); // Add Helmet as a middleware
 
 app.use(morgan("tiny"));
 
