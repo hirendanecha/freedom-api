@@ -4,7 +4,7 @@ const environment = require("../environments/environment");
 const { executeQuery } = require("../helpers/utils");
 
 var Community = function (community) {
-  this.profileid = community.profileid;
+  this.profileId = community.profileId;
   this.communityName = community.CommunityName;
   this.communityDescription = community.CommunityDescription;
   this.logoImg = community.logoImg;
