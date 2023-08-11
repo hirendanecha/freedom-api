@@ -117,7 +117,7 @@ socket.config = (server) => {
         socket.emit("create-community-post", post);
         const data = await socketService.getCommunityPost(params);
         if (data) {
-          socket.emit("community-post", data);
+          socket.broadcast.emit("community-post", data);
         }
       }
       // socket.broadcast.emit("get-community-post", { ...params });
