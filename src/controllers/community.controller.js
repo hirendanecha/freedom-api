@@ -66,7 +66,7 @@ exports.approveCommunity = function (req, res) {
 exports.changeAccountType = function (req, res) {
   if (req.params.id) {
     const userId = req.params.id;
-    User.changeAccountType(userId, req.query.type, function (err, res) {
+    User.changeAccountType(userId, req.query.type, function (err, result) {
       if (err) {
         return utils.send500(res, err);
       } else {

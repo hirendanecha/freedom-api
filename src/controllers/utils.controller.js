@@ -21,10 +21,10 @@ exports.fileupload = function (req, res) {
     var new_dir = __upload_dir + "/" + folder + "/" + id;
     if (!fs.existsSync(new_dir)) {
       fs.mkdirSync(new_dir, { recursive: true });
-    } else {
-      let files = fs.readdirSync(new_dir);
-      const oldImage = new_dir + "/" + files[0];
-      fs.unlinkSync(oldImage);
+      // } else {
+      //   let files = fs.readdirSync(new_dir);
+      //   const oldImage = new_dir + "/" + files[0];
+      //   fs.unlinkSync(oldImage);
     }
 
     var newpath = new_dir + "/" + index + "." + extn;
@@ -40,8 +40,8 @@ exports.fileupload = function (req, res) {
       // res.write('File uploaded and moved!');
       // res.end();
     });
-
-    res.send({ success: true });
+    const url = `${apiUrl}/${folder}/${id}/${index}.${extn}`;
+    res.send({ success: true, url: url });
   });
 };
 
@@ -130,13 +130,13 @@ exports.uploadPostImage = function (req, res) {
     var new_dir = __upload_dir + "/" + folder + "/" + id;
     if (!fs.existsSync(new_dir)) {
       fs.mkdirSync(new_dir, { recursive: true });
-    } else {
+      // } else {
       // let files = fs.readdirSync(new_dir);
       // const oldImage = new_dir + "/" + files[0];
       // fs.unlinkSync(oldImage);
     }
-
-    var newpath = new_dir + "/" + index + "." + extn;
+    var timeStamp = new Date().getTime();
+    var newpath = new_dir + "/" + timeStamp + "-" + index + "." + extn;
     // try {
     //   fs.unlinkSync(newpath);
     //   fs.statSync(newpath);
@@ -149,8 +149,8 @@ exports.uploadPostImage = function (req, res) {
       // res.write('File uploaded and moved!');
       // res.end();
     });
-
-    res.send({ success: true });
+    const url = `${apiUrl}/${folder}/${id}/${timeStamp}-${index}.${extn}`;
+    res.send({ success: true, url: url });
   });
 };
 exports.readFile = async (req, res) => {
