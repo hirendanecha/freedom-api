@@ -100,9 +100,8 @@ socket.config = (server) => {
       const community = await socketService.createCommunity(params);
       if (community) {
         socket.emit("create-new-community", community);
-        // socket.broadcast
-        //   .to(params.communityId)
-        //   .emit("get-new-community", { ...params });
+        const communityList = await socketService.getUnApproveCommunity(params);
+        socket.broadcast.emit("get-unApprove-community", communityList);
       }
     });
 
@@ -132,7 +131,7 @@ socket.config = (server) => {
       });
       const data = await socketService.getCommunityPost(params);
       if (data) {
-        console.log('posts',data);
+        console.log("posts", data);
         socket.emit("community-post", data);
       }
     });
@@ -147,6 +146,35 @@ socket.config = (server) => {
       const communityList = await socketService.getCommunity(params);
       if (communityList) {
         // socket.emit('')
+      }
+    });
+
+    //socket for admin //
+    socket.on("get-unApprove-community", async (params) => {
+      console.log(params);
+
+      logger.info("New community found", {
+        method: "New community found",
+        params: params,
+      });
+      const communityList = await socketService.getUnApproveCommunity(params);
+      if (communityList) {
+        console.log(communityList);
+        socket.emit("get-unApprove-community", communityList);
+      }
+    });
+
+    socket.on("get-Approve-community", async (params) => {
+      console.log(params);
+
+      logger.info("New community found", {
+        method: "New community found",
+        params: params,
+      });
+      const communityList = await socketService.getApproveCommunity(params);
+      if (communityList) {
+        console.log(communityList);
+        socket.emit("get-Approve-community", communityList);
       }
     });
 

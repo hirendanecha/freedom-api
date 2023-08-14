@@ -50,3 +50,12 @@ exports.updateProfile = function (req, res) {
     });
   }
 };
+
+exports.getUsersByUsername = async function (req, res) {
+  const { searchText } = req.query;
+  const data = await Profile.getUsersByUsername(searchText);
+  return res.send({
+    error: false,
+    data: data,
+  });
+};

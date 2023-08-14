@@ -23,7 +23,7 @@ var Profile = function (profile) {
   this.ProfilePicName = profile.ProfilePicName;
   this.IsActivated = profile.IsActive;
   this.CreatedOn = new Date();
-  this.AccountType = 'I'
+  this.AccountType = "I";
 };
 
 Profile.create = function (profileData, result) {
@@ -88,4 +88,14 @@ Profile.update = function (profileId, profileData, result) {
   );
 };
 
+Profile.getUsersByUsername = async function (searchText) {
+  if (searchText) {
+    const query = `select p.ID as Id,p.Username,p.ProfilePicName from profile as p WHERE p.Username LIKE ? order by p.CreatedOn DESC limit 500`;
+    const values = [`%${searchText}%`];
+    const searchData = await executeQuery(query, values);
+    return searchData;
+  } else {
+    return { error: "data not found" };
+  }
+};
 module.exports = Profile;

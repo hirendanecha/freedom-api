@@ -21,6 +21,14 @@ exports.getCommunity = async function (data) {
   return await getCommunity(data);
 };
 
+exports.getUnApproveCommunity = async function (data) {
+  return await getUnApproveCommunity(data);
+};
+
+exports.getApproveCommunity = async function (data) {
+  return await getApproveCommunity(data);
+};
+
 getPost = async function (params) {
   const { page, size } = params;
   const { limit, offset } = getPagination(page, size);
@@ -80,6 +88,27 @@ getCommunity = async function (params) {
   const { id } = params;
   const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.profileId != ? group by c.Id`;
   const values = [id];
+  const communitYList = await executeQuery(query, values);
+  return communitYList;
+};
+
+
+// socket for admin //
+
+getUnApproveCommunity = async function (params) {
+  const { page, size } = params;
+  const { limit, offset } = getPagination(page, size);
+  const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'N' order by c.creationDate DESC limit ? offset ?`;
+  const values = [limit, offset];
+  const communitYList = await executeQuery(query, values);
+  return communitYList;
+};
+
+getApproveCommunity = async function (params) {
+  const { page, size } = params;
+  const { limit, offset } = getPagination(page, size);
+  const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' group by c.Id order by c.creationDate DESC limit ? offset ?`;
+  const values = [limit, offset];
   const communitYList = await executeQuery(query, values);
   return communitYList;
 };
