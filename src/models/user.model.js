@@ -108,9 +108,13 @@ User.create = function (userData, result) {
 };
 
 User.findAndSearchAll = async (limit, offset, search) => {
-  const whereCondition = `IsAdmin != 'Y' ${search ? `AND Email LIKE '%${search}%'` : ""}`;
+  const whereCondition = `IsAdmin != 'Y' ${
+    search ? `AND Email LIKE '%${search}%'` : ""
+  }`;
 
-  const searchCount = await executeQuery(`SELECT count(Id) as count FROM users WHERE ${whereCondition}`);
+  const searchCount = await executeQuery(
+    `SELECT count(Id) as count FROM users WHERE ${whereCondition}`
+  );
   const searchData = await executeQuery(
     `SELECT Id, Email, Username, IsActive, DateCreation, IsAdmin, FirstName, LastName, Address, Country, City, State, Zip, AccountType, IsSuspended FROM users WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
     [limit, offset]
@@ -419,7 +423,6 @@ User.resendVerification = async function (email, result) {
     return result(error, null);
   }
 };
-
 
 User.setPassword = async function (user_id, password) {
   const query = `UPDATE users SET password=? WHERE Id=?`;
