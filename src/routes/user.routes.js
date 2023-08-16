@@ -16,7 +16,6 @@ router.post("/forgot-password", userController.forgotPassword);
 router.post("/set-password", userController.setPassword);
 router.get("/countries", userController.getZipCountries);
 router.get("/search-user", profileController.getUsersByUsername);
-router.get("/search", userController.search);
 router.get("/:id", userController.findById);
 router.get("/profile/:id", profileController.FindProfieById);
 router.put("/:id", userController.update);

@@ -107,36 +107,19 @@ User.create = function (userData, result) {
   });
 };
 
-User.findAll = function (limit, offset, result) {
-  db.query(
-    `SELECT 
-          Id,
-          Email,
-          Username,
-          IsActive,
-          DateCreation,
-          IsAdmin,
-          FirstName,
-          LastName,
-          Address,
-          Country,
-          City,
-          State,
-          Zip,
-          AccountType,
-          IsSuspended
-   from users where IsAdmin != 'Y' order by DateCreation desc limit ? offset ? `,
-    [limit, offset],
-    function (err, res) {
-      if (err) {
-        console.log("error", err);
-        result(err, null);
-      } else {
-        // console.log("user: ", res);
-        result(null, res);
-      }
-    }
+User.findAndSearchAll = async (limit, offset, search) => {
+  const whereCondition = `IsAdmin != 'Y' ${search ? `AND Email LIKE '%${search}%'` : ""}`;
+
+  const searchCount = await executeQuery(`SELECT count(Id) as count FROM users WHERE ${whereCondition}`);
+  const searchData = await executeQuery(
+    `SELECT Id, Email, Username, IsActive, DateCreation, IsAdmin, FirstName, LastName, Address, Country, City, State, Zip, AccountType, IsSuspended FROM users WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
+    [limit, offset]
   );
+
+  return {
+    count: searchCount?.[0]?.count || 0,
+    data: searchData,
+  };
 };
 
 User.findById = async function (user_id) {
@@ -437,23 +420,6 @@ User.resendVerification = async function (email, result) {
   }
 };
 
-User.search = async function (searchText, limit, offset) {
-  // const { searchText } = query;
-  if (searchText) {
-    const query = `select * from users WHERE Email LIKE ? limit ? offset ?`;
-    const values = [`%${searchText}%`, limit, offset];
-    const searchData = await executeQuery(query, values);
-    return searchData;
-  } else {
-    // const query = `select *  from ${type}`;
-    // const searchData = await executeQuery(query);
-    // return searchData;
-    return { error: "data not found" };
-  }
-  // } else {
-  //   return { error: "error" };
-  // }
-};
 
 User.setPassword = async function (user_id, password) {
   const query = `UPDATE users SET password=? WHERE Id=?`;
