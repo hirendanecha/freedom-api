@@ -44,17 +44,18 @@ exports.createPost = function (req, res) {
 
 exports.getMeta = function (req, res) {
   const url = req.body.url;
-  og(url, function (err, meta) {
-    if (err) {
-      return utils.send500(res, err);
-    } else {
-      return res.json({
-        error: false,
-        mesage: "Post created",
-        data: meta.image,
-      });
-    }
-  });
+  console.log(url);
+  if (url) {
+    og(url, function (err, meta) {
+      if (err) {
+        return utils.send500(res, err);
+      } else {
+        return res.json({
+          meta,
+        });
+      }
+    });
+  }
 };
 
 exports.deletePost = function (req, res) {

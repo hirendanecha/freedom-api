@@ -3,7 +3,11 @@
 const mysql = require("mysql2");
 
 const db = mysql.createConnection({
-  host: '127.0.0.1',
+  // host: "127.0.0.1",
+  // user: "root",
+  // password: "",
+  // database: "freedom-live",
+  host: '65.108.254.22',
   user: 'root',
   password: 'JYq1Nyr2l7Cf',
   database: 'freedom2021db-live'

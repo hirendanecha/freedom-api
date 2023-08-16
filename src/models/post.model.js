@@ -10,6 +10,7 @@ var Post = function (post) {
   this.profileid = post.profileid;
   this.isdeleted = "N";
   this.postcreationdate = new Date();
+  this.metalink = post.metalink
 };
 
 Post.findAll = async function (limit, offset, result) {

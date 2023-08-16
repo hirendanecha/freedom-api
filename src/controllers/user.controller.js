@@ -109,14 +109,12 @@ exports.create = async function (req, res) {
   }
 };
 
-exports.findAll = async function (req, res) {
-  const { page, size } = req.query;
+exports.findAll = async (req, res) => {
+  const { page, size, search } = req.query;
   const { limit, offset } = getPagination(page, size);
-  const count = await getCount("users");
-  User.findAll(limit, offset, function (err, users) {
-    if (err) return utils.send500(res, err);
-    res.send(getPaginationData({ count, docs: users }, page, limit));
-  });
+
+  const searchCountData = await User.findAndSearchAll(limit, offset, search);
+  return res.send(getPaginationData({ count: searchCountData.count, docs: searchCountData.data }, page, limit));
 };
 
 exports.getAll = async function (req, res) {
@@ -375,14 +373,6 @@ exports.resendVerification = function (req, res) {
       message: "Verification mail sent successfully.",
     });
   });
-};
-
-exports.search = async function (req, res) {
-  const { page, size, searchText } = req.query;
-  const { limit, offset } = getPagination(page, size);
-  const count = await getCount("users");
-  const data = await User.search(searchText, limit, offset);
-  return res.send(getPaginationData({ count, docs: data }, page, limit));
 };
 
 function Encrypt(strToEncrypt) {
