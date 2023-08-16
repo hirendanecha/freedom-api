@@ -10,6 +10,7 @@ var CommunityPost = function (post) {
   this.profileid = post.profileid;
   this.communityId = post.communityId;
   this.createdDate = new Date();
+  this.metalink = post.metalink;
 };
 
 CommunityPost.findAll = function (limit, offset, result) {
