@@ -32,7 +32,7 @@ exports.getApproveCommunity = async function (data) {
 getPost = async function (params) {
   const { page, size } = params;
   const { limit, offset } = getPagination(page, size);
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' order by p.postcreationdate DESC limit ? offset ?`;
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' order by p.id DESC limit ? offset ?`;
   const values = [limit, offset];
   const posts = await executeQuery(query, values);
   return posts;
@@ -98,7 +98,7 @@ getCommunity = async function (params) {
 getUnApproveCommunity = async function (params) {
   const { page, size } = params;
   const { limit, offset } = getPagination(page, size);
-  const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'N' order by c.creationDate DESC limit ? offset ?`;
+  const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'N' group by c.Id order by c.creationDate DESC limit ? offset ?`;
   const values = [limit, offset];
   const communitYList = await executeQuery(query, values);
   return communitYList;

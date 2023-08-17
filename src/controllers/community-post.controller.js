@@ -3,13 +3,17 @@ const utils = require("../helpers/utils");
 const og = require("open-graph");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 
-exports.findAll = function (req, res) {
-  const { page, size } = req.query;
+exports.findAll = async function (req, res) {
+  const { page, size, search } = req.query;
   const { limit, offset } = getPagination(page, size);
-  CommunityPost.findAll(limit, offset, function (err, post) {
-    if (err) return utils.send500(res, err);
-    res.send(post);
-  });
+  const searchData = await CommunityPost.findAll(limit, offset, search);
+  return res.send(
+    getPaginationData(
+      { count: searchData.count, docs: searchData.data },
+      page,
+      limit
+    )
+  );
 };
 
 exports.getCommunityPostById = function (req, res) {
