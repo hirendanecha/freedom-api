@@ -13,32 +13,45 @@ var Community = function (community) {
   this.creationDate = new Date();
 };
 
-Community.findApproveCommunity = function (limit, offset, result) {
-  db.query(
-    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='Y' GROUP BY c.Id order by c.creationDate desc limit ? offset ?",
-    [limit, offset],
-    function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res);
-      }
-    }
+Community.findApproveCommunity = async function (limit, offset, search) {
+  const whereCondition = `c.CommunityName LIKE '%${search}%'`;
+  const searchCount = await executeQuery(
+    `SELECT count(c.Id) as count FROM community as c WHERE ${whereCondition}`
   );
+  const searchData = await executeQuery(
+    `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='Y' and ${whereCondition} GROUP BY c.Id order by c.creationDate desc limit ? offset ?`,
+    [limit, offset]
+  );
+  return {
+    count: searchCount?.[0]?.count || 0,
+    data: searchData,
+  };
+  // db.query(
+  //   "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='Y' GROUP BY c.Id order by c.creationDate desc limit ? offset ?",
+  //   [limit, offset],
+  //   function (err, res) {
+  //     if (err) {
+  //       result(err, null);
+  //     } else {
+  //       result(null, res);
+  //     }
+  //   }
+  // );
 };
 
-Community.findUnApproveCommunity = function (limit, offset, result) {
-  db.query(
-    "select * from community where isApprove='N' order by creationDate desc limit ? offset ?",
-    [limit, offset],
-    function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res);
-      }
-    }
+Community.findUnApproveCommunity = async function (limit, offset, search) {
+  const whereCondition = `c.CommunityName LIKE '%${search}%'`;
+  const searchCount = await executeQuery(
+    `SELECT count(c.Id) as count FROM community as c WHERE ${whereCondition}`
   );
+  const searchData = await executeQuery(
+    `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='N' and ${whereCondition} GROUP BY c.Id order by c.creationDate desc limit ? offset ?`,
+    [limit, offset]
+  );
+  return {
+    count: searchCount?.[0]?.count || 0,
+    data: searchData,
+  };
 };
 
 Community.create = function (communityData, result) {
@@ -130,7 +143,7 @@ Community.getCommunity = async function (id) {
 
 Community.getCommunityByUserId = async function (id) {
   const query =
-    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.profileId =?";
+    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.profileId =? group by c.Id;";
   const values = id;
   const communityList = await executeQuery(query, values);
   console.log(communityList);

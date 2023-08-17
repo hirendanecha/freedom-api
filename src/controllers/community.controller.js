@@ -5,22 +5,36 @@ const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 
 // Admin Api //
 exports.findApproveCommunity = async function (req, res) {
-  const { page, size } = req.query;
+  const { page, size, search } = req.query;
   const { limit, offset } = getPagination(page, size);
-  const count = await getCount("community");
-  Community.findApproveCommunity(limit, offset, function (err, community) {
-    if (err) return utils.send500(res, err);
-    res.send(getPaginationData({ count, docs: community }, page, limit));
-  });
+  const searchData = await Community.findApproveCommunity(
+    limit,
+    offset,
+    search
+  );
+  return res.send(
+    getPaginationData(
+      { count: searchData.count, docs: searchData.data },
+      page,
+      limit
+    )
+  );
 };
 exports.findUnApproveCommunity = async function (req, res) {
-  const { page, size } = req.query;
+  const { page, size, search } = req.query;
   const { limit, offset } = getPagination(page, size);
-  const count = await getCount("community");
-  Community.findUnApproveCommunity(limit, offset, function (err, community) {
-    if (err) return utils.send500(res, err);
-    res.send(getPaginationData({ count, docs: community }, page, limit));
-  });
+  const searchData = await Community.findUnApproveCommunity(
+    limit,
+    offset,
+    search
+  );
+  return res.send(
+    getPaginationData(
+      { count: searchData.count, docs: searchData.data },
+      page,
+      limit
+    )
+  );
 };
 
 exports.createCommunity = function (req, res) {

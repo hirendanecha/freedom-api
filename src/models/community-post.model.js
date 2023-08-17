@@ -13,20 +13,21 @@ var CommunityPost = function (post) {
   this.metalink = post.metalink;
 };
 
-CommunityPost.findAll = function (limit, offset, result) {
-  db.query(
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from communityPosts as p left join profile as pr on p.profileId = pr.ID order by p.createdDate DESC limit ? offset ?",
-    [limit, offset],
-    function (err, res) {
-      if (err) {
-        console.log("error", err);
-        result(err, null);
-      } else {
-        // console.log("post: ", res);
-        result(null, res);
-      }
-    }
+CommunityPost.findAll = async function (limit, offset, search) {
+  const whereCondition = `pr.Username LIKE '%${search}%'`;
+  console.log(whereCondition);
+  const searchCount = await executeQuery(
+    `SELECT count(c.Id) as count FROM communityPosts as c left join profile as pr on c.profileId = pr.Id WHERE ${whereCondition}`
   );
+
+  const searchData = await executeQuery(
+    `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from communityPosts as p left join profile as pr on p.profileId = pr.ID where ${whereCondition} order by p.createdDate DESC limit ? offset ?`,
+    [limit, offset]
+  );
+  return {
+    count: searchCount?.[0]?.count || 0,
+    data: searchData,
+  };
 };
 
 CommunityPost.getCommunityPostById = function (profileId, result) {
