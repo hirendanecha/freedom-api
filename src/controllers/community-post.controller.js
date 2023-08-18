@@ -61,17 +61,25 @@ exports.getMeta = function (req, res) {
 
 exports.deletePost = function (req, res) {
   if (req.params.id) {
-    CommunityPost.delete(req.params.id, function (err, result) {
+    CommunityPost.deletePost(req.params.id, function (err, result) {
       if (err) {
         return utils.send500(res, err);
       } else {
         res.send({
           error: false,
-          mesage: "post deleted",
+          mesage: "Post deleted sucessfully",
         });
       }
     });
   } else {
     return utils.send404(res, err);
   }
+};
+
+exports.getPostByPostId = function (req, res) {
+  console.log(req.params.id);
+  CommunityPost.getPostByPostId(req.params.id, function (err, post) {
+    if (err) return utils.send500(res, err);
+    res.send(post);
+  });
 };

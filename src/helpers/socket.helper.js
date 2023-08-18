@@ -143,9 +143,10 @@ socket.config = (server) => {
         method: "New community found",
         params: params,
       });
+      console.log(params);
       const communityList = await socketService.getCommunity(params);
       if (communityList) {
-        // socket.emit('')
+        socket.emit("new-community", communityList);
       }
     });
 

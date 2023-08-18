@@ -13,7 +13,7 @@ var User = function (user) {
   this.DateCreation = new Date();
   this.IsAdmin = user.IsAdmin || "N";
   this.PartnerId = user.PartnerId;
-  this.IsSuspended = user.IsSuspended;
+  this.IsSuspended = user.IsSuspended || "N";
   this.FirstName = user.FirstName;
   this.LastName = user.LastName;
   this.Address = user.Address;
@@ -24,7 +24,6 @@ var User = function (user) {
 };
 
 User.login = function (email, Id, result) {
-  console.log("email = " + email);
   db.query(
     `SELECT u.Id,
             u.Email,
@@ -50,8 +49,6 @@ User.login = function (email, Id, result) {
         return result(err, null);
       } else {
         const user = res[0];
-        // console.log(user);
-
         if (user?.IsActive === "N") {
           return result(
             {
@@ -81,8 +78,6 @@ User.login = function (email, Id, result) {
             null
           );
         } else {
-          console.log("Login Data");
-          console.log(user);
           const token = await generateJwtToken(res[0]);
           return result(null, {
             userId: user.Id,
@@ -127,34 +122,6 @@ User.findAndSearchAll = async (limit, offset, search) => {
 };
 
 User.findById = async function (user_id) {
-  // db.query(
-  //   `SELECT u.Id,
-  //           u.Email,
-  //           u.Username,
-  //           u.IsActive,
-  //           u.DateCreation,
-  //           u.IsAdmin,
-  //           u.FirstName,
-  //           u.LastName,
-  //           u.Address,
-  //           u.Country,
-  //           u.City,
-  //           u.State,
-  //           u.Zip,
-  //           p.ID as profileId
-  //   FROM users as u left join profile as p on p.UserID = u.Id WHERE u.Id = ? `,
-  //   user_id,
-  //   function (err, res) {
-  //     if (err) {
-  //       console.log("error", err);
-  //       result(err, null);
-  //     } else {
-  //       console.log("user: ", res);
-  //       result(null, res[0]);
-  //     }
-  //   }
-  // );
-
   const query = `SELECT u.Id,
   u.Email,
   u.IsActive,

@@ -10,13 +10,31 @@ var Post = function (post) {
   this.profileid = post.profileid;
   this.isdeleted = "N";
   this.postcreationdate = new Date();
-  this.metalink = post.metalink
+  this.metalink = post.metalink;
 };
 
-Post.findAll = async function (limit, offset, result) {
+Post.findAll = async function (limit, offset, search) {
+  const whereCondition = `p.isdeleted ='N' AND p.postdescription !='' AND pr.Username LIKE '%${search}%'`;
+  console.log(whereCondition);
+  const postCount = await executeQuery(
+    `SELECT count(p.id) as count FROM posts as p left join profile as pr on p.profileid = pr.Id WHERE ${whereCondition}`
+  );
+
+  const postData = await executeQuery(
+    `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where ${whereCondition} order by p.postcreationdate DESC limit ? offset ?`,
+    [limit, offset]
+  );
+  return {
+    count: postCount?.[0]?.count || 0,
+    data: postData,
+  };
+};
+
+Post.getPostByProfileId = function (profileId, result) {
   db.query(
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' order by p.postcreationdate DESC limit ? offset ?",
-    [limit, offset],
+    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? order by p.postcreationdate DESC limit 15;",
+    profileId,
     function (err, res) {
       if (err) {
         console.log("error", err);
@@ -28,11 +46,10 @@ Post.findAll = async function (limit, offset, result) {
     }
   );
 };
-
-Post.getPostById = function (profileId, result) {
+Post.getPostByPostId = function (profileId, result) {
   db.query(
     // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? order by p.postcreationdate DESC limit 15;",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.id =? ;",
     profileId,
     function (err, res) {
       if (err) {
@@ -63,7 +80,7 @@ Post.delete = function (id, result) {
       console.log("error", err);
       result(err, null);
     } else {
-      console.log("Post deleted", res);
+      console.log("Post deleted sucessfully", res);
       result(null, res);
     }
   });
