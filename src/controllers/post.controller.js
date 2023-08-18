@@ -5,18 +5,30 @@ const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 // const socket = require("../helpers/socket.helper");
 const io = require("socket.io-client");
 
-exports.findAll = function (req, res) {
-  const { page, size } = req.query;
+exports.findAll = async function (req, res) {
+  const { page, size, search } = req.query;
   const { limit, offset } = getPagination(page, size);
-  Post.findAll(limit, offset, function (err, post) {
+  const postData = await Post.findAll(limit, offset, search);
+  return res.send(
+    getPaginationData(
+      { count: postData.count, docs: postData.data },
+      page,
+      limit
+    )
+  );
+};
+
+exports.getPostByProfileId = function (req, res) {
+  console.log(req.params.id);
+  Post.getPostByProfileId(req.params.id, function (err, post) {
     if (err) return utils.send500(res, err);
     res.send(post);
   });
 };
 
-exports.getPostById = function (req, res) {
+exports.getPostByPostId = function (req, res) {
   console.log(req.params.id);
-  Post.getPostById(req.params.id, function (err, post) {
+  Post.getPostByPostId(req.params.id, function (err, post) {
     if (err) return utils.send500(res, err);
     res.send(post);
   });
@@ -66,7 +78,7 @@ exports.deletePost = function (req, res) {
       } else {
         res.send({
           error: false,
-          mesage: "post deleted",
+          message: "Post deleted sucessfully",
         });
       }
     });

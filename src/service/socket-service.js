@@ -86,12 +86,12 @@ getCommunityPost = async function (params) {
 
 getCommunity = async function (params) {
   const { id } = params;
-  const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.profileId != ? group by c.Id`;
-  const values = [id];
-  const communitYList = await executeQuery(query, values);
-  return communitYList;
+  const query =
+    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.profileId != ? group by c.Id;";
+  const communityList = await executeQuery(query, [id]);
+  console.log(communityList);
+  return communityList;
 };
-
 
 // socket for admin //
 

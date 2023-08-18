@@ -58,4 +58,28 @@ CommunityPost.create = function (postData, result) {
   });
 };
 
+CommunityPost.deletePost = async function (id, result) {
+  const query = "delete from communityPosts where Id= ?";
+  const values = [id];
+  const data = await executeQuery(query, values);
+  return data;
+};
+
+CommunityPost.getPostByPostId = function (id, result) {
+  db.query(
+    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from communityPosts as p left join profile as pr on p.profileId = pr.ID where  p.Id =?;",
+    id,
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        // console.log("post: ", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
 module.exports = CommunityPost;
