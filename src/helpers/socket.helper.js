@@ -1,6 +1,6 @@
 let logger = console;
 const socket = {};
-const { post } = require("../routes");
+const { post, param } = require("../routes");
 const socketService = require("../service/socket-service");
 
 socket.config = (server) => {
@@ -179,14 +179,18 @@ socket.config = (server) => {
       }
     });
 
-    socket.on("likeOrDislike", (params) => {
+    socket.on("likeOrDislike", async (params) => {
       logger.info("like", {
         method: "Like on post",
         params: params,
       });
-      socket.broadcast
-        .to(params.postId)
-        .emit("likeOrDislikeNotify", { ...params });
+      if (params.actionType) {
+        const data = await socketService.likeFeedPost(params);
+        socket.broadcast.emit("new-post", data);
+      } else {
+        const data = await socketService.disLikeFeedPost(params);
+        socket.broadcast.emit("new-post", data);
+      }
     });
 
     socket.on("likeOrDislikeNotify", (params) => {

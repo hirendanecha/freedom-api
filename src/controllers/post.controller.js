@@ -72,7 +72,7 @@ exports.getMeta = function (req, res) {
 
 exports.deletePost = function (req, res) {
   if (req.params.id) {
-    Post.delete(req.params.id, function (err, result) {
+    Post.delete(req.params.id, function (err) {
       if (err) {
         return utils.send500(res, err);
       } else {
