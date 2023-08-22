@@ -10,11 +10,17 @@ var Post = function (post) {
   this.profileid = post.profileid;
   this.isdeleted = "N";
   this.postcreationdate = new Date();
-  this.metalink = post.metalink;
+  this.metalink = post?.metalink;
+  this.tittle = post?.tittle;
+  this.metadescription = post?.metadescription;
 };
 
 Post.findAll = async function (limit, offset, search) {
-  const whereCondition = `p.isdeleted ='N' AND p.postdescription !='' AND pr.Username LIKE '%${search}%'`;
+  const whereCondition = `${
+    search
+      ? `p.isdeleted ='N' AND p.postdescription !='' AND pr.Username LIKE '%${search}%'`
+      : `p.isdeleted ='N' AND p.postdescription !=''`
+  }`;
   console.log(whereCondition);
   const postCount = await executeQuery(
     `SELECT count(p.id) as count FROM posts as p left join profile as pr on p.profileid = pr.Id WHERE ${whereCondition}`

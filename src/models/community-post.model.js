@@ -59,10 +59,23 @@ CommunityPost.create = function (postData, result) {
 };
 
 CommunityPost.deletePost = async function (id, result) {
-  const query = "delete from communityPosts where Id= ?";
-  const values = [id];
-  const data = await executeQuery(query, values);
-  return data;
+  db.query(
+    "delete from communityPosts where Id = ?",
+    [id],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("Post deleted sucessfully", res);
+        result(null, res);
+      }
+    }
+  );
+  // const query = "delete from communityPosts where Id= ?";
+  // const values = [id];
+  // const data = await executeQuery(query, values);
+  // return data;
 };
 
 CommunityPost.getPostByPostId = function (id, result) {

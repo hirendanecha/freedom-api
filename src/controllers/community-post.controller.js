@@ -65,7 +65,7 @@ exports.deletePost = function (req, res) {
       if (err) {
         return utils.send500(res, err);
       } else {
-        res.send({
+       return res.send({
           error: false,
           mesage: "Post deleted sucessfully",
         });
