@@ -7,6 +7,7 @@ const postRoutes = require("./post.routes");
 const adminRouter = require("./admin.routes");
 const communityRouter = require("./community.routes");
 const communityPostRouter = require("./community-post.routes");
+const unsubscribeProfileRouter = require("./unsubscribeProfile.routes");
 
 router.use("/login", authRoutes);
 router.use("/customers", authRoutes);
@@ -15,5 +16,6 @@ router.use("/utils", utilsRoutes);
 router.use("/posts", postRoutes);
 router.use("/community", communityRouter);
 router.use("/community-post", communityPostRouter);
+router.use("/unsubscribe-profile", unsubscribeProfileRouter);
 
 module.exports = router;
