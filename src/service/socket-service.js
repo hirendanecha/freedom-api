@@ -40,8 +40,12 @@ exports.disLikeFeedPost = async function (data) {
 getPost = async function (params) {
   const { page, size, profileId } = params;
   const { limit, offset } = getPagination(page, size);
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' AND p.postdescription !='' order by profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
-  const values = [profileId, profileId, limit, offset];
+  const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName 
+  from 
+  posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id  left join profile as pr on p.profileid = pr.ID  
+  where 
+  p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' AND p.postdescription !='' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
+  const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
   return posts;
 };
@@ -85,10 +89,10 @@ createCommunityPost = async function (data) {
 };
 
 getCommunityPost = async function (params) {
-  const { page, size } = params;
+  const { page, size, profileId } = params;
   const { limit, offset } = getPagination(page, size);
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from communityPosts as p left join profile as pr on p.profileId = pr.ID order by p.createdDate DESC limit ? offset ?`;
-  const values = [limit, offset];
+  const query = `SELECT p.*,pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName from communityPosts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.communityPostId = p.Id left join profile as pr on p.profileId = pr.ID order by p.createdDate DESC limit ? offset ?`;
+  const values = [profileId, limit, offset];
   const posts = await executeQuery(query, values);
   return posts;
 };
@@ -123,30 +127,61 @@ getApproveCommunity = async function (params) {
 };
 
 likeFeedPost = async function (params) {
-  const { id, profileId, likeCount, actionType } = params;
-  const query = `update posts set likescount = ? where id =?`;
-  const query1 = `INSERT INTO postlikedislike set ?`;
-  const values = [likeCount, id];
-  const data = {
-    PostID: id,
-    ProfileID: profileId,
-    ActionType: actionType,
-  };
-  const values1 = [data];
-  const post = await executeQuery(query, values);
-  const likeData = await executeQuery(query1, values1);
-  const postData = await getPost({ page: 1, size: 15 });
-  return postData;
+  const { postId, communityPostId, profileId, likeCount, actionType } = params;
+  if (postId) {
+    const query = `update posts set likescount = ? where id =?`;
+    const query1 = `INSERT INTO postlikedislike set ?`;
+    const values = [likeCount, postId];
+    const data = {
+      PostID: postId,
+      ProfileID: profileId,
+      ActionType: actionType,
+    };
+    const values1 = [data];
+    const post = await executeQuery(query, values);
+    const likeData = await executeQuery(query1, values1);
+    const postData = await getPost({ page: 1, size: 15 });
+    return postData;
+  } else if (communityPostId) {
+    const query = `update communityPosts set likescount = ? where Id =?`;
+    const query1 = `INSERT INTO postlikedislike set ?`;
+    const values = [likeCount, communityPostId];
+    const data = {
+      communityPostId: communityPostId,
+      ProfileID: profileId,
+      ActionType: actionType,
+    };
+    const values1 = [data];
+    const post = await executeQuery(query, values);
+    const likeData = await executeQuery(query1, values1);
+    const postData = await getCommunityPost({ page: 1, size: 15 });
+    return postData;
+  }
 };
 
 disLikeFeedPost = async function (params) {
-  const { id, profileId, likeCount } = params;
-  const query = `update posts set likescount = ? where id =?`;
-  const query1 = `delete from postlikedislike where PostID = ? AND ProfileID = ?`;
-  const values = [likeCount, id];
-  const values1 = [id, profileId];
-  const post = await executeQuery(query, values);
-  const likeData = await executeQuery(query1, values1);
-  const postData = await getPost({ page: 1, size: 15 });
-  return postData;
+  const { postId, communityPostId, profileId, likeCount } = params;
+  if (postId) {
+    const query = `update posts set likescount = ? where id =?`;
+    const query1 = `delete from postlikedislike where PostID = ? AND ProfileID = ?`;
+    const values = [likeCount, postId];
+    const values1 = [postId, profileId];
+    const post = await executeQuery(query, values);
+    const likeData = await executeQuery(query1, values1);
+    const postData = await getPost({ profileId: profileId, page: 1, size: 15 });
+    return postData;
+  } else if (communityPostId) {
+    const query = `update communityPosts set likescount = ? where id =?`;
+    const query1 = `delete from postlikedislike where communityPostId = ? AND ProfileID = ?`;
+    const values = [likeCount, communityPostId];
+    const values1 = [communityPostId, profileId];
+    const post = await executeQuery(query, values);
+    const likeData = await executeQuery(query1, values1);
+    const postData = await getCommunityPost({
+      profileId: profileId,
+      page: 1,
+      size: 15,
+    });
+    return postData;
+  }
 };
