@@ -1,4 +1,3 @@
-var db = require("../../config/db.config");
 const { executeQuery } = require("../helpers/utils");
 require("../common/common")();
 
