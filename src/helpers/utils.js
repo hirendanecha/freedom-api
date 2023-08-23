@@ -77,7 +77,7 @@ exports.partnerRegistrationMail = async (userData, userId) => {
 
   const mailObj = {
     email: userData.Username,
-    subject: "Registration",
+    subject: "freedom.social Registration",
     root: "../email-templates/partner-registration.ejs",
     templateData: { name: name, url: registerUrl },
   };
@@ -102,7 +102,7 @@ exports.forgotPasswordMail = async (user) => {
     let forgotPasswordUrl = `${environment.FRONTEND_URL}reset-password/user?accesstoken=${token}`;
     const mailObj = {
       email: user?.Email,
-      subject: "forgot password",
+      subject: "freedom.social forgot password",
       root: "../email-templates/forgot-password.ejs",
       templateData: { name: name, url: forgotPasswordUrl },
     };
