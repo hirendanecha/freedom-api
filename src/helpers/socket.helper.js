@@ -185,11 +185,21 @@ socket.config = (server) => {
         params: params,
       });
       if (params.actionType) {
-        const data = await socketService.likeFeedPost(params);
-        socket.broadcast.emit("new-post", data);
+        if (params.postId) {
+          const data = await socketService.likeFeedPost(params);
+          socket.broadcast.emit("new-post", data);
+        } else if (params.communityPostId) {
+          const data = await socketService.likeFeedPost(params);
+          socket.broadcast.emit("community-post", data);
+        }
       } else {
-        const data = await socketService.disLikeFeedPost(params);
-        socket.broadcast.emit("new-post", data);
+        if (params.postId) {
+          const data = await socketService.disLikeFeedPost(params);
+          socket.broadcast.emit("new-post", data);
+        } else if (params.communityPostId) {
+          const data = await socketService.disLikeFeedPost(params);
+          socket.broadcast.emit("community-post", data);
+        }
       }
     });
 
