@@ -10,7 +10,7 @@ let transporter = nodemailer.createTransport({
   },
   host: "mail.your-server.de",
   port: 587,
-  sender: environment.SMTP_USER,
+  sender: 'freedom.social@your-server.de',
   auth: { user: environment.SMTP_USER, pass: environment.SMTP_PASS },
 });
 
@@ -21,7 +21,7 @@ exports.sendMail = async function (mailObj) {
       { ...mailObj.templateData }
     );
     return transporter.sendMail({
-      from: environment.SMTP_USER,
+      from: 'freedom.social@your-server.de',
       to: mailObj.email,
       subject: mailObj.subject,
       html: emailTemplateSource,
