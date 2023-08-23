@@ -40,8 +40,8 @@ exports.disLikeFeedPost = async function (data) {
 getPost = async function (params) {
   const { page, size, profileId } = params;
   const { limit, offset } = getPagination(page, size);
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' AND p.postdescription !='' order by p.id DESC limit ? offset ?`;
-  const values = [profileId, limit, offset];
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' AND p.postdescription !='' order by profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
+  const values = [profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
   return posts;
 };
