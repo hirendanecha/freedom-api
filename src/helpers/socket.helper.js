@@ -188,9 +188,32 @@ socket.config = (server) => {
         if (params.postId) {
           const data = await socketService.likeFeedPost(params);
           socket.broadcast.emit("new-post", data);
+          const notification = await socketService.createNotification({
+            notificationToProfileId: params.toProfileId,
+            postId: params.postId,
+            notificationByProfileId: params.profileId,
+            actionType: params.actionType,
+          });
+          console.log(notification);
+          // notification - emit - to user
+          io.to(`${notification.notificationToProfileId}`).emit(
+            "notification",
+            notification
+          );
         } else if (params.communityPostId) {
           const data = await socketService.likeFeedPost(params);
           socket.broadcast.emit("community-post", data);
+          const notification = await socketService.createNotification({
+            notificationToProfileId: params.toProfileId,
+            postId: params.communityPostId,
+            notificationByProfileId: params.profileId,
+            actionType: params.actionType,
+          });
+          // notification - emit - to user
+          io.to(`${notification.notificationToProfileId}`).emit(
+            "notification",
+            notification
+          );
         }
       } else {
         if (params.postId) {
@@ -203,7 +226,7 @@ socket.config = (server) => {
       }
     });
 
-    socket.on("likeOrDislikeNotify", (params) => {
+    socket.on("send-notification", (params) => {
       console.log(params);
 
       logger.info("likeOrDislikeNotify", {

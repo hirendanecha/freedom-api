@@ -36,13 +36,16 @@ exports.likeFeedPost = async function (data) {
 exports.disLikeFeedPost = async function (data) {
   return await disLikeFeedPost(data);
 };
+exports.createNotification = async function (data) {
+  return await createNotification(data);
+};
 
 getPost = async function (params) {
   const { page, size, profileId } = params;
   const { limit, offset } = getPagination(page, size);
   const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName 
   from 
-  posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id  left join profile as pr on p.profileid = pr.ID  
+  posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id  left join profile as pr on p.profileid = pr.ID 
   where 
   p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' AND p.postdescription !='' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
   const values = [profileId, profileId, profileId, limit, offset];
@@ -183,5 +186,40 @@ disLikeFeedPost = async function (params) {
       size: 15,
     });
     return postData;
+  }
+};
+
+createNotification = async function (params) {
+  const {
+    notificationToProfileId,
+    postId,
+    notificationByProfileId,
+    actionType,
+  } = params;
+  const query =
+    "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
+  const values = [notificationByProfileId];
+  const userData = await executeQuery(query, values);
+  const desc =
+    `${userData[0]?.FirstName || userData[0]?.Username}` + " liked your post.";
+  const data = {
+    notificationToProfileId: notificationToProfileId,
+    postId: postId,
+    notificationByProfileId: notificationByProfileId,
+    actionType: actionType,
+    notificationDesc: desc,
+  };
+  const find =
+    "select * from notifications where postId= ? and notificationByProfileId = ?";
+  const value = [data.postId, data.notificationByProfileId];
+  const oldData = await executeQuery(find, value);
+  console.log(oldData);
+  if (oldData.length) {
+    return oldData[0];
+  } else {
+    const query1 = "insert into notifications set ?";
+    const values1 = [data];
+    const notificationData = await executeQuery(query1, values1);
+    return { ...data, id: notificationData.insertId };
   }
 };
