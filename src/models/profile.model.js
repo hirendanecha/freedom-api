@@ -98,4 +98,15 @@ Profile.getUsersByUsername = async function (searchText) {
     return { error: "data not found" };
   }
 };
+
+Profile.getNotificationById = async function (id, limit, offset) {
+  if (id) {
+    const query = `select n.*,p.Username,p.FirstName,p.ProfilePicName from notifications as n left join profile as p on p.ID = n.notificationByProfileId where n.notificationToProfileId =? order by createDate desc limit ? offset ?`;
+    const values = [id, limit, offset];
+    const notificationData = await executeQuery(query, values);
+    return notificationData;
+  } else {
+    return { error: "data not found" };
+  }
+};
 module.exports = Profile;

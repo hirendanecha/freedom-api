@@ -12,14 +12,33 @@ class SeeFirstUser {
   }
 
   static async remove(id) {
-    return await executeQuery("DELETE FROM see_first_profile WHERE Id=?;", [id]);
+    return await executeQuery("DELETE FROM see_first_profile WHERE Id=?;", [
+      id,
+    ]);
   }
-  
-  static async getByProfileId(profileId) {
+  static async removeByProfileIdAndSeeFirstId(profileId, seeFirstProfileId) {
     return await executeQuery(
-      `SELECT sf_pr.Id, pr.ProfilePicName, pr.Username, pr.FirstName from see_first_profile as sf_pr left join profile as pr on sf_pr.seeFirstProfileId = pr.ID where sf_pr.profileId = ?`,
-      [profileId]
-    ) || [];
+      "DELETE FROM see_first_profile WHERE ProfileId=? AND SeeFirstProfileId=?;",
+      [profileId, seeFirstProfileId]
+    );
+  }
+
+  static async getByProfileId(profileId) {
+    return (
+      (await executeQuery(
+        `SELECT sf_pr.Id, pr.ProfilePicName, pr.Username, pr.FirstName from see_first_profile as sf_pr left join profile as pr on sf_pr.seeFirstProfileId = pr.ID where sf_pr.profileId = ?`,
+        [profileId]
+      )) || []
+    );
+  }
+
+  static async getSeefirstIdByProfileId(profileId) {
+    return (
+      (await executeQuery(
+        `SELECT SeeFirstProfileId from see_first_profile where profileId = ?`,
+        [profileId]
+      )) || []
+    );
   }
 }
 
