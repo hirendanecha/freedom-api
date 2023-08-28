@@ -61,6 +61,15 @@ exports.getUsersByUsername = async function (req, res) {
   });
 };
 
+exports.editNotifications = async function (req, res) {
+  const { id } = req.params;
+  const { isRead } = req.query;
+  Profile.editNotifications(id, isRead, function (err) {
+    if (err) return utils.send500(res, err);
+    res.json({ error: false, message: "Notification updated successfully" });
+  });
+};
+
 exports.getNotificationById = async function (req, res) {
   const { id, page, size } = req.params;
   const { limit, offset } = getPagination(page, size);
@@ -68,5 +77,12 @@ exports.getNotificationById = async function (req, res) {
   return res.send({
     error: false,
     data: data,
+  });
+};
+
+exports.deleteNotification = function (req, res) {
+  Profile.deleteNotification(req.params.id, function (err, result) {
+    if (err) return utils.send500(res, err);
+    res.json({ error: false, message: "Notification deleted successfully" });
   });
 };

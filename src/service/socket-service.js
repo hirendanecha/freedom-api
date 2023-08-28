@@ -198,7 +198,7 @@ createNotification = async function (params) {
     actionType,
   } = params;
   const query =
-    "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = g?";
+    "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
   const values = [notificationByProfileId];
   const userData = await executeQuery(query, values);
   const desc =

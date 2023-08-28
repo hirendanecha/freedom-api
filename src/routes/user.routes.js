@@ -24,6 +24,8 @@ router.get("/zip/:zip", userController.getZipData);
 router.get("/get-notification/:id", profileController.getNotificationById);
 router.post("/user/verification/resend", userController.resendVerification);
 router.get("/user/verification/:token", userController.verification);
+router.get("/edit-notification/:id", profileController.editNotifications);
 router.delete("/:id", userController.delete);
+router.delete("/notification/:id", profileController.deleteNotification);
 
 module.exports = router;
