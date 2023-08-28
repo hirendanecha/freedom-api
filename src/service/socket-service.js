@@ -55,14 +55,39 @@ getPost = async function (params) {
 
 createNewPost = async function (data) {
   console.log("post-data", data);
-  data.postcreationdate = new Date();
-  data.isdeleted = "N";
-  data.posttype = "S";
+  const postData = {
+    profileId: data?.profileId,
+    title: data?.meta?.title,
+    metadescription: data?.meta?.metadescription,
+    metaimage: data?.meta?.metaimage,
+    metalink: data?.meta?.metalink,
+    postdescription: data?.postdescription,
+  };
+
+  postData.postcreationdate = new Date();
+  postData.isdeleted = "N";
+  postData.posttype = "S";
   const query = `INSERT INTO posts set ?`;
-  const values = [data];
+  const values = [postData];
   const post = await executeQuery(query, values);
   console.log(post.insertId);
   if (post.insertId) {
+    if (data?.tags?.length > 0) {
+      for (const key in data?.tags) {
+        if (Object.hasOwnProperty.call(data?.tags, key)) {
+          const tag = data?.tags[key];
+          
+          const notification = await createNotification({
+            notificationToProfileId: tag?.id,
+            postId: post.insertId,
+            notificationByProfileId: postData?.profileId,
+            actionType: 'T',
+          });
+          console.log(notification);
+        }
+      }
+    }
+
     const query1 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
     const values1 = [post.insertId];
     const posts = await executeQuery(query1, values1);
@@ -201,8 +226,7 @@ createNotification = async function (params) {
     "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
   const values = [notificationByProfileId];
   const userData = await executeQuery(query, values);
-  const desc =
-    `${userData[0]?.FirstName || userData[0]?.Username}` + " liked your post.";
+  const desc = (actionType === 'T') ? (`${userData[0]?.FirstName || userData[0]?.Username} tag you in post.`) : (`${userData[0]?.FirstName || userData[0]?.Username} liked your post.`);
   const data = {
     notificationToProfileId: Number(notificationToProfileId),
     postId: postId,
