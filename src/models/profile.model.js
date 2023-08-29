@@ -90,8 +90,8 @@ Profile.update = function (profileId, profileData, result) {
 
 Profile.getUsersByUsername = async function (searchText) {
   if (searchText) {
-    const query = `select p.ID as Id,p.Username,p.ProfilePicName from profile as p WHERE p.Username LIKE ? order by p.CreatedOn DESC limit 500`;
-    const values = [`%${searchText}%`];
+    const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin='N' AND u.IsSuspended='N' AND p.Username LIKE ? order by p.Username limit 500`;
+    const values = [`${searchText}%`];
     const searchData = await executeQuery(query, values);
     return searchData;
   } else {

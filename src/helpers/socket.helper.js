@@ -82,12 +82,26 @@ socket.config = (server) => {
         method: "Create new post",
         params: params,
       });
-      const post = await socketService.createPost(params);
-      console.log(post);
-      if (post) {
-        socket.emit("create-new-post", post);
-        const data = await socketService.getPost(params);
-        socket.broadcast.emit("new-post", data);
+      const data = await socketService.createPost(params);
+      console.log(data);
+      if (data?.posts) {
+        socket.emit("create-new-post", data?.posts);
+
+        if (data?.notifications) {
+          for (const key in data?.notifications) {
+            if (Object.hasOwnProperty.call(data?.notifications, key)) {
+              const notification = data?.notifications[key];
+              
+              io.to(`${notification.notificationToProfileId}`).emit(
+                "notification",
+                notification
+              );
+            }
+          }
+        }
+
+        const socketData = await socketService.getPost(params);
+        socket.broadcast.emit("new-post", socketData);
       }
     });
 

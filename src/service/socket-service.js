@@ -71,6 +71,8 @@ createNewPost = async function (data) {
   const values = [postData];
   const post = await executeQuery(query, values);
   console.log(post.insertId);
+
+  const notifications = [];
   if (post.insertId) {
     if (data?.tags?.length > 0) {
       for (const key in data?.tags) {
@@ -84,6 +86,8 @@ createNewPost = async function (data) {
             actionType: 'T',
           });
           console.log(notification);
+
+          notifications.push(notification);
         }
       }
     }
@@ -91,7 +95,7 @@ createNewPost = async function (data) {
     const query1 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
     const values1 = [post.insertId];
     const posts = await executeQuery(query1, values1);
-    return posts;
+    return { notifications, posts };
   }
 };
 
