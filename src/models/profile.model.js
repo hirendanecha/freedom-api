@@ -109,4 +109,36 @@ Profile.getNotificationById = async function (id, limit, offset) {
     return { error: "data not found" };
   }
 };
+
+Profile.editNotifications = function (id, isRead, result) {
+  db.query(
+    "update notifications set isRead=? WHERE id = ?",
+    [isRead, id],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("notification updated", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
+Profile.deleteNotification = function (user_id, result) {
+  db.query(
+    "DELETE FROM notifications WHERE Id = ?",
+    [user_id],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("notification deleted", res);
+        result(null, res);
+      }
+    }
+  );
+};
 module.exports = Profile;

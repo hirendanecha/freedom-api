@@ -49,7 +49,7 @@ exports.createCommunity = function (req, res) {
       } else {
         return res.json({
           error: false,
-          message: "community created",
+          message: "Your community will be approve by admin",
           data: community,
         });
       }

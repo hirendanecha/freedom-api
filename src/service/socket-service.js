@@ -47,7 +47,7 @@ getPost = async function (params) {
   from 
   posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id  left join profile as pr on p.profileid = pr.ID 
   where 
-  p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' AND p.postdescription !='' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
+  p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
   return posts;
@@ -55,13 +55,39 @@ getPost = async function (params) {
 
 createNewPost = async function (data) {
   console.log("post-data", data);
-  data.postcreationdate = new Date();
-  data.isdeleted = "N";
+  const postData = {
+    profileId: data?.profileId,
+    title: data?.meta?.title,
+    metadescription: data?.meta?.metadescription,
+    metaimage: data?.meta?.metaimage,
+    metalink: data?.meta?.metalink,
+    postdescription: data?.postdescription,
+  };
+
+  postData.postcreationdate = new Date();
+  postData.isdeleted = "N";
+  postData.posttype = "S";
   const query = `INSERT INTO posts set ?`;
-  const values = [data];
+  const values = [postData];
   const post = await executeQuery(query, values);
   console.log(post.insertId);
   if (post.insertId) {
+    if (data?.tags?.length > 0) {
+      for (const key in data?.tags) {
+        if (Object.hasOwnProperty.call(data?.tags, key)) {
+          const tag = data?.tags[key];
+          
+          const notification = await createNotification({
+            notificationToProfileId: tag?.id,
+            postId: post.insertId,
+            notificationByProfileId: postData?.profileId,
+            actionType: 'T',
+          });
+          console.log(notification);
+        }
+      }
+    }
+
     const query1 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
     const values1 = [post.insertId];
     const posts = await executeQuery(query1, values1);
@@ -200,26 +226,29 @@ createNotification = async function (params) {
     "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
   const values = [notificationByProfileId];
   const userData = await executeQuery(query, values);
-  const desc =
-    `${userData[0]?.FirstName || userData[0]?.Username}` + " liked your post.";
+  const desc = (actionType === 'T') ? (`${userData[0]?.FirstName || userData[0]?.Username} tag you in post.`) : (`${userData[0]?.FirstName || userData[0]?.Username} liked your post.`);
   const data = {
-    notificationToProfileId: notificationToProfileId,
+    notificationToProfileId: Number(notificationToProfileId),
     postId: postId,
-    notificationByProfileId: notificationByProfileId,
+    notificationByProfileId: Number(notificationByProfileId),
     actionType: actionType,
     notificationDesc: desc,
   };
-  const find =
-    "select * from notifications where postId= ? and notificationByProfileId = ?";
-  const value = [data.postId, data.notificationByProfileId];
-  const oldData = await executeQuery(find, value);
-  console.log(oldData);
-  if (oldData.length) {
-    return oldData[0];
+  if (data.notificationByProfileId === data.notificationToProfileId) {
+    return true;
   } else {
-    const query1 = "insert into notifications set ?";
-    const values1 = [data];
-    const notificationData = await executeQuery(query1, values1);
-    return { ...data, id: notificationData.insertId };
+    const find =
+      "select * from notifications where postId= ? and notificationByProfileId = ?";
+    const value = [data.postId, data.notificationByProfileId];
+    const oldData = await executeQuery(find, value);
+    console.log(oldData);
+    if (oldData.length) {
+      return oldData[0];
+    } else {
+      const query1 = "insert into notifications set ?";
+      const values1 = [data];
+      const notificationData = await executeQuery(query1, values1);
+      return { ...data, id: notificationData.insertId };
+    }
   }
 };

@@ -114,7 +114,13 @@ exports.findAll = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
 
   const searchCountData = await User.findAndSearchAll(limit, offset, search);
-  return res.send(getPaginationData({ count: searchCountData.count, docs: searchCountData.data }, page, limit));
+  return res.send(
+    getPaginationData(
+      { count: searchCountData.count, docs: searchCountData.data },
+      page,
+      limit
+    )
+  );
 };
 
 exports.getAll = async function (req, res) {
