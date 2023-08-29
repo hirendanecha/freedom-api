@@ -123,7 +123,7 @@ Community.search = async function (searchText, limit, offset) {
   // }
 };
 
-Community.createCommunityAdmin = async function (data, result) {
+Community.joinCommunity = async function (data, result) {
   console.log(data);
   db.query("insert into communityMembers set ?", data, function (err, res) {
     if (err) {
@@ -132,6 +132,20 @@ Community.createCommunityAdmin = async function (data, result) {
       result(null, res.insertId);
     }
   });
+};
+
+Community.createCommunityAdmin = async function (isAdmin, id, result) {
+  db.query(
+    "update communityMembers set isAdmin=? where Id =?",
+    [isAdmin, id],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
 };
 
 Community.getCommunity = async function (id) {
