@@ -129,9 +129,9 @@ exports.search = async function (req, res) {
   return res.send(getPaginationData({ count, docs: data }, page, limit));
 };
 
-exports.createCommunityAdmin = function (req, res) {
+exports.joinCommunity = function (req, res) {
   const data = { ...req.body };
-  Community.createCommunityAdmin(data, function (err, result) {
+  Community.joinCommunity(data, function (err, result) {
     if (err) {
       return utils.send500(res, err);
     } else {
@@ -139,6 +139,26 @@ exports.createCommunityAdmin = function (req, res) {
         error: false,
         data: result,
       });
+    }
+  });
+};
+exports.createCommunityAdmin = function (req, res) {
+  const { isAdmin, id } = req.body;
+  Community.createCommunityAdmin(isAdmin, id, function (err, result) {
+    if (err) {
+      return utils.send500(res, err);
+    } else {
+      if (isAdmin === "Y") {
+        return res.json({
+          error: false,
+          message: "Member promoted successfully.",
+        });
+      } else {
+        return res.json({
+          error: false,
+          message: "Admin demoted successfully.",
+        });
+      }
     }
   });
 };
