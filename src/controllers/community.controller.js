@@ -107,6 +107,17 @@ exports.deleteCommunity = function (req, res) {
   }
 };
 
+exports.leaveFromCommunity = function (req, res) {
+  const { profileId, communityId } = req.query;
+  Community.leaveFromCommunity(profileId, communityId, function (err, result) {
+    if (err) return utils.send500(res, err);
+    res.json({
+      error: false,
+      message: "Removed from community successfully",
+    });
+  });
+};
+
 exports.findCommunityById = async function (req, res) {
   if (req.params.id) {
     const community = await Community.findCommunityById(req.params.id);
@@ -183,6 +194,18 @@ exports.getCommunityByUserId = async function (req, res) {
   const userId = req.params.id;
   console.log(userId);
   const communityList = await Community.getCommunityByUserId(userId);
+  if (!communityList) {
+    return utils.send500(err, res);
+  } else {
+    res.send({
+      error: false,
+      data: communityList,
+    });
+  }
+};
+exports.getJoinedCommunityByProfileId = async function (req, res) {
+  const { id } = req.params;
+  const communityList = await Community.getJoinedCommunityByProfileId(id);
   if (!communityList) {
     return utils.send500(err, res);
   } else {

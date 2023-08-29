@@ -90,6 +90,20 @@ Community.deleteCommunity = function (id, result) {
   });
 };
 
+Community.leaveFromCommunity = function (profileId, communityId, result) {
+  db.query(
+    "delete from communityMembers where profileId=? and communityId=?",
+    [profileId, communityId],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+};
+
 Community.findCommunityById = async function (id, result) {
   const query1 =
     "select c.*,p.Username,count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.Id=?;";
@@ -158,6 +172,22 @@ Community.getCommunity = async function (id) {
 Community.getCommunityByUserId = async function (id) {
   const query =
     "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.profileId =? group by c.Id;";
+  const values = id;
+  const communityList = await executeQuery(query, values);
+  console.log(communityList);
+  return communityList;
+};
+Community.getJoinedCommunityByProfileId = async function (id) {
+  const query = `SELECT 
+    c.*, COUNT(cm.Id) AS members
+    FROM
+    community AS c
+        LEFT JOIN
+    communityMembers AS cm ON cm.communityId = c.Id and cm.profileId != c.profileId
+    WHERE
+    c.isApprove = 'Y'
+        AND cm.profileId = ?
+    GROUP BY c.Id`;
   const values = id;
   const communityList = await executeQuery(query, values);
   console.log(communityList);
