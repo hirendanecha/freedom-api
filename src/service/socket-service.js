@@ -41,12 +41,14 @@ exports.createNotification = async function (data) {
 };
 
 getPost = async function (params) {
-  const { page, size, profileId } = params;
+  const { page, size, profileId, communityId } = params;
   const { limit, offset } = getPagination(page, size);
+  const communityCondition = communityId ? `p.communityId = ${communityId} AND` : 'p.communityId IS NULL AND';
+
   const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName 
   from 
   posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id  left join profile as pr on p.profileid = pr.ID 
-  where 
+  where ${communityCondition}
   p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
@@ -62,6 +64,7 @@ createNewPost = async function (data) {
     metaimage: data?.meta?.metaimage,
     metalink: data?.meta?.metalink,
     postdescription: data?.postdescription,
+    communityId: data?.communityId
   };
 
   postData.postcreationdate = new Date();

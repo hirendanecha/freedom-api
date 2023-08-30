@@ -48,7 +48,7 @@ CommunityPost.getCommunityPostById = function (profileId, result) {
 };
 
 CommunityPost.create = function (postData, result) {
-  db.query("INSERT INTO communityPostsset ?", postData, function (err, res) {
+  db.query("INSERT INTO communityPosts set ?", postData, function (err, res) {
     if (err) {
       console.log(err);
       result(err, null);
