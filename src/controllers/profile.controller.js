@@ -71,9 +71,8 @@ exports.editNotifications = async function (req, res) {
 };
 
 exports.getNotificationById = async function (req, res) {
-  const { id, page, size } = req.params;
-  const { limit, offset } = getPagination(page, size);
-  const data = await Profile.getNotificationById(id, limit, offset);
+  const { id } = req.params;
+  const data = await Profile.getNotificationById(id);
   return res.send({
     error: false,
     data: data,
