@@ -1,4 +1,5 @@
 const { executeQuery } = require("../helpers/utils");
+const { notificationMail } = require("../helpers/utils");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 const { param } = require("../routes");
 
@@ -43,7 +44,9 @@ exports.createNotification = async function (data) {
 getPost = async function (params) {
   const { page, size, profileId, communityId } = params;
   const { limit, offset } = getPagination(page, size);
-  const communityCondition = communityId ? `p.communityId = ${communityId} AND` : 'p.communityId IS NULL AND';
+  const communityCondition = communityId
+    ? `p.communityId = ${communityId} AND`
+    : "p.communityId IS NULL AND";
 
   const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName 
   from 
@@ -64,7 +67,7 @@ createNewPost = async function (data) {
     metaimage: data?.meta?.metaimage,
     metalink: data?.meta?.metalink,
     postdescription: data?.postdescription,
-    communityId: data?.communityId
+    communityId: data?.communityId,
   };
 
   postData.postcreationdate = new Date();
@@ -81,16 +84,31 @@ createNewPost = async function (data) {
       for (const key in data?.tags) {
         if (Object.hasOwnProperty.call(data?.tags, key)) {
           const tag = data?.tags[key];
-          
+
           const notification = await createNotification({
             notificationToProfileId: tag?.id,
             postId: post.insertId,
             notificationByProfileId: postData?.profileId,
-            actionType: 'T',
+            actionType: "T",
           });
           console.log(notification);
-
+          const findUser = `select u.Email,p.FirstName,p.LastName from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+          const values = [tag?.id];
+          const userData = await executeQuery(findUser, values);
+          console.log("userData ==>", userData);
+          const findSenderUser = `select p.ID,p.Username from profile as p where p.ID = ?`;
+          const values1 = [postData?.profileId];
+          const senderData = await executeQuery(findSenderUser, values1);
+          console.log("senderData ==>", senderData);
           notifications.push(notification);
+          const userDetails = {
+            email: userData[0].Email,
+            profileId: senderData[0].ID,
+            userName: senderData[0].Username,
+            firstName: userData[0].FirstName,
+            lastName: userData[0].LastName,
+          };
+          await notificationMail(userDetails);
         }
       }
     }
@@ -233,7 +251,10 @@ createNotification = async function (params) {
     "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
   const values = [notificationByProfileId];
   const userData = await executeQuery(query, values);
-  const desc = (actionType === 'T') ? (`${userData[0]?.FirstName || userData[0]?.Username} tag you in post.`) : (`${userData[0]?.FirstName || userData[0]?.Username} liked your post.`);
+  const desc =
+    actionType === "T"
+      ? `You were tagged in ${userData[0]?.FirstName || userData[0]?.Username}'s post.`
+      : `${userData[0]?.FirstName || userData[0]?.Username} liked your post.`;
   const data = {
     notificationToProfileId: Number(notificationToProfileId),
     postId: postId,

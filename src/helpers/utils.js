@@ -115,12 +115,12 @@ exports.forgotPasswordMail = async (user) => {
 };
 
 exports.notificationMail = async (userData) => {
-  let name = userData.FirstName + " " + userData.LastName;
-  let msg = userData.Username + "Tag you in post";
-  let redirectUrl = `${environment.FRONTEND_URL}login`;
+  let name = userData.firstName + " " + userData.lastName;
+  let msg = `You were tagged in ${userData.userName}'s post.`;
+  let redirectUrl = `${environment.FRONTEND_URL}settings/general/view-profile/${userData?.profileId}`;
 
   const mailObj = {
-    email: userData.Email,
+    email: userData.email,
     subject: "Freedom notification",
     root: "../email-templates/notification.ejs",
     templateData: { name: name, msg: msg, url: redirectUrl },
