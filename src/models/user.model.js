@@ -111,7 +111,7 @@ User.findAndSearchAll = async (limit, offset, search) => {
     `SELECT count(Id) as count FROM users WHERE ${whereCondition}`
   );
   const searchData = await executeQuery(
-    `SELECT Id, Email, Username, IsActive, DateCreation, IsAdmin, FirstName, LastName, Address, Country, City, State, Zip, AccountType, IsSuspended FROM users WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
+    `SELECT u.Id, u.Email, u.Username, u.IsActive, u.DateCreation, u.IsAdmin, u.FirstName, u.LastName, u.Address, u.Country, u.City, u.State, u.Zip, u.AccountType, u.IsSuspended,p.ProfilePicName FROM users as u left join profile as p on p.UserID = u.Id  WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
     [limit, offset]
   );
 
@@ -294,10 +294,10 @@ User.suspendUser = function (userId, status, result) {
 
 User.getAll = async function () {
   const query = `SELECT 
-          Id,
-          Username,
-          Email
-   from users where IsActive='Y' AND IsAdmin != 'Y' AND IsSuspended !='Y' order by DateCreation limit 150`;
+          p.ID,
+          p.Username,
+          p.FirstName
+   from users as u left join profile as p on p.UserID = u.Id where u.IsActive='Y' AND u.IsAdmin != 'Y' AND u.IsSuspended !='Y' AND p.Username is not NULL order by p.CreatedOn desc limit 500`;
   const values = [];
   const user = await executeQuery(query, values);
   console.log("users===>", user);

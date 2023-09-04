@@ -19,6 +19,7 @@ router.get("/files/:folder/:id", utilsController.getFiles);
 router.post("/upload-community", utilsController.uploadPostImage);
 router.post("/create", communityController.createCommunity);
 router.post("/join-community", communityController.joinCommunity);
+router.post("/create-community-admin-by-MA", communityController.createCommunityAdminByMA);
 router.put("/create-community-admin", communityController.createCommunityAdmin);
 router.delete("/leave", communityController.leaveFromCommunity);
 router.delete("/:id", communityController.deleteCommunity);

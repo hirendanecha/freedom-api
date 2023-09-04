@@ -162,6 +162,23 @@ Community.createCommunityAdmin = async function (isAdmin, id, result) {
   );
 };
 
+Community.createCommunityAdminByMA = async function (data) {
+  const query =
+    "select * from communityMembers where profileId = ? and communityId= ?";
+  const values = [data.profileId, data.communityId];
+  const member = await executeQuery(query, values);
+  if (member.length) {
+    const query =
+      "update communityMembers set isAdmin=? where profileId =? and communityId = ?";
+    const values = [data.isAdmin, data.profileId, data.communityId];
+    const member = await executeQuery(query, values);
+  } else {
+    const query = "insert into communityMembers set ?";
+    const values = [data];
+    const member = await executeQuery(query, values);
+  }
+};
+
 Community.getCommunity = async function (id) {
   const query =
     "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.profileId != ? group by c.Id;";
