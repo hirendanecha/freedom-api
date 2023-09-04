@@ -85,3 +85,56 @@ exports.deleteNotification = function (req, res) {
     res.json({ error: false, message: "Notification deleted successfully" });
   });
 };
+
+exports.groupsAndPosts = async function (req, res) {
+  try {
+    const groupedPosts = await Profile.groupsAndPosts();
+  
+    return res.send(groupedPosts);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+
+exports.getGroups = async function (req, res) {
+  try {
+    const groups = await Profile.getGroups();
+  
+    return res.send(groups);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+
+exports.getGroupBasicDetails = async function (req, res) {
+  try {
+    const { uniqueLink } = req.params;
+    const groupDetails = await Profile.getGroupBasicDetails(uniqueLink);
+  
+    return res.send(groupDetails);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+
+exports.getGroupPostById = async function (req, res) {
+  try {
+    const { id } = req.params;
+    const posts = await Profile.getGroupPostById(id);
+  
+    return res.send(posts);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+
+exports.getGroupFileResourcesById = async function (req, res) {
+  try {
+    const { id } = req.params;
+    const posts = await Profile.getGroupFileResourcesById(id);
+  
+    return res.send(posts);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};

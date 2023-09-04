@@ -9,6 +9,7 @@ const communityRouter = require("./community.routes");
 const communityPostRouter = require("./community-post.routes");
 const unsubscribeProfileRouter = require("./unsubscribeProfile.routes");
 const seeFirstUserRouter = require("./seeFirstUser.routes");
+const profileRouter = require("./profile.routes");
 
 router.use("/login", authRoutes);
 router.use("/customers", authRoutes);
@@ -19,5 +20,6 @@ router.use("/community", communityRouter);
 router.use("/community-post", communityPostRouter);
 router.use("/unsubscribe-profile", unsubscribeProfileRouter);
 router.use("/see-first-user", seeFirstUserRouter);
+router.use("/profile", profileRouter);
 
 module.exports = router;
