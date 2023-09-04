@@ -86,3 +86,45 @@ exports.deletePost = function (req, res) {
     return utils.send404(res, err);
   }
 };
+
+exports.getPostComments = async function (req, res) {
+  if (req.params.id) {
+    // Post.getPostComments(req.params.id, function (err, comments) {
+    //   if (err) {
+    //     return utils.send500(res, err);
+    //   } else {
+    //     res.send({
+    //       error: false,
+    //       data: comments,
+    //     });
+    //   }
+    // });
+
+    const data = await Post.getPostComments(req.params.id);
+    if (data) {
+      res.send({
+        error: false,
+        data: data,
+      });
+    }
+  } else {
+    return utils.send404(res, err);
+  }
+};
+
+exports.deletePostComment = function (req, res) {
+  if (req.params.id) {
+    Post.deletePostComment(req.params.id, function (err) {
+      if (err) {
+        return utils.send500(res, err);
+      } else {
+        res.send({
+          error: false,
+          message: "Comment deleted sucessfully",
+        });
+      }
+    });
+  } else {
+    return utils.send404(res, err);
+  }
+};

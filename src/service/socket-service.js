@@ -37,8 +37,21 @@ exports.likeFeedPost = async function (data) {
 exports.disLikeFeedPost = async function (data) {
   return await disLikeFeedPost(data);
 };
+
 exports.createNotification = async function (data) {
   return await createNotification(data);
+};
+
+exports.createComments = async function (data) {
+  return await createComments(data);
+};
+
+exports.likeFeedComment = async function (data) {
+  return await likeFeedComment(data);
+};
+
+exports.disLikeFeedComment = async function (data) {
+  return await disLikeFeedComment(data);
 };
 
 getPost = async function (params) {
@@ -55,6 +68,18 @@ getPost = async function (params) {
   p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
+  // if (posts.length > 0) {
+  //   for (const key in posts) {
+  //     if (Object.hasOwnProperty.call(posts, key)) {
+  //       const post = posts[key];
+  //       const query =
+  //         "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.postId = ?";
+  //       const value = [post.id];
+  //       const comment = await executeQuery(query, value);
+  //       post.commentList = comment;
+  //     }
+  //   }
+  // }
   return posts;
 };
 
@@ -246,15 +271,33 @@ createNotification = async function (params) {
     postId,
     notificationByProfileId,
     actionType,
+    commentId,
   } = params;
   const query =
     "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
   const values = [notificationByProfileId];
   const userData = await executeQuery(query, values);
-  const desc =
-    actionType === "T"
-      ? `You were tagged in ${userData[0]?.FirstName || userData[0]?.Username}'s post.`
-      : `${userData[0]?.FirstName || userData[0]?.Username} liked your post.`;
+  let desc = "";
+  if (commentId && actionType === "L") {
+    desc = `${
+      userData[0]?.FirstName || userData[0]?.Username
+    } liked your Comment.`;
+  } else {
+    desc =
+      actionType === "R"
+        ? `${
+            userData[0]?.FirstName || userData[0]?.Username
+          } replied to your comment`
+        : actionType === "C"
+        ? `${
+            userData[0]?.FirstName || userData[0]?.Username
+          } commented on your post`
+        : actionType === "T"
+        ? `You were tagged in ${
+            userData[0]?.FirstName || userData[0]?.Username
+          }'s post.`
+        : `${userData[0]?.FirstName || userData[0]?.Username} liked your post.`;
+  }
   const data = {
     notificationToProfileId: Number(notificationToProfileId),
     postId: postId,
@@ -278,5 +321,79 @@ createNotification = async function (params) {
       const notificationData = await executeQuery(query1, values1);
       return { ...data, id: notificationData.insertId };
     }
+  }
+};
+
+createComments = async function (params) {
+  const data = {
+    postId: params?.postId,
+    profileId: params?.profileId,
+    comment: params?.comment,
+    parentCommentId: params?.parentCommentId,
+  };
+  const query = "insert into comments set ?";
+  const values = [data];
+  const commentData = await executeQuery(query, values);
+  let notifications = [];
+  let notification = {};
+  if (data.parentCommentId) {
+    const query1 = "select profileId from comments where postId= ?";
+    const value = [data.postId];
+    const comments = await executeQuery(query1, value);
+    console.log(comments);
+    notification = await createNotification({
+      notificationToProfileId: comments[0].profileId,
+      postId: data.postId,
+      notificationByProfileId: data?.profileId,
+      actionType: "R",
+    });
+  } else {
+    const query1 = "select profileid from posts where id= ?";
+    const value = [data.postId];
+    const posts = await executeQuery(query1, value);
+    notification = await createNotification({
+      notificationToProfileId: posts[0].profileid,
+      postId: data.postId,
+      notificationByProfileId: data?.profileId,
+      actionType: "C",
+    });
+  }
+  notifications.push(notification);
+  console.log(notifications);
+  const query3 =
+    "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.id = ?";
+  const value3 = [commentData.insertId];
+  const comments = await executeQuery(query3, value3);
+  return { notifications, comments };
+};
+
+likeFeedComment = async function (params) {
+  const { commentId, profileId, likeCount, actionType } = params;
+  const query = `update comments set likeCount = ? where id =?`;
+  const query1 = `INSERT INTO commentsLikesDislikes set ?`;
+  const values = [likeCount, commentId];
+  const data = {
+    commentId: commentId,
+    profileId: profileId,
+    actionType: actionType,
+  };
+  const values1 = [data];
+  const post = await executeQuery(query, values);
+  const likeData = await executeQuery(query1, values1);
+  const postData = await getPost({ page: 1, size: 15 });
+  return postData;
+};
+
+disLikeFeedComment = async function (params) {
+  const { commentId, profileId, likeCount } = params;
+  if (postId) {
+    const query = `update comments set likescount = ? where id =?`;
+    const query1 = `delete from commentsLikesDislikes where commentId = ? AND profileId = ?`;
+    const values = [likeCount, commentId];
+    const values1 = [commentId, profileId];
+    const post = await executeQuery(query, values);
+    const likeData = await executeQuery(query1, values1);
+    const postData = await getPost({ profileId: profileId, page: 1, size: 15 });
+    return postData;
   }
 };

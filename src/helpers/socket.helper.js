@@ -91,7 +91,7 @@ socket.config = (server) => {
           for (const key in data?.notifications) {
             if (Object.hasOwnProperty.call(data?.notifications, key)) {
               const notification = data?.notifications[key];
-              
+
               io.to(`${notification.notificationToProfileId}`).emit(
                 "notification",
                 notification
@@ -214,20 +214,20 @@ socket.config = (server) => {
             "notification",
             notification
           );
-        } else if (params.communityPostId) {
-          const data = await socketService.likeFeedPost(params);
-          socket.broadcast.emit("community-post", data);
-          const notification = await socketService.createNotification({
-            notificationToProfileId: params.toProfileId,
-            postId: params.communityPostId,
-            notificationByProfileId: params.profileId,
-            actionType: params.actionType,
-          });
-          // notification - emit - to user
-          io.to(`${notification.notificationToProfileId}`).emit(
-            "notification",
-            notification
-          );
+          // } else if (params.communityPostId) {
+          //   const data = await socketService.likeFeedPost(params);
+          //   socket.broadcast.emit("community-post", data);
+          //   const notification = await socketService.createNotification({
+          //     notificationToProfileId: params.toProfileId,
+          //     postId: params.communityPostId,
+          //     notificationByProfileId: params.profileId,
+          //     actionType: params.actionType,
+          //   });
+          //   // notification - emit - to user
+          //   io.to(`${notification.notificationToProfileId}`).emit(
+          //     "notification",
+          //     notification
+          //   );
         }
       } else {
         if (params.postId) {
@@ -247,6 +247,56 @@ socket.config = (server) => {
         method: "User like on post",
         params: params,
       });
+    });
+
+    socket.on("comments-on-post", async (params) => {
+      console.log(params);
+      const data = await socketService.createComments(params);
+      if (data.comments) {
+        socket.emit("comments-on-post", data?.comments);
+      }
+      if (data?.notifications) {
+        for (const key in data?.notifications) {
+          if (Object.hasOwnProperty.call(data?.notifications, key)) {
+            const notification = data?.notifications[key];
+            io.to(`${notification.notificationToProfileId}`).emit(
+              "notification",
+              notification
+            );
+          }
+        }
+      }
+      logger.info("comments on post", {
+        method: "User comment on post",
+        params: params,
+      });
+    });
+
+    socket.on("likeOrDislikeComments", async (params) => {
+      logger.info("like", {
+        method: "Like on post",
+        params: params,
+      });
+      if (params.actionType) {
+        const data = await socketService.likeFeedComment(params);
+        socket.broadcast.emit("new-post", data);
+        const notification = await socketService.createNotification({
+          notificationToProfileId: params.toProfileId,
+          postId: params.postId,
+          commentId: params.commentId,
+          notificationByProfileId: params.profileId,
+          actionType: params.actionType,
+        });
+        console.log(notification);
+        // notification - emit - to user
+        io.to(`${notification.notificationToProfileId}`).emit(
+          "notification",
+          notification
+        );
+      } else {
+        const data = await socketService.disLikeFeedComment(params);
+          socket.broadcast.emit("new-post", data);
+      }
     });
   });
 };
