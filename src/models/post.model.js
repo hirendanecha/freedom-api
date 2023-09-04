@@ -92,4 +92,46 @@ Post.delete = function (id, result) {
   });
 };
 
+Post.deletePostComment = function (id, result) {
+  db.query("DELETE FROM comments WHERE id = ?", [id], function (err, res) {
+    if (err) {
+      console.log("error", err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
+Post.getPostComments = async function (id) {
+  // db.query(
+  //   "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.postId = ?",
+  //   [id],
+  //   function (err, res) {
+  //     if (err) {
+  //       console.log("error", err);
+  //       result(err, null);
+  //     } else {
+  //       result(null, res);
+  //     }
+  //   }
+  // );
+
+  const query =
+    "select c.*,pr.ProfilePicName,pr.Username, pr.FirstName, cl.actionType as react from comments as c left join commentsLikesDislikes as cl on cl.commentId = c.id left join profile as pr on pr.ID = c.profileId where c.postId = ? and c.parentCommentId is NULL";
+  const values = [id];
+  const commmentsList = await executeQuery(query, values);
+  if (commmentsList.length >= 0) {
+    const ids = commmentsList.map((ele) => Number(ele.id)).join(",");
+    console.log(commmentsList);
+    const query =
+      "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName, cl.actionType as react from comments as c left join commentsLikesDislikes as cl on cl.commentId = c.id left join profile as pr on pr.ID = c.profileId where c.parentCommentId in (?)";
+    const values = ids;
+    const replyCommnetsList = await executeQuery(query, values);
+    return { commmentsList, replyCommnetsList };
+  } else {
+    return null;
+  }
+};
+
 module.exports = Post;
