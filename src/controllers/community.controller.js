@@ -60,18 +60,28 @@ exports.createCommunity = function (req, res) {
 exports.approveCommunity = function (req, res) {
   console.log(req.params.id, req.query.IsApprove);
   const communityId = req.params.id;
+  const isApprove = req.query.IsApprove;
+  const profileId = req.query.profileId;
   Community.approveCommunity(
     communityId,
-    req.query.IsApprove,
-    function (err, result) {
+    isApprove,
+    async function (err, result) {
       if (err) {
         return utils.send500(err, res);
       } else {
+        await utils.communityApproveEmail(profileId, isApprove);
         console.log(result);
-        res.json({
-          error: false,
-          message: "Community approve successfully",
-        });
+        if (isApprove === "Y") {
+          res.json({
+            error: false,
+            message: "Community approved successfully",
+          });
+        } else {
+          res.json({
+            error: false,
+            message: "Community unapproved successfully",
+          });
+        }
       }
     }
   );
@@ -153,6 +163,7 @@ exports.joinCommunity = function (req, res) {
     }
   });
 };
+
 exports.createCommunityAdmin = function (req, res) {
   const { isAdmin, id } = req.body;
   Community.createCommunityAdmin(isAdmin, id, function (err, result) {
@@ -172,6 +183,18 @@ exports.createCommunityAdmin = function (req, res) {
       }
     }
   });
+};
+
+exports.createCommunityAdminByMA = function (req, res) {
+  const data = { ...req.body };
+  console.log(data);
+  const member = Community.createCommunityAdminByMA(data);
+  if (member) {
+    return res.json({
+      error: false,
+      message: "Member promoted successfully.",
+    });
+  }
 };
 
 // Client Api //

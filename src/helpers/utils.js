@@ -130,6 +130,31 @@ exports.notificationMail = async (userData) => {
   return;
 };
 
+exports.communityApproveEmail = async (profileId, isApprove) => {
+  const query =
+    "select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.ID =?";
+  const values = [profileId];
+  const userData = await this.executeQuery(query, values);
+  if (userData) {
+    let name = userData[0]?.FirstName + " " + userData[0]?.LastName;
+    let msg = "";
+    if (isApprove === "Y") {
+      msg = `Your community has been aprroved by Master Admin.`;
+    } else {
+      msg = `Your community has been upaprroved by Master Admin.`;
+    }
+    let redirectUrl = `${environment.FRONTEND_URL}`;
+    const mailObj = {
+      email: userData[0].Email,
+      subject: "Freedom notification",
+      root: "../email-templates/notification.ejs",
+      templateData: { name: name, msg: msg, url: redirectUrl },
+    };
+    await email.sendMail(mailObj);
+    return;
+  }
+};
+
 exports.executeQuery = async (query, values = []) => {
   return new Promise((resolve, reject) => {
     db.query(query, values, function (err, result) {
