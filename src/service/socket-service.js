@@ -93,6 +93,7 @@ createNewPost = async function (data) {
     metalink: data?.meta?.metalink,
     postdescription: data?.postdescription,
     communityId: data?.communityId,
+    imageUrl: data?.imageUrl
   };
 
   postData.postcreationdate = new Date();
