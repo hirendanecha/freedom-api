@@ -150,7 +150,7 @@ Profile.groupsAndPosts = async () => {
   const groupIds = groupsResult.map((group) => group.ID);
 
   const postsResult = await executeQuery(
-    'SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid IN (?)',
+    'SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid IN (?) ORDER BY ID DESC',
     [groupIds]
   );   
 
@@ -207,11 +207,13 @@ Profile.getGroupBasicDetails = async (uniqueLink) => {
   return groupsResult?.[0] || {};
 };
 
-Profile.getGroupPostById = async (id) => {
-  const posts = await executeQuery(
-    'SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid=?',
-    [id]
-  );   
+Profile.getGroupPostById = async (id, limit, offset) => {
+  let query = `SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid=${id} ORDER BY ID DESC `;  
+
+  if (limit > 0 && offset >= 0) {
+    query += `LIMIT ${limit} OFFSET ${offset}`
+  }
+  const posts = await executeQuery(query);   
 
   return posts || [];
 };
