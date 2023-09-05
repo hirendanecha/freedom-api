@@ -220,7 +220,7 @@ Profile.getGroupPostById = async (id, limit, offset) => {
 
 Profile.getGroupFileResourcesById = async (id) => {
   const posts = await executeQuery(
-    "SELECT p.ID AS PostID, p.PostDescription, p.PostCreationDate AS UploadedOn FROM posts AS p WHERE isdeleted = 'N' AND  p.posttype = 'F' AND (p.ProfileID = ? OR p.PostToProfileID = ?)",
+    "SELECT p.ID AS PostID, p.PostDescription, p.PostCreationDate AS UploadedOn, ph.PhotoName as FileName FROM posts AS p LEFT JOIN photos as ph on p.ID = ph.PostID WHERE isdeleted = 'N' AND  p.posttype = 'F' AND (p.ProfileID = ? OR p.PostToProfileID = ?)",
     [id, id]
   );   
 
