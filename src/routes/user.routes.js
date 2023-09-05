@@ -27,5 +27,6 @@ router.get("/user/verification/:token", userController.verification);
 router.get("/edit-notification/:id", profileController.editNotifications);
 router.delete("/:id", userController.delete);
 router.delete("/notification/:id", profileController.deleteNotification);
+router.get("/groupsAndPosts", profileController.groupsAndPosts);
 
 module.exports = router;
