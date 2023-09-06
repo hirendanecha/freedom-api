@@ -123,11 +123,14 @@ Post.getPostComments = async function (id) {
   const commmentsList = await executeQuery(query, values);
   if (commmentsList.length >= 0) {
     const ids = commmentsList.map((ele) => Number(ele.id)).join(",");
-    console.log(commmentsList);
-    const query =
-      "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName, cl.actionType as react from comments as c left join commentsLikesDislikes as cl on cl.commentId = c.id left join profile as pr on pr.ID = c.profileId where c.parentCommentId in (?)";
-    const values = ids;
-    const replyCommnetsList = await executeQuery(query, values);
+    console.log(ids);
+    const query = `select c.*,pr.ProfilePicName, pr.Username, pr.FirstName, cl.actionType as react from comments as c left join commentsLikesDislikes as cl on cl.commentId = c.id left join profile as pr on pr.ID = c.profileId where c.parentCommentId in (${
+      ids || ""
+    })`;
+    // const values = ids;
+    console.log({ query });
+    const replyCommnetsList = await executeQuery(query);
+    console.log({ commmentsList, replyCommnetsList });
     return { commmentsList, replyCommnetsList };
   } else {
     return null;

@@ -180,8 +180,13 @@ Community.createCommunityAdminByMA = async function (data) {
 };
 
 Community.getCommunity = async function (id) {
-  const query =
-    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.profileId != ? group by c.Id;";
+  const query1 = "select communityId from communityMembers where profileId = ?";
+  const communityId = await executeQuery(query1, [id]);
+  const ids = communityId.map((ele) => Number(ele.communityId)).join(",");
+  console.log(ids);
+  const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.communityId not in (${
+    ids || ""
+  }) AND cm.profileId != ? group by c.Id;`;
   const communityList = await executeQuery(query, [id]);
   return communityList;
 };
@@ -194,9 +199,10 @@ Community.getCommunityByUserId = async function (id) {
   console.log(communityList);
   return communityList;
 };
+
 Community.getJoinedCommunityByProfileId = async function (id) {
   const query = `SELECT 
-    c.*, COUNT(cm.Id) AS members
+    c.*, COUNT(cm.profileId) AS members
     FROM
     community AS c
         LEFT JOIN
