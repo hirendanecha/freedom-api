@@ -86,26 +86,28 @@ getPost = async function (params) {
 createNewPost = async function (data) {
   console.log("post-data", data);
   const postData = {
-    profileId: data?.profileId,
+    profileid: data?.profileid,
     title: data?.meta?.title,
     metadescription: data?.meta?.metadescription,
     metaimage: data?.meta?.metaimage,
     metalink: data?.meta?.metalink,
     postdescription: data?.postdescription,
     communityId: data?.communityId,
-    imageUrl: data?.imageUrl
+    imageUrl: data?.imageUrl,
   };
 
   postData.postcreationdate = new Date();
   postData.isdeleted = "N";
   postData.posttype = "S";
-  const query = `INSERT INTO posts set ?`;
-  const values = [postData];
+  const query = data?.id
+    ? `update posts set ? where id= ?`
+    : `INSERT INTO posts set ?`;
+  const values = data?.id ? [postData, data?.id] : [postData];
   const post = await executeQuery(query, values);
-  console.log(post.insertId);
+  console.log(post);
 
   const notifications = [];
-  if (post.insertId) {
+  if (post) {
     if (data?.tags?.length > 0) {
       for (const key in data?.tags) {
         if (Object.hasOwnProperty.call(data?.tags, key)) {
@@ -113,19 +115,17 @@ createNewPost = async function (data) {
 
           const notification = await createNotification({
             notificationToProfileId: tag?.id,
-            postId: post.insertId,
-            notificationByProfileId: postData?.profileId,
+            postId: data?.id || post.insertId,
+            notificationByProfileId: postData?.profileid,
             actionType: "T",
           });
           console.log(notification);
           const findUser = `select u.Email,p.FirstName,p.LastName from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
           const values = [tag?.id];
           const userData = await executeQuery(findUser, values);
-          console.log("userData ==>", userData);
           const findSenderUser = `select p.ID,p.Username from profile as p where p.ID = ?`;
-          const values1 = [postData?.profileId];
+          const values1 = [postData?.profileid];
           const senderData = await executeQuery(findSenderUser, values1);
-          console.log("senderData ==>", senderData);
           notifications.push(notification);
           const userDetails = {
             email: userData[0].Email,
@@ -140,7 +140,7 @@ createNewPost = async function (data) {
     }
 
     const query1 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
-    const values1 = [post.insertId];
+    const values1 = [data?.id || post.insertId];
     const posts = await executeQuery(query1, values1);
     return { notifications, posts };
   }
@@ -283,6 +283,7 @@ createNotification = async function (params) {
     desc = `${
       userData[0]?.FirstName || userData[0]?.Username
     } liked your Comment.`;
+    console.log("desc===>", desc);
   } else {
     desc =
       actionType === "R"
@@ -306,6 +307,7 @@ createNotification = async function (params) {
     actionType: actionType,
     notificationDesc: desc,
   };
+  console.log(data, "==>");
   if (data.notificationByProfileId === data.notificationToProfileId) {
     return true;
   } else {
@@ -387,8 +389,8 @@ likeFeedComment = async function (params) {
 
 disLikeFeedComment = async function (params) {
   const { commentId, profileId, likeCount } = params;
-  if (postId) {
-    const query = `update comments set likescount = ? where id =?`;
+  if (commentId) {
+    const query = `update comments set likeCount = ? where id =?`;
     const query1 = `delete from commentsLikesDislikes where commentId = ? AND profileId = ?`;
     const values = [likeCount, commentId];
     const values1 = [commentId, profileId];
