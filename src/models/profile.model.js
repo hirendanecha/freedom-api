@@ -150,7 +150,7 @@ Profile.groupsAndPosts = async () => {
   const groupIds = groupsResult.map((group) => group.ID);
 
   const postsResult = await executeQuery(
-    'SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid IN (?)',
+    'SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid IN (?) ORDER BY ID DESC',
     [groupIds]
   );   
 
@@ -207,18 +207,20 @@ Profile.getGroupBasicDetails = async (uniqueLink) => {
   return groupsResult?.[0] || {};
 };
 
-Profile.getGroupPostById = async (id) => {
-  const posts = await executeQuery(
-    'SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid=?',
-    [id]
-  );   
+Profile.getGroupPostById = async (id, limit, offset) => {
+  let query = `SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid=${id} ORDER BY ID DESC `;  
+
+  if (limit > 0 && offset >= 0) {
+    query += `LIMIT ${limit} OFFSET ${offset}`
+  }
+  const posts = await executeQuery(query);   
 
   return posts || [];
 };
 
 Profile.getGroupFileResourcesById = async (id) => {
   const posts = await executeQuery(
-    "SELECT p.ID AS PostID, p.PostDescription, p.PostCreationDate AS UploadedOn FROM posts AS p WHERE isdeleted = 'N' AND  p.posttype = 'F' AND (p.ProfileID = ? OR p.PostToProfileID = ?)",
+    "SELECT p.ID AS PostID, p.PostDescription, p.PostCreationDate AS UploadedOn, ph.PhotoName as FileName FROM posts AS p LEFT JOIN photos as ph on p.ID = ph.PostID WHERE isdeleted = 'N' AND  p.posttype = 'F' AND (p.ProfileID = ? OR p.PostToProfileID = ?)",
     [id, id]
   );   
 

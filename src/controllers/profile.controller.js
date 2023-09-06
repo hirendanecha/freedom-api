@@ -120,10 +120,14 @@ exports.getGroupBasicDetails = async function (req, res) {
 exports.getGroupPostById = async function (req, res) {
   try {
     const { id } = req.params;
-    const posts = await Profile.getGroupPostById(id);
+    const { page, limit } = req.query;
+    const offset = page > 0 ? (page - 1)*limit : 0;
+
+    const posts = await Profile.getGroupPostById(id, limit, offset);
   
     return res.send(posts);
   } catch (error) {
+    console.log('error : ', error);
     return utils.send500(res, error);
   }
 };
