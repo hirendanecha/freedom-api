@@ -125,16 +125,19 @@ Post.getPostComments = async function (id) {
     const ids = commmentsList.map((ele) => Number(ele.id)).join(",");
     console.log(ids);
     const query = `select c.*,pr.ProfilePicName, pr.Username, pr.FirstName, cl.actionType as react from comments as c left join commentsLikesDislikes as cl on cl.commentId = c.id left join profile as pr on pr.ID = c.profileId where c.parentCommentId in (${
-      ids || ""
+      ids || NULL
     })`;
-    // const values = ids;
-    console.log({ query });
     const replyCommnetsList = await executeQuery(query);
-    console.log({ commmentsList, replyCommnetsList });
     return { commmentsList, replyCommnetsList };
   } else {
     return null;
   }
+};
+
+Post.editPost = async function (post) {
+  const query = "update posts set ? where id = ?";
+  const values = [post, post.id];
+  const postData = await executeQuery(query, values);
 };
 
 module.exports = Post;

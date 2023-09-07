@@ -2,6 +2,7 @@ const Profile = require("../models/profile.model");
 const utils = require("../helpers/utils");
 const environments = require("../environments/environment");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
+const User = require("../models/user.model");
 
 exports.create = function (req, res) {
   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
@@ -40,7 +41,26 @@ exports.updateProfile = function (req, res) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const profileId = req.params.id;
-    const profile = new Profile({ ...req.body });
+    const reqBody = req.body;
+    const profile = new Profile({ ...reqBody });
+    
+    if (req.body.UserID) {
+      const updateUserData = {
+        Username: reqBody?.Username,
+        FirstName: reqBody?.FirstName,
+        LastName: reqBody?.LastName,
+        Address: reqBody?.Address,
+        Zip: reqBody?.Zip,
+        City: reqBody?.City,
+        State: reqBody?.State,
+        Country: reqBody?.Country,
+      };
+
+      User.update(req.body.UserID, updateUserData, (err, result) => {
+        if (err) return utils.send500(res, err);
+      });
+    }
+
     Profile.update(profileId, profile, async function (err, profile) {
       if (err) return utils.send500(res, err);
       return res.json({
