@@ -184,9 +184,14 @@ Community.getCommunity = async function (id) {
   const communityId = await executeQuery(query1, [id]);
   const ids = communityId.map((ele) => Number(ele.communityId)).join(",");
   console.log(ids);
-  const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.communityId not in (${
-    ids || ""
-  }) AND cm.profileId != ? group by c.Id;`;
+  let query = "";
+  if (ids) {
+    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.communityId not in (${
+      ids || ""
+    }) AND cm.profileId != ? group by c.Id;`;
+  } else {
+    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND  cm.profileId != ? group by c.Id;`;
+  }
   const communityList = await executeQuery(query, [id]);
   return communityList;
 };
