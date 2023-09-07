@@ -85,7 +85,7 @@ socket.config = (server) => {
       const data = await socketService.createPost(params);
       console.log(data);
       if (data?.posts) {
-        socket.emit("create-new-post", data?.posts);
+        // socket.emit("create-new-post", data?.posts);
 
         if (data?.notifications) {
           for (const key in data?.notifications) {
