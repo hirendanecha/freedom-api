@@ -30,7 +30,7 @@ exports.getPostByPostId = function (req, res) {
   console.log(req.params.id);
   Post.getPostByPostId(req.params.id, function (err, post) {
     if (err) return utils.send500(res, err);
-    res.send(post[0]);
+    res.send(post);
   });
 };
 
