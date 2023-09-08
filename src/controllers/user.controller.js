@@ -266,10 +266,11 @@ exports.userSuspend = function (req, res) {
 };
 
 exports.delete = function (req, res) {
-  User.delete(req.params.id, function (err) {
-    if (err) return utils.send500(res, err);
+  console.log(req.params.id);
+  const isdeleted = User.delete(req.params.id);
+  if (isdeleted) {
     res.json({ error: false, message: "User deleted successfully" });
-  });
+  }
 };
 
 exports.adminLogin = async function (req, res) {
