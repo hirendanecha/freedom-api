@@ -198,7 +198,7 @@ Community.getCommunity = async function (id) {
 
 Community.getCommunityByUserId = async function (id) {
   const query =
-    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.profileId =? group by c.Id;";
+    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.profileId =? group by c.Id;";
   const values = id;
   const communityList = await executeQuery(query, values);
   console.log(communityList);
