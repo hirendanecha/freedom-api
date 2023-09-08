@@ -185,7 +185,7 @@ User.update = function (user_id, user, result) {
 
 User.delete = async function (user_id) {
   const query = "DELETE FROM users WHERE Id = ?";
-  const query1 = "DELETE FROM proflie WHERE UserID = ?";
+  const query1 = "DELETE FROM profile WHERE UserID = ?";
   const values = [user_id];
   const user = await executeQuery(query, values);
   const users = await executeQuery(query1, values);
