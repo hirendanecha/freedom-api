@@ -107,7 +107,7 @@ exports.changeAccountType = function (req, res) {
 
 exports.deleteCommunity = function (req, res) {
   if (req.params.id) {
-    Community.deleteCommunity(req.params.id, function (err, res) {
+    Community.deleteCommunity(req.params.id, function (err, result) {
       if (err) return utils.send500(res, err);
       res.json({
         error: false,
