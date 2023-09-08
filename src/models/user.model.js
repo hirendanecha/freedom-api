@@ -189,6 +189,7 @@ User.delete = async function (user_id) {
   const values = [user_id];
   const user = await executeQuery(query, values);
   const users = await executeQuery(query1, values);
+  return true;
   // db.query("DELETE FROM users WHERE Id = ?", [user_id], function (err, res) {
   //   if (err) {
   //     console.log("error", err);
