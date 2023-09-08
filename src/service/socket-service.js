@@ -127,14 +127,16 @@ createNewPost = async function (data) {
           const values1 = [postData?.profileid];
           const senderData = await executeQuery(findSenderUser, values1);
           notifications.push(notification);
-          const userDetails = {
-            email: userData[0].Email,
-            profileId: senderData[0].ID,
-            userName: senderData[0].Username,
-            firstName: userData[0].FirstName,
-            lastName: userData[0].LastName,
-          };
-          await notificationMail(userDetails);
+          if (tag?.id) {
+            const userDetails = {
+              email: userData[0].Email,
+              profileId: senderData[0].ID,
+              userName: senderData[0].Username,
+              firstName: userData[0].FirstName,
+              lastName: userData[0].LastName,
+            };
+            await notificationMail(userDetails);
+          }
         }
       }
     }
