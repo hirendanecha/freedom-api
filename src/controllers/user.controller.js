@@ -266,7 +266,7 @@ exports.userSuspend = function (req, res) {
 };
 
 exports.delete = function (req, res) {
-  User.delete(req.params.id, function (err, result) {
+  User.delete(req.params.id, function (err) {
     if (err) return utils.send500(res, err);
     res.json({ error: false, message: "User deleted successfully" });
   });
