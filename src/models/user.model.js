@@ -183,16 +183,21 @@ User.update = function (user_id, user, result) {
   );
 };
 
-User.delete = function (user_id, result) {
-  db.query("DELETE FROM users WHERE Id = ?", [user_id], function (err, res) {
-    if (err) {
-      console.log("error", err);
-      result(err, null);
-    } else {
-      console.log("user deleted", res);
-      result(null, res);
-    }
-  });
+User.delete = async function (user_id) {
+  const query = "DELETE FROM users WHERE Id = ?";
+  const query1 = "DELETE FROM proflie WHERE UserID = ?";
+  const values = [user_id];
+  const user = await executeQuery(query, values);
+  const users = await executeQuery(query1, values);
+  // db.query("DELETE FROM users WHERE Id = ?", [user_id], function (err, res) {
+  //   if (err) {
+  //     console.log("error", err);
+  //     result(err, null);
+  //   } else {
+  //     console.log("user deleted", res);
+  //     result(null, res);
+  //   }
+  // });
 };
 
 User.changeAccountType = function (userId, type, result) {
