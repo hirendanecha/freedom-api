@@ -335,6 +335,7 @@ createComments = async function (params) {
     profileId: params?.profileId,
     comment: params?.comment,
     parentCommentId: params?.parentCommentId,
+    imageUrl: params?.imageUrl,
   };
   const query = "insert into comments set ?";
   const values = [data];
