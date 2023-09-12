@@ -119,6 +119,15 @@ Community.findCommunityById = async function (id, result) {
   return community;
 };
 
+Community.findCommunityByName = async function (name) {
+  const query ="select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.CommunityName=?";
+  const values = [name];
+
+  const community = await executeQuery(query, values);
+  
+  return community;
+};
+
 Community.search = async function (searchText, limit, offset) {
   // const { searchText } = query;
   if (searchText) {

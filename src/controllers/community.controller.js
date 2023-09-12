@@ -142,6 +142,25 @@ exports.findCommunityById = async function (req, res) {
   }
 };
 
+exports.findCommunityByName = async function (req, res) {
+  if (req.params.name) {
+    const community = await Community.findCommunityByName(req.params.name);
+    if (community) {
+      res.send(community);
+    } else {
+      res.status(400).send({
+        error: true,
+        message: "Community not found",
+      });
+    }
+  } else {
+    res.status(400).send({
+      error: true,
+      message: "Pass valid params",
+    });
+  }
+};
+
 exports.search = async function (req, res) {
   const { page, size, searchText } = req.query;
   const { limit, offset } = getPagination(page, size);
