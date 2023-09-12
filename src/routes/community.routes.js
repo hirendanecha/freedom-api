@@ -8,7 +8,7 @@ router.get("/approve-community", communityController.findApproveCommunity);
 router.get("/un-approve-community", communityController.findUnApproveCommunity);
 router.get("/search", communityController.search);
 router.get("/:id", communityController.findCommunityById);
-router.get("/byName/:name", communityController.findCommunityByName);
+router.get("/bySlug/:slug", communityController.findCommunityBySlug);
 router.get("/user/:id", communityController.getCommunityByUserId);
 router.get(
   "/joined-community/:id",

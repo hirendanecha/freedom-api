@@ -142,9 +142,9 @@ exports.findCommunityById = async function (req, res) {
   }
 };
 
-exports.findCommunityByName = async function (req, res) {
-  if (req.params.name) {
-    const community = await Community.findCommunityByName(req.params.name);
+exports.findCommunityBySlug = async function (req, res) {
+  if (req.params.slug) {
+    const community = await Community.findCommunityBySlug(req.params.slug);
     if (community) {
       res.send(community);
     } else {
