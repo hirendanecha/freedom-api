@@ -6,6 +6,7 @@ const { executeQuery } = require("../helpers/utils");
 var Community = function (community) {
   this.profileId = community.profileId;
   this.communityName = community.CommunityName;
+  this.slug = community.slug;
   this.communityDescription = community.CommunityDescription;
   this.logoImg = community.logoImg;
   this.coverImg = community.coverImg;
@@ -119,9 +120,9 @@ Community.findCommunityById = async function (id, result) {
   return community;
 };
 
-Community.findCommunityByName = async function (name) {
-  const query ="select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.CommunityName=?";
-  const values = [name];
+Community.findCommunityBySlug = async function (slug) {
+  const query ="select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.slug=?";
+  const values = [slug];
 
   const community = await executeQuery(query, values);
   
