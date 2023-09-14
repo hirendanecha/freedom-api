@@ -110,10 +110,15 @@ exports.create = async function (req, res) {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, search } = req.query;
+  const { page, size, search, isSuspended } = req.query;
   const { limit, offset } = getPagination(page, size);
 
-  const searchCountData = await User.findAndSearchAll(limit, offset, search);
+  const searchCountData = await User.findAndSearchAll(
+    limit,
+    offset,
+    search,
+    isSuspended
+  );
   return res.send(
     getPaginationData(
       { count: searchCountData.count, docs: searchCountData.data },
@@ -259,7 +264,13 @@ exports.userSuspend = function (req, res) {
       if (err) {
         return utils.send500(res, err);
       } else {
-        res.json({ error: false, message: "User suspended successfully" });
+        res.json({
+          error: false,
+          message:
+            req.query.IsSuspended === "Y"
+              ? "User suspend successfully"
+              : "User unsuspend successfully",
+        });
       }
     }
   );

@@ -99,19 +99,19 @@ User.create = function (userData, result) {
       console.log(res.insertId);
       result(null, res.insertId);
     }
-  });
+  }); 
 };
 
-User.findAndSearchAll = async (limit, offset, search) => {
-  const whereCondition = `IsAdmin != 'Y' ${
+User.findAndSearchAll = async (limit, offset, search, isSuspended) => {
+  const whereCondition = `u.IsAdmin != 'Y' AND u.IsSuspended = '${isSuspended}' ${
     search ? `AND Email LIKE '%${search}%'` : ""
   }`;
-
   const searchCount = await executeQuery(
-    `SELECT count(Id) as count FROM users WHERE ${whereCondition}`
+    `SELECT count(Id) as count FROM users as u WHERE ${whereCondition}`
   );
+  console.log(searchCount);
   const searchData = await executeQuery(
-    `SELECT u.Id, u.Email, u.Username, u.IsActive, u.DateCreation, u.IsAdmin, u.FirstName, u.LastName, u.Address, u.Country, u.City, u.State, u.Zip, u.AccountType, u.IsSuspended,p.ProfilePicName FROM users as u left join profile as p on p.UserID = u.Id  WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
+    `SELECT u.Id, u.Email, u.Username, u.IsActive, u.DateCreation, u.IsAdmin, u.FirstName, u.LastName, u.Address, u.Country, u.City, u.State, u.Zip, u.AccountType, u.IsSuspended,p.ProfilePicName,p.ID as profileId FROM users as u left join profile as p on p.UserID = u.Id  WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
     [limit, offset]
   );
 
