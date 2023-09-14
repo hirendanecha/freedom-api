@@ -92,7 +92,7 @@ createNewPost = async function (data) {
     metaimage: data?.meta?.metaimage,
     metalink: data?.meta?.metalink,
     postdescription: data?.postdescription,
-    communityId: data?.communityId,
+    communityId: data?.communityId || null,
     imageUrl: data?.imageUrl,
   };
 
@@ -104,7 +104,7 @@ createNewPost = async function (data) {
     : `INSERT INTO posts set ?`;
   const values = data?.id ? [postData, data?.id] : [postData];
   const post = await executeQuery(query, values);
-  console.log(post);
+  console.log('post : ', post);
 
   const notifications = [];
   if (post) {
