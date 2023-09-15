@@ -11,6 +11,7 @@ var Community = function (community) {
   this.logoImg = community.logoImg;
   this.coverImg = community.coverImg;
   this.isApprove = community.isApprove || "N";
+  this.pageType = community?.pageType;
   this.creationDate = new Date();
 };
 
@@ -121,11 +122,12 @@ Community.findCommunityById = async function (id, result) {
 };
 
 Community.findCommunityBySlug = async function (slug) {
-  const query ="select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.slug=?";
+  const query =
+    "select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.slug=?";
   const values = [slug];
 
   const community = await executeQuery(query, values);
-  
+
   return community;
 };
 
@@ -189,33 +191,33 @@ Community.createCommunityAdminByMA = async function (data) {
   }
 };
 
-Community.getCommunity = async function (id) {
+Community.getCommunity = async function (id, pageType) {
+  console.log("get==>", id, pageType);
   const query1 = "select communityId from communityMembers where profileId = ?";
   const communityId = await executeQuery(query1, [id]);
   const ids = communityId.map((ele) => Number(ele.communityId)).join(",");
-  console.log(ids);
   let query = "";
   if (ids) {
-    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.communityId not in (${
+    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.pageType = '${pageType}' AND cm.communityId not in (${
       ids || ""
     }) AND cm.profileId != ? group by c.Id;`;
   } else {
-    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND  cm.profileId != ? group by c.Id;`;
+    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.pageType = '${pageType}' AND cm.profileId != ? group by c.Id;`;
   }
   const communityList = await executeQuery(query, [id]);
   return communityList;
 };
 
-Community.getCommunityByUserId = async function (id) {
+Community.getCommunityByUserId = async function (id, pageType) {
   const query =
-    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.profileId =? group by c.Id;";
-  const values = id;
+    "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.pageType = ? AND c.profileId =? group by c.Id;";
+  const values = [pageType, id];
   const communityList = await executeQuery(query, values);
   console.log(communityList);
   return communityList;
 };
 
-Community.getJoinedCommunityByProfileId = async function (id) {
+Community.getJoinedCommunityByProfileId = async function (id, pageType) {
   const query = `SELECT 
     c.*, COUNT(cm.profileId) AS members
     FROM
@@ -224,9 +226,10 @@ Community.getJoinedCommunityByProfileId = async function (id) {
     communityMembers AS cm ON cm.communityId = c.Id and cm.profileId != c.profileId
     WHERE
     c.isApprove = 'Y'
+    AND c.pageType = '${pageType}'
         AND cm.profileId = ?
     GROUP BY c.Id`;
-  const values = id;
+  const values = [id];
   const communityList = await executeQuery(query, values);
   console.log(communityList);
   return communityList;

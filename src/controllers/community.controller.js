@@ -111,7 +111,7 @@ exports.deleteCommunity = function (req, res) {
       if (err) return utils.send500(res, err);
       res.json({
         error: false,
-        message: "Community deleted successfully",
+        message: "deleted successfully",
       });
     });
   }
@@ -123,7 +123,7 @@ exports.leaveFromCommunity = function (req, res) {
     if (err) return utils.send500(res, err);
     res.json({
       error: false,
-      message: "Removed from community successfully",
+      message: "removed successfully",
     });
   });
 };
@@ -220,8 +220,9 @@ exports.createCommunityAdminByMA = function (req, res) {
 
 exports.getCommunity = async function (req, res) {
   const userId = req.query.id;
-  console.log(userId);
-  const communityList = await Community.getCommunity(userId);
+  const { pageType } = req.query;
+  console.log(pageType);
+  const communityList = await Community.getCommunity(userId, pageType);
   if (!communityList) {
     return utils.send500(err, res);
   } else {
@@ -234,8 +235,9 @@ exports.getCommunity = async function (req, res) {
 
 exports.getCommunityByUserId = async function (req, res) {
   const userId = req.params.id;
-  console.log(userId);
-  const communityList = await Community.getCommunityByUserId(userId);
+  const { pageType } = req.query;
+  console.log(pageType);
+  const communityList = await Community.getCommunityByUserId(userId, pageType);
   if (!communityList) {
     return utils.send500(err, res);
   } else {
@@ -247,7 +249,11 @@ exports.getCommunityByUserId = async function (req, res) {
 };
 exports.getJoinedCommunityByProfileId = async function (req, res) {
   const { id } = req.params;
-  const communityList = await Community.getJoinedCommunityByProfileId(id);
+  const { pageType } = req.query;
+  const communityList = await Community.getJoinedCommunityByProfileId(
+    id,
+    pageType
+  );
   if (!communityList) {
     return utils.send500(err, res);
   } else {
