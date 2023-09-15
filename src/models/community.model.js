@@ -122,12 +122,16 @@ Community.findCommunityById = async function (id, result) {
 };
 
 Community.findCommunityBySlug = async function (slug) {
-  const query =
-    "select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.slug=?";
-  const values = [slug];
+  const communityQuery ="select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.slug=?";
+  const communities = await executeQuery(communityQuery, [slug]);
+  const community = communities?.[0] || {};
 
-  const community = await executeQuery(query, values);
-
+  if (community?.Id) {
+    const getMembersQuery = "select cm.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName from communityMembers as cm left join profile as p on p.ID = cm.profileId where cm.communityId = ?;";
+    const members = await executeQuery(getMembersQuery, [community?.Id]);
+    community['memberList'] = members;
+  }
+  
   return community;
 };
 
