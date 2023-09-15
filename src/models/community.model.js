@@ -15,8 +15,13 @@ var Community = function (community) {
   this.creationDate = new Date();
 };
 
-Community.findApproveCommunity = async function (limit, offset, search) {
-  const whereCondition = `c.CommunityName LIKE '%${search}%'`;
+Community.findApproveCommunity = async function (
+  limit,
+  offset,
+  search,
+  pageType
+) {
+  const whereCondition = `c.pageType = '${pageType}' AND c.CommunityName LIKE '%${search}%'`;
   const searchCount = await executeQuery(
     `SELECT count(c.Id) as count FROM community as c WHERE ${whereCondition}`
   );
@@ -41,8 +46,13 @@ Community.findApproveCommunity = async function (limit, offset, search) {
   // );
 };
 
-Community.findUnApproveCommunity = async function (limit, offset, search) {
-  const whereCondition = `c.CommunityName LIKE '%${search}%'`;
+Community.findUnApproveCommunity = async function (
+  limit,
+  offset,
+  search,
+  pageType
+) {
+  const whereCondition = `c.pageType = '${pageType}' AND c.CommunityName LIKE '%${search}%'`;
   const searchCount = await executeQuery(
     `SELECT count(c.Id) as count FROM community as c WHERE ${whereCondition}`
   );
