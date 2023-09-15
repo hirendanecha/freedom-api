@@ -104,7 +104,7 @@ createNewPost = async function (data) {
     : `INSERT INTO posts set ?`;
   const values = data?.id ? [postData, data?.id] : [postData];
   const post = await executeQuery(query, values);
-  console.log('post : ', post);
+  console.log("post : ", post);
 
   const notifications = [];
   if (post) {
@@ -151,9 +151,9 @@ createNewPost = async function (data) {
 createCommunity = async function (params) {
   const query = `INSERT INTO community set ?`;
   const values = [data];
-  const post = await executeQuery(query, values);
-  console.log(post.insertId);
-  return post.insertId;
+  const community = await executeQuery(query, values);
+  console.log(community.insertId);
+  return community.insertId;
 };
 
 createCommunityPost = async function (data) {
