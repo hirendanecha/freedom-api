@@ -6,16 +6,8 @@ const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 const io = require("socket.io-client");
 
 exports.findAll = async function (req, res) {
-  const { page, size, search } = req.query;
-  const { limit, offset } = getPagination(page, size);
-  const postData = await Post.findAll(limit, offset, search);
-  return res.send(
-    getPaginationData(
-      { count: postData.count, docs: postData.data },
-      page,
-      limit
-    )
-  );
+  const postData = await Post.findAll(req.body);
+  return res.send(postData);
 };
 
 exports.getPostByProfileId = function (req, res) {
