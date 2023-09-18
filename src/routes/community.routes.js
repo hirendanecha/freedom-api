@@ -4,8 +4,8 @@ const communityController = require("../controllers/community.controller");
 const utilsController = require("../controllers/utils.controller");
 
 router.get("/", communityController.getCommunity);
-router.get("/approve-community", communityController.findApproveCommunity);
-router.get("/un-approve-community", communityController.findUnApproveCommunity);
+router.get("/all-community", communityController.findAllCommunity);
+// router.get("/un-approve-community", communityController.findUnApproveCommunity);
 router.get("/search", communityController.search);
 router.get("/:id", communityController.findCommunityById);
 router.get("/bySlug/:slug", communityController.findCommunityBySlug);
@@ -20,7 +20,10 @@ router.get("/files/:folder/:id", utilsController.getFiles);
 router.post("/upload-community", utilsController.uploadPostImage);
 router.post("/create", communityController.createCommunity);
 router.post("/join-community", communityController.joinCommunity);
-router.post("/create-community-admin-by-MA", communityController.createCommunityAdminByMA);
+router.post(
+  "/create-community-admin-by-MA",
+  communityController.createCommunityAdminByMA
+);
 router.put("/create-community-admin", communityController.createCommunityAdmin);
 router.delete("/leave", communityController.leaveFromCommunity);
 router.delete("/:id", communityController.deleteCommunity);

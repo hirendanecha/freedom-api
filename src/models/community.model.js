@@ -15,18 +15,13 @@ var Community = function (community) {
   this.creationDate = new Date();
 };
 
-Community.findApproveCommunity = async function (
-  limit,
-  offset,
-  search,
-  pageType
-) {
+Community.findAllCommunity = async function (limit, offset, search, pageType) {
   const whereCondition = `c.pageType = '${pageType}' AND c.CommunityName LIKE '%${search}%'`;
   const searchCount = await executeQuery(
     `SELECT count(c.Id) as count FROM community as c WHERE ${whereCondition}`
   );
   const searchData = await executeQuery(
-    `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove='Y' and ${whereCondition} GROUP BY c.Id order by c.creationDate desc limit ? offset ?`,
+    `select c.*,count(cm.profileId) as members,p.Country,p.City,p.State,p.Zip from community as c left join communityMembers as cm on cm.communityId = c.Id left join profile as p on p.ID = c.profileId where ${whereCondition} GROUP BY c.Id order by c.creationDate desc limit ? offset ?`,
     [limit, offset]
   );
   return {
@@ -132,16 +127,18 @@ Community.findCommunityById = async function (id, result) {
 };
 
 Community.findCommunityBySlug = async function (slug) {
-  const communityQuery ="select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.slug=?";
+  const communityQuery =
+    "select c.*,p.Username, count(cm.profileId) as members from community as c left join profile as p on p.ID = c.profileId left join communityMembers as cm on cm.communityId = c.Id where c.slug=?";
   const communities = await executeQuery(communityQuery, [slug]);
   const community = communities?.[0] || {};
 
   if (community?.Id) {
-    const getMembersQuery = "select cm.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName from communityMembers as cm left join profile as p on p.ID = cm.profileId where cm.communityId = ?;";
+    const getMembersQuery =
+      "select cm.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName from communityMembers as cm left join profile as p on p.ID = cm.profileId where cm.communityId = ?;";
     const members = await executeQuery(getMembersQuery, [community?.Id]);
-    community['memberList'] = members;
+    community["memberList"] = members;
   }
-  
+
   return community;
 };
 
