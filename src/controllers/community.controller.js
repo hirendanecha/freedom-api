@@ -4,10 +4,10 @@ const utils = require("../helpers/utils");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 
 // Admin Api //
-exports.findApproveCommunity = async function (req, res) {
+exports.findAllCommunity = async function (req, res) {
   const { page, size, search, pageType } = req.query;
   const { limit, offset } = getPagination(page, size);
-  const searchData = await Community.findApproveCommunity(
+  const searchData = await Community.findAllCommunity(
     limit,
     offset,
     search,

@@ -7,6 +7,7 @@ router.get("/", userController.findAll);
 router.get("/get", userController.getAll);
 router.get("/change-status/:id", userController.changeActiveStatus);
 router.get("/suspend-user/:id", userController.userSuspend);
+router.get("/activate-media/:id", userController.activateMedia);
 router.get("/change-user-type/:id", userController.changeAccountType);
 router.post("/", userController.login);
 router.post("/login", userController.adminLogin);

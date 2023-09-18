@@ -99,11 +99,11 @@ User.create = function (userData, result) {
       console.log(res.insertId);
       result(null, res.insertId);
     }
-  }); 
+  });
 };
 
-User.findAndSearchAll = async (limit, offset, search, isSuspended) => {
-  const whereCondition = `u.IsAdmin != 'Y' AND u.IsSuspended = '${isSuspended}' ${
+User.findAndSearchAll = async (limit, offset, search) => {
+  const whereCondition = `u.IsAdmin != 'Y' ${
     search ? `AND Email LIKE '%${search}%'` : ""
   }`;
   const searchCount = await executeQuery(
@@ -111,7 +111,7 @@ User.findAndSearchAll = async (limit, offset, search, isSuspended) => {
   );
   console.log(searchCount);
   const searchData = await executeQuery(
-    `SELECT u.Id, u.Email, u.Username, u.IsActive, u.DateCreation, u.IsAdmin, u.FirstName, u.LastName, u.Address, u.Country, u.City, u.State, u.Zip, u.AccountType, u.IsSuspended,p.ProfilePicName,p.ID as profileId FROM users as u left join profile as p on p.UserID = u.Id  WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
+    `SELECT u.Id, u.Email, u.Username, u.IsActive, u.DateCreation, u.IsAdmin, u.FirstName, u.LastName, u.Address, u.Country, u.City, u.State, u.Zip, u.AccountType, u.IsSuspended,p.MobileNo,p.ProfilePicName,p.ID as profileId,p.MediaApproved FROM users as u left join profile as p on p.UserID = u.Id  WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
     [limit, offset]
   );
 
@@ -286,6 +286,22 @@ User.suspendUser = function (userId, status, result) {
   db.query(
     "UPDATE users SET IsSuspended = ? WHERE Id= ?",
     [status, userId],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("update: ", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
+User.activateMedia = function (profileId, status, result) {
+  db.query(
+    "UPDATE profile SET MediaApproved = ? WHERE ID= ?",
+    [status, profileId],
     function (err, res) {
       if (err) {
         console.log("error", err);

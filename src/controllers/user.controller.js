@@ -110,15 +110,10 @@ exports.create = async function (req, res) {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, search, isSuspended } = req.query;
+  const { page, size, search } = req.query;
   const { limit, offset } = getPagination(page, size);
 
-  const searchCountData = await User.findAndSearchAll(
-    limit,
-    offset,
-    search,
-    isSuspended
-  );
+  const searchCountData = await User.findAndSearchAll(limit, offset, search);
   return res.send(
     getPaginationData(
       { count: searchCountData.count, docs: searchCountData.data },
@@ -270,6 +265,27 @@ exports.userSuspend = function (req, res) {
             req.query.IsSuspended === "Y"
               ? "User suspend successfully"
               : "User unsuspend successfully",
+        });
+      }
+    }
+  );
+};
+
+exports.activateMedia = function (req, res) {
+  console.log(req.params.id, req.query.IsSuspended);
+  User.activateMedia(
+    req.params.id,
+    req.query.MediaApproved,
+    function (err, result) {
+      if (err) {
+        return utils.send500(res, err);
+      } else {
+        res.json({
+          error: false,
+          message:
+            req.query.MediaApproved === 0
+              ? "Activate media successfully"
+              : "De-activate media successfully",
         });
       }
     }
