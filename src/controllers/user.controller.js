@@ -110,10 +110,15 @@ exports.create = async function (req, res) {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, search } = req.query;
+  const { page, size, search, startDate, endDate } = req.body;
   const { limit, offset } = getPagination(page, size);
-
-  const searchCountData = await User.findAndSearchAll(limit, offset, search);
+  const searchCountData = await User.findAndSearchAll(
+    limit,
+    offset,
+    search,
+    startDate,
+    endDate
+  );
   return res.send(
     getPaginationData(
       { count: searchCountData.count, docs: searchCountData.data },

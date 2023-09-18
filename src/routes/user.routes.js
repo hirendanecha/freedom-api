@@ -3,7 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 const profileController = require("./../controllers/profile.controller");
 
-router.get("/", userController.findAll);
+router.post("/", userController.findAll);
 router.get("/get", userController.getAll);
 router.get("/change-status/:id", userController.changeActiveStatus);
 router.get("/suspend-user/:id", userController.userSuspend);

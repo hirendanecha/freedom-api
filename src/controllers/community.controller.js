@@ -5,13 +5,15 @@ const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 
 // Admin Api //
 exports.findAllCommunity = async function (req, res) {
-  const { page, size, search, pageType } = req.query;
+  const { page, size, search, pageType, startDate, endDate } = req.body;
   const { limit, offset } = getPagination(page, size);
   const searchData = await Community.findAllCommunity(
     limit,
     offset,
     search,
-    pageType
+    pageType,
+    startDate,
+    endDate
   );
   return res.send(
     getPaginationData(
