@@ -4,7 +4,7 @@ const router = express.Router();
 const postController = require("../controllers/post.controller");
 const utilsController = require("../controllers/utils.controller");
 
-router.get("/", postController.findAll);
+router.post("/", postController.findAll);
 router.get("/:id", postController.getPostByProfileId);
 router.get("/get/:id", postController.getPostByPostId);
 router.get("/comments/:id", postController.getPostComments);
