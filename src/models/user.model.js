@@ -102,14 +102,21 @@ User.create = function (userData, result) {
   });
 };
 
-User.findAndSearchAll = async (limit, offset, search) => {
-  const whereCondition = `u.IsAdmin != 'Y' ${
+User.findAndSearchAll = async (limit, offset, search, startDate, endDate) => {
+  let whereCondition = `u.IsAdmin != 'Y' ${
     search ? `AND Email LIKE '%${search}%'` : ""
   }`;
+
+  if (startDate && endDate) {
+    whereCondition += `AND u.DateCreation >= '${startDate}' AND u.DateCreation <= '${endDate}'`;
+  } else if (startDate) {
+    whereCondition += `AND u.DateCreation >= '${startDate}'`;
+  } else if (endDate) {
+    whereCondition += `AND u.DateCreation <= '${endDate}'`;
+  }
   const searchCount = await executeQuery(
     `SELECT count(Id) as count FROM users as u WHERE ${whereCondition}`
   );
-  console.log(searchCount);
   const searchData = await executeQuery(
     `SELECT u.Id, u.Email, u.Username, u.IsActive, u.DateCreation, u.IsAdmin, u.FirstName, u.LastName, u.Address, u.Country, u.City, u.State, u.Zip, u.AccountType, u.IsSuspended,p.MobileNo,p.ProfilePicName,p.ID as profileId,p.MediaApproved FROM users as u left join profile as p on p.UserID = u.Id  WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
     [limit, offset]

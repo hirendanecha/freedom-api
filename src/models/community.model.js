@@ -15,8 +15,25 @@ var Community = function (community) {
   this.creationDate = new Date();
 };
 
-Community.findAllCommunity = async function (limit, offset, search, pageType) {
-  const whereCondition = `c.pageType = '${pageType}' AND c.CommunityName LIKE '%${search}%'`;
+Community.findAllCommunity = async function (
+  limit,
+  offset,
+  search,
+  pageType,
+  startDate,
+  endDate
+) {
+  let whereCondition = `c.pageType = '${pageType}' ${
+    search ? `AND c.CommunityName LIKE '%${search}%'` : ""
+  }`;
+  if (startDate && endDate) {
+    whereCondition += `AND c.creationDate >= '${startDate}' AND c.creationDate <= '${endDate}'`;
+    console.log(whereCondition);
+  } else if (startDate) {
+    whereCondition += `AND c.creationDate >= '${startDate}'`;
+  } else if (endDate) {
+    whereCondition += `AND c.creationDate <= '${endDate}'`;
+  }
   const searchCount = await executeQuery(
     `SELECT count(c.Id) as count FROM community as c WHERE ${whereCondition}`
   );
