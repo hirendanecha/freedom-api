@@ -1,7 +1,8 @@
 var express = require("express");
 var router = express.Router();
 
-const authRoutes = require("./user.routes");
+const authRoutes = require("./auth.routes");
+const userRoutes = require("./user.routes");
 const utilsRoutes = require("./utils.routes");
 const postRoutes = require("./post.routes");
 const adminRouter = require("./admin.routes");
@@ -12,7 +13,7 @@ const seeFirstUserRouter = require("./seeFirstUser.routes");
 const profileRouter = require("./profile.routes");
 
 router.use("/login", authRoutes);
-router.use("/customers", authRoutes);
+router.use("/customers", userRoutes);
 router.use("/admin", adminRouter);
 router.use("/utils", utilsRoutes);
 router.use("/posts", postRoutes);

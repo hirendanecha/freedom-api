@@ -9,7 +9,7 @@ router.get("/change-status/:id", userController.changeActiveStatus);
 router.get("/suspend-user/:id", userController.userSuspend);
 router.get("/activate-media/:id", userController.activateMedia);
 router.get("/change-user-type/:id", userController.changeAccountType);
-router.post("/", userController.login);
+// router.post("/", userController.login);
 router.post("/login", userController.adminLogin);
 router.post("/register", userController.create);
 router.post("/profile", profileController.create);
