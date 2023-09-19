@@ -51,29 +51,25 @@ Post.findAll = async function (params) {
   p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
- 
-  return getPaginationData(
-    { count: 100, docs: posts },
-    page,
-    limit
-  );
+
+  return getPaginationData({ count: 100, docs: posts }, page, limit);
 };
 
-Post.getPostByProfileId = function (profileId, result) {
-  db.query(
-    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? order by p.postcreationdate DESC limit 15;",
-    profileId,
-    function (err, res) {
-      if (err) {
-        console.log("error", err);
-        result(err, null);
-      } else {
-        // console.log("post: ", res);
-        result(null, res);
-      }
-    }
-  );
+Post.getPostByProfileId = async function (profileId, startDate, endDate) {
+  let whereCondition = "";
+  if (startDate && endDate) {
+    whereCondition += `AND p.postcreationdate >= '${startDate}' AND p.postcreationdate <= '${endDate}'`;
+    console.log(whereCondition);
+  } else if (startDate) {
+    whereCondition += `AND p.postcreationdate >= '${startDate}'`;
+  } else if (endDate) {
+    whereCondition += `AND p.postcreationdate <= '${endDate}'`;
+  }
+
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? ${whereCondition} order by p.postcreationdate DESC;`;
+  const values = [profileId];
+  const postData = await executeQuery(query, values);
+  return postData;
 };
 Post.getPostByPostId = function (profileId, result) {
   db.query(

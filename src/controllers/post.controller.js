@@ -10,12 +10,19 @@ exports.findAll = async function (req, res) {
   return res.send(postData);
 };
 
-exports.getPostByProfileId = function (req, res) {
+exports.getPostByProfileId = async function (req, res) {
   console.log(req.params.id);
-  Post.getPostByProfileId(req.params.id, function (err, post) {
-    if (err) return utils.send500(res, err);
-    res.send(post);
-  });
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
+  console.log("in ==>", req.query.startDate, req.query.endDate);
+  const postList = await Post.getPostByProfileId(
+    req.params.id,
+    startDate,
+    endDate
+  );
+  if (postList) {
+    res.send({ data: postList });
+  }
 };
 
 exports.getPostByPostId = function (req, res) {
