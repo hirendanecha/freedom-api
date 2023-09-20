@@ -172,7 +172,7 @@ Profile.groupsAndPosts = async () => {
       }
 
       return {
-        postID: post.ID,
+        postID: post.ID || post.id,
         postType: post.posttype,
         sharedPostID: post.sharedpostid,
         postToSharedDesc: post.postdescription,
