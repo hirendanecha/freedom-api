@@ -57,8 +57,9 @@ Profile.FindById = function (profileId, result) {
             IsActivated,
             Username,
             ProfilePicName,
-            EmailVerified
-            CreatedOn
+            EmailVerified,
+            CreatedOn,
+            MediaApproved
     FROM profile WHERE ID=? `,
     profileId,
     function (err, res) {
@@ -172,7 +173,7 @@ Profile.groupsAndPosts = async () => {
       }
 
       return {
-        postID: post.ID,
+        postID: post.ID || post.id,
         postType: post.posttype,
         sharedPostID: post.sharedpostid,
         postToSharedDesc: post.postdescription,
