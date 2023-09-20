@@ -57,8 +57,9 @@ Profile.FindById = function (profileId, result) {
             IsActivated,
             Username,
             ProfilePicName,
-            EmailVerified
-            CreatedOn
+            EmailVerified,
+            CreatedOn,
+            MediaApproved
     FROM profile WHERE ID=? `,
     profileId,
     function (err, res) {
