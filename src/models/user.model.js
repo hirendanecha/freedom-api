@@ -104,7 +104,7 @@ User.create = function (userData, result) {
 
 User.findAndSearchAll = async (limit, offset, search, startDate, endDate) => {
   let whereCondition = `u.IsAdmin != 'Y' ${
-    search ? `AND Username LIKE '%${search}%'` : ""
+    search ? `AND u.Username LIKE '%${search}%'` : ""
   }`;
 
   if (startDate && endDate) {
