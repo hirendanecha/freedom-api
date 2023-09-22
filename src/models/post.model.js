@@ -124,6 +124,22 @@ Post.deletePostComment = function (id, result) {
     }
   });
 };
+Post.deleteAllData = async function (id) {
+  const query = "delete from comments where profileId = ?";
+  const query1 = "delete from posts where profileid = ?";
+  const query2 = "delete from communityMembers where profileId = ?";
+  const query3 = "delete from community where profileId = ?";
+  const query4 = "delete from see_first_profile where profileId = ?";
+  const query5 = "delete from unsubscribe_profiles where profileId = ?";
+  const values = [id];
+  await executeQuery(query, values);
+  await executeQuery(query1, values);
+  await executeQuery(query2, values);
+  await executeQuery(query3, values);
+  await executeQuery(query4, values);
+  await executeQuery(query5, values);
+  return;
+};
 
 Post.getPostComments = async function (id) {
   // db.query(

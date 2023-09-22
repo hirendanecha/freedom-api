@@ -119,7 +119,6 @@ exports.groupsAndPosts = async function (req, res) {
 exports.getGroups = async function (req, res) {
   try {
     const groups = await Profile.getGroups();
-  
     return res.send(groups);
   } catch (error) {
     return utils.send500(res, error);

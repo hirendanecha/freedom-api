@@ -15,5 +15,6 @@ router.get("/files/:folder/:id", utilsController.getFiles);
 router.get("/:folder/:id/:filename", utilsController.readFile);
 router.delete("/:id", postController.deletePost);
 router.delete("/comments/:id", postController.deletePostComment);
+router.delete("/delete-all/:id", postController.deleteAllData);
 
 module.exports = router;

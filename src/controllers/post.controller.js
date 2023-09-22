@@ -127,3 +127,14 @@ exports.deletePostComment = function (req, res) {
     return utils.send404(res, err);
   }
 };
+exports.deleteAllData = async function (req, res) {
+  if (req.params.id) {
+    await Post.deleteAllData(req.params.id);
+    res.send({
+      error: false,
+      message: "Data deleted successfully",
+    });
+  } else {
+    return utils.send404(res, err);
+  }
+};
