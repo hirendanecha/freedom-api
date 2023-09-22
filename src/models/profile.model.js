@@ -180,7 +180,7 @@ Profile.groupsAndPosts = async () => {
         shortDescription: post.shortdescription,
         postToProfileID: post.posttoprofileid,
         profileID: post.profileid,
-        title: post.textpostdesc || post.postdescription,
+        title: post.textpostdesc,
         image: firstImage,
       };
     });
