@@ -44,8 +44,8 @@ Post.findAll = async function (params) {
   const { page, size, profileId, communityId } = params;
   const { limit, offset } = getPagination(page, size);
   const communityCondition = communityId
-    ? `p.communityId = ${communityId} AND`
-    : "p.communityId IS NULL AND";
+    ? `p.communityId = ${communityId} AND p.posttype='S' AND`
+    : "p.communityId IS NULL AND p.posttype='S' AND";
 
   const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName 
   from 
