@@ -42,7 +42,7 @@ exports.createPost = function (req, res) {
     Post.create(postData, function (err, post) {
       if (err) {
         return utils.send500(res, err);
-      } else {
+      } else {        
         return res.json({
           error: false,
           mesage: "Post created",
