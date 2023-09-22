@@ -2,6 +2,7 @@ const { executeQuery } = require("../helpers/utils");
 const { notificationMail } = require("../helpers/utils");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 const { param } = require("../routes");
+const UserRewardDetails = require("../models/userRewardDetails.model");
 
 exports.getPost = async function (data) {
   return await getPost(data);
@@ -108,6 +109,10 @@ createNewPost = async function (data) {
 
   const notifications = [];
   if (post) {
+    if (post?.insertId) {
+      await UserRewardDetails.create({ ProfileID: postData?.profileid, PostID: post?.insertId, ActionType: 'P', ActionDate: new Date() });      
+    }
+
     if (data?.tags?.length > 0) {
       for (const key in data?.tags) {
         if (Object.hasOwnProperty.call(data?.tags, key)) {
@@ -152,7 +157,7 @@ createCommunity = async function (params) {
   const query = `INSERT INTO community set ?`;
   const values = [data];
   const community = await executeQuery(query, values);
-  console.log(community.insertId);
+  console.log(community.insertId);  
   return community.insertId;
 };
 
@@ -222,6 +227,9 @@ likeFeedPost = async function (params) {
     const values1 = [data];
     const post = await executeQuery(query, values);
     const likeData = await executeQuery(query1, values1);
+    if (likeData) {
+      await UserRewardDetails.create({ ProfileID: profileId, PostID: postId, ActionType: 'L', ActionDate: new Date() });
+    }
     const postData = await getPost({ page: 1, size: 15 });
     return postData;
   } else if (communityPostId) {
@@ -370,6 +378,9 @@ createComments = async function (params) {
     "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.id = ?";
   const value3 = [commentData.insertId];
   const comments = await executeQuery(query3, value3);
+  
+  await UserRewardDetails.create({ ProfileID: data?.profileId, PostID: data.postId, ActionType: 'C', ActionDate: new Date() });
+        
   return { notifications, comments };
 };
 
