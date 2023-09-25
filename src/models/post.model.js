@@ -47,7 +47,7 @@ Post.findAll = async function (params) {
     ? `p.communityId = ${communityId} AND p.posttype in ('S', 'R') AND`
     : "p.communityId IS NULL AND p.posttype in ('S', 'R') AND";
 
-  const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName, groupPr.FirstName as groupName
+  const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName, groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink
   from 
   posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID 
   where ${communityCondition}
