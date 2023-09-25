@@ -140,6 +140,15 @@ exports.getAll = async function (req, res) {
   });
 };
 
+exports.getEmail = async function (req, res) {
+  const { startDate, endDate } = req.body;
+  const Users = await User.getEmail(startDate, endDate);
+  res.send({
+    error: false,
+    data: Users,
+  });
+};
+
 exports.getUserList = function (req, res) {
   User.getUserList(req.params.id, function (err, user) {
     if (err) return utils.send500(res, err);
