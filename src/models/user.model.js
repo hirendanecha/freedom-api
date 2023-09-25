@@ -333,6 +333,21 @@ User.getAll = async function () {
   return user;
 };
 
+User.getEmail = async function (startDate, endDate) {
+  let whereCondition = "";
+  if (startDate && endDate) {
+    whereCondition += `u.DateCreation >= '${startDate}' AND u.DateCreation <= '${endDate}'`;
+  } else if (startDate) {
+    whereCondition += `u.DateCreation >= '${startDate}'`;
+  } else if (endDate) {
+    whereCondition += `u.DateCreation <= '${endDate}'`;
+  }
+  const query = `select Email from users as u where ${whereCondition} order by u.DateCreation desc`;
+  const user = await executeQuery(query);
+  console.log("users===>", user);
+  return user;
+};
+
 // ------------------- Zip Data ------------------
 
 User.getZipData = function (zip, country, result) {
