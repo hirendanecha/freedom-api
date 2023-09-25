@@ -1,6 +1,5 @@
 var db = require("../../config/db.config");
 require("../common/common")();
-const environment = require("../environments/environment");
 const { getPagination, getPaginationData } = require("../helpers/fn");
 const { executeQuery } = require("../helpers/utils");
 
@@ -14,9 +13,10 @@ var Post = function (post) {
   this.profileid = post.profileid;
   this.isdeleted = "N";
   this.postcreationdate = new Date();
-  this.metalink = post?.metalink;
   this.title = post?.title;
+  this.metalink = post?.metalink;
   this.metadescription = post?.metadescription;
+  this.metaimage = post?.metaimage;
 };
 
 // Post.findAll = async function (limit, offset, search) {
