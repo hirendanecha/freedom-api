@@ -307,9 +307,11 @@ exports.activateMedia = function (req, res) {
 };
 
 exports.delete = function (req, res) {
-  console.log(req.params.id);
-  const isdeleted = User.delete(req.params.id);
-  if (isdeleted) {
+  const userId = req.params.id;
+  const profileId = req.query.profileId;
+  console.log(userId, profileId);
+  const isDeleted = User.delete(userId, profileId);
+  if (isDeleted) {
     res.json({ error: false, message: "User deleted successfully" });
   }
 };

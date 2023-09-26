@@ -190,13 +190,27 @@ User.update = function (user_id, user, result) {
   );
 };
 
-User.delete = async function (user_id) {
-  const query = "DELETE FROM users WHERE Id = ?";
-  const query1 = "DELETE FROM profile WHERE UserID = ?";
-  const values = [user_id];
-  const user = await executeQuery(query, values);
-  const users = await executeQuery(query1, values);
-  return true;
+User.delete = async function (userId, profileId) {
+  const query = "delete from comments where profileId = ?";
+  const query1 = "delete from posts where profileid = ?";
+  const query2 = "delete from communityMembers where profileId = ?";
+  const query3 = "delete from community where profileId = ?";
+  const query4 = "delete from see_first_profile where profileId = ?";
+  const query5 = "delete from unsubscribe_profiles where profileId = ?";
+  const query6 = "DELETE FROM users WHERE Id = ?";
+  const query7 = "DELETE FROM profile WHERE ID = ?";
+  const values = [userId];
+  const values1 = [profileId];
+  await executeQuery(query, values1);
+  await executeQuery(query1, values1);
+  await executeQuery(query2, values1);
+  await executeQuery(query3, values1);
+  await executeQuery(query4, values1);
+  await executeQuery(query5, values1);
+  await executeQuery(query6, values);
+  const data = await executeQuery(query7, values1);
+  console.log(data);
+  // return true;
   // db.query("DELETE FROM users WHERE Id = ?", [user_id], function (err, res) {
   //   if (err) {
   //     console.log("error", err);
