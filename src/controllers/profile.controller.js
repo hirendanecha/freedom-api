@@ -66,7 +66,6 @@ exports.updateProfile = function (req, res) {
       return res.json({
         error: false,
         message: "Profile update successfully",
-        data: profile,
       });
     });
   }
