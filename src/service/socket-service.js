@@ -110,7 +110,12 @@ createNewPost = async function (data) {
   const notifications = [];
   if (post) {
     if (post?.insertId) {
-      await UserRewardDetails.create({ ProfileID: postData?.profileid, PostID: post?.insertId, ActionType: 'P', ActionDate: new Date() });      
+      await UserRewardDetails.create({
+        ProfileID: postData?.profileid,
+        PostID: post?.insertId,
+        ActionType: "P",
+        ActionDate: new Date(),
+      });
     }
 
     if (data?.tags?.length > 0) {
@@ -157,7 +162,7 @@ createCommunity = async function (params) {
   const query = `INSERT INTO community set ?`;
   const values = [data];
   const community = await executeQuery(query, values);
-  console.log(community.insertId);  
+  console.log(community.insertId);
   return community.insertId;
 };
 
@@ -228,7 +233,12 @@ likeFeedPost = async function (params) {
     const post = await executeQuery(query, values);
     const likeData = await executeQuery(query1, values1);
     if (likeData) {
-      await UserRewardDetails.create({ ProfileID: profileId, PostID: postId, ActionType: 'L', ActionDate: new Date() });
+      await UserRewardDetails.create({
+        ProfileID: profileId,
+        PostID: postId,
+        ActionType: "L",
+        ActionDate: new Date(),
+      });
     }
     const postData = await getPost({ page: 1, size: 15 });
     return postData;
@@ -345,8 +355,10 @@ createComments = async function (params) {
     parentCommentId: params?.parentCommentId,
     imageUrl: params?.imageUrl,
   };
-  const query = "insert into comments set ?";
-  const values = [data];
+  const query = params.id
+    ? "update comments set ? where Id = ?"
+    : "insert into comments set ?";
+  const values = params.id ? [data, params.id] : [data];
   const commentData = await executeQuery(query, values);
   let notifications = [];
   let notification = {};
@@ -378,9 +390,14 @@ createComments = async function (params) {
     "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.id = ?";
   const value3 = [commentData.insertId];
   const comments = await executeQuery(query3, value3);
-  
-  await UserRewardDetails.create({ ProfileID: data?.profileId, PostID: data.postId, ActionType: 'C', ActionDate: new Date() });
-        
+
+  await UserRewardDetails.create({
+    ProfileID: data?.profileId,
+    PostID: data.postId,
+    ActionType: "C",
+    ActionDate: new Date(),
+  });
+
   return { notifications, comments };
 };
 
