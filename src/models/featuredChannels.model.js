@@ -13,7 +13,7 @@ var featuredChannels = function (data) {
 };
 
 featuredChannels.getChannels = async function () {
-  const query = "select * from featured_channels";
+  const query = "select * from featured_channels where feature = 'Y'";
   const channels = await executeQuery(query);
   if (channels) {
     return channels;
