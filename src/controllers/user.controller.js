@@ -78,10 +78,14 @@ exports.login = async function (req, res) {
 };
 exports.getToken = async function (req, res) {
   const data = req.headers.cookie;
-  const token = decodeURIComponent(data);
-  const t = token.split("auth-user=j:");
-  if (t) {
-    return res.json({ token: JSON.parse(t[1]) });
+  if (data) {
+    const token = decodeURIComponent(data);
+    const t = token.split("auth-user=j:");
+    if (t) {
+      return res.json({ token: JSON.parse(t[1]) });
+    }
+  } else {
+    return false;
   }
 };
 
