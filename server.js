@@ -23,7 +23,12 @@ var corsOptions = {
   // credentials: true,
   // methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH", "OPTIONS"],
 };
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "*");
