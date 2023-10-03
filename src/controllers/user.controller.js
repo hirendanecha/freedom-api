@@ -34,8 +34,8 @@ exports.login = async function (req, res) {
             expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
             secure: true,
             sameSite: "none",
-            domain: environments.domain,
           });
+          // domain: environments.domain,
           return res.json(token);
         }
       });
@@ -75,6 +75,11 @@ exports.login = async function (req, res) {
   } else {
     return res.status(400).send({ error: true, message: "User not found" });
   }
+};
+exports.getToken = async function (req, res) {
+  const data = req.headers.cookie;
+  const token = decodeURIComponent(data);
+  return res.json(JSON.parse(JSON.stringify(token)));
 };
 
 exports.create = async function (req, res) {
