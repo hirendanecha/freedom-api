@@ -30,6 +30,12 @@ exports.login = async function (req, res) {
           }
           return res.status(400).send({ error: true, message: err });
         } else {
+          res.cookie("auth-user", token, {
+            expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            secure: true,
+            sameSite: "none",
+            domain: environments.domain,
+          });
           return res.json(token);
         }
       });
