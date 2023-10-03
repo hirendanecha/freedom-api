@@ -84,6 +84,8 @@ exports.getToken = async function (req, res) {
 
     if (token) {
       return res.json(token);
+    }else{
+      return res.status(400).json({ message: "" });
     }
   } else {
     return res.status(400).json({ message: "" });
@@ -441,6 +443,15 @@ exports.resendVerification = function (req, res) {
       error: false,
       message: "Verification mail sent successfully.",
     });
+  });
+};
+
+exports.logout = function (req, res) {
+  res.clearCookie('auth-user');
+  res.clearCookie();
+  res.send({
+    error: false,
+    message: "logout successfully",
   });
 };
 
