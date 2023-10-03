@@ -78,16 +78,15 @@ exports.login = async function (req, res) {
 };
 exports.getToken = async function (req, res) {
   const data = req?.cookies;
-  console.log(data);
+  console.log(data["auth-user"]);
   if (data) {
-    const token = data;
-    
+    const token = data["auth-user"];
+
     if (token) {
       return res.json({ token });
     }
   } else {
-    return res.status(400).json({ message: '' });
-    
+    return res.status(400).json({ message: "" });
   }
 };
 
