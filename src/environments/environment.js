@@ -14,7 +14,7 @@ const environment = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   X_CMC_PRO_API_KEY: process.env.X_CMC_PRO_API_KEY,
   EncryptionKey: process.env.EncryptionKey,
-  domain: "freedom.buzz",
+  domain: "opash.in",
 };
 
 module.exports = environment;
