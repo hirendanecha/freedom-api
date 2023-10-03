@@ -34,8 +34,8 @@ exports.login = async function (req, res) {
             expire: new Date(Date.now() + 24 * 60 * 60 * 1000),
             secure: true,
             sameSite: "none",
-            domain: environments.domain,
           });
+          // domain: environments.domain,
           return res.json(token);
         }
       });
