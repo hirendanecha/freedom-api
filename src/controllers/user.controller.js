@@ -83,7 +83,7 @@ exports.getToken = async function (req, res) {
     const token = data["auth-user"];
 
     if (token) {
-      return res.json({ token });
+      return res.json(token);
     }
   } else {
     return res.status(400).json({ message: "" });
