@@ -78,10 +78,9 @@ exports.login = async function (req, res) {
 };
 exports.getToken = async function (req, res) {
   const data = req.headers.cookie;
-  const token = decodeURIComponent(data);
-  if (token) {
-    return res.json(JSON.parse(JSON.stringify(token)));
-  }
+  const token = await decodeURIComponent(data);
+  const t = token.split("auth-user=j:");
+  return res.json({ token: JSON.parse(t[1]) });
 };
 
 exports.create = async function (req, res) {
