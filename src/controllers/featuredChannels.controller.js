@@ -15,7 +15,7 @@ exports.getMyChannels = async function (req, res) {
   const { id } = req.params;
   const data = await featuredChannels.getMyChannels(id);
   if (data) {
-    res.send({ data });
+    res.send(data);
   } else {
     utils.send404(res, (err = { message: "data not found" }));
   }
