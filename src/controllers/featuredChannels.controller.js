@@ -11,6 +11,16 @@ exports.getChannels = async function (req, res) {
   }
 };
 
+exports.getMyChannels = async function (req, res) {
+  const { id } = req.params;
+  const data = await featuredChannels.getMyChannels(id);
+  if (data) {
+    res.send({ data });
+  } else {
+    utils.send404(res, (err = { message: "data not found" }));
+  }
+};
+
 exports.channelsApprove = async function (req, res) {
   const { id, feature } = req.query;
   console.log(id, feature);
