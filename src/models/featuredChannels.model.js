@@ -19,6 +19,14 @@ featuredChannels.getChannels = async function () {
     return channels;
   }
 };
+featuredChannels.getMyChannels = async function (id) {
+  const query = "select * from featured_channels where profileid =?";
+  const values = [id];
+  const channels = await executeQuery(query, values);
+  if (channels) {
+    return channels;
+  }
+};
 
 featuredChannels.approveChannels = async function (id, feature) {
   const query = "update featured_channels set feature = ? where id =?";
