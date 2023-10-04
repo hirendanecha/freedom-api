@@ -40,6 +40,8 @@ User.login = function (email, Id, result) {
             u.Zip,
             u.AccountType,
             p.ID as profileId,
+            p.CoverPicName,
+            p.ProfilePicName,
             cm.communityId
      FROM users as u left join profile as p on p.UserID = u.Id left join communityMembers as cm on cm.profileId = p.ID WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
     [email, email, Id],
