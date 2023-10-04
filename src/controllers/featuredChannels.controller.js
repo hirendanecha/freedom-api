@@ -46,8 +46,7 @@ exports.createChannel = async function (req, res) {
 };
 
 exports.getVideos = async function (req, res) {
-  const { id } = req.params;
-  const { page, size } = req.query;
+  const { id, page, size } = req?.body;
   const { limit, offset } = getPagination(page, size);
   const posts = await featuredChannels.getVideos(id, limit, offset);
   if (posts.data) {
