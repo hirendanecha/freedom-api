@@ -1,5 +1,6 @@
 const Post = require("../models/post.model");
 const utils = require("../helpers/utils");
+const s3 = require("../helpers/aws-s3.helper");
 const og = require("open-graph");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 // const socket = require("../helpers/socket.helper");
@@ -42,7 +43,7 @@ exports.createPost = function (req, res) {
     Post.create(postData, function (err, post) {
       if (err) {
         return utils.send500(res, err);
-      } else {        
+      } else {
         return res.json({
           error: false,
           mesage: "Post created",
@@ -51,6 +52,35 @@ exports.createPost = function (req, res) {
       }
     });
   }
+};
+
+exports.uploadVideo = async function (req, res) {
+  console.log(req.file);
+  const url = await s3.uploadFileToWasabi(req.file, req.file.originalname);
+  console.log(url);
+  if (url) {
+    return res.json({
+      error: false,
+      url: url,
+    });
+  } else {
+    return utils.send500(res, err);
+  }
+  // if (Object.keys(req.body).length === 0) {
+  //   res.status(400).send({ error: true, message: "Error in application" });
+  // } else {
+  // Post.create(postData, function (err, post) {
+  //   if (err) {
+  //     return utils.send500(res, err);
+  //   } else {
+  //     return res.json({
+  //       error: false,
+  //       mesage: "Post created",
+  //       data: post,
+  //     });
+  //   }
+  // });
+  // }
 };
 
 exports.getMeta = function (req, res) {
