@@ -2,6 +2,8 @@ var db = require("../../config/db.config");
 require("../common/common")();
 const { getPagination, getPaginationData } = require("../helpers/fn");
 const { executeQuery } = require("../helpers/utils");
+const { notificationMail } = require("../helpers/utils");
+const { createNotification } = require("../service/socket-service");
 
 var Post = function (post) {
   this.postdescription = post.postdescription;
@@ -59,7 +61,14 @@ Post.findAll = async function (params) {
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
 
-  return getPaginationData({ count: 100, docs: posts }, page, limit);
+  return getPaginationData(
+    {
+      count: 100,
+      docs: posts,
+    },
+    page,
+    limit
+  );
 };
 
 Post.getPostByProfileId = async function (profileId, startDate, endDate) {
@@ -95,15 +104,48 @@ Post.getPostByPostId = function (profileId, result) {
   );
 };
 
-Post.create = function (postData, result) {
-  db.query("INSERT INTO posts set ?", postData, function (err, res) {
-    if (err) {
-      console.log(err);
-      result(err, null);
-    } else {
-      result(null, res.insertId);
+Post.create = async function (postData) {
+  const query = postData?.id
+    ? `update posts set ? where id= ?`
+    : `INSERT INTO posts set ?`;
+  const values = postData?.id ? [postData, postData?.id] : [postData];
+  const post = await executeQuery(query, values);
+  console.log("post : ", post);
+
+  const notifications = [];
+  if (postData?.tags?.length > 0) {
+    for (const key in postData?.tags) {
+      if (Object.hasOwnProperty.call(postData?.tags, key)) {
+        const tag = postData?.tags[key];
+
+        const notification = await createNotification({
+          notificationToProfileId: tag?.id, 
+          postId: postData?.id || post.insertId,
+          notificationByProfileId: postData?.profileid,
+          actionType: "T",
+        });
+        console.log(notification);
+        const findUser = `select u.Email,p.FirstName,p.LastName from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+        const values = [tag?.id];
+        const userData = await executeQuery(findUser, values);
+        const findSenderUser = `select p.ID,p.Username from profile as p where p.ID = ?`;
+        const values1 = [postData?.profileid];
+        const senderData = await executeQuery(findSenderUser, values1);
+        notifications.push(notification);
+        if (tag?.id) {
+          const userDetails = {
+            email: userData[0].Email,
+            profileId: senderData[0].ID,
+            userName: senderData[0].Username,
+            firstName: userData[0].FirstName,
+            lastName: userData[0].LastName,
+          };
+          await notificationMail(userDetails);
+        }
+      }
     }
-  });
+  }
+  return post;
 };
 
 Post.delete = function (id, result) {
@@ -170,7 +212,10 @@ Post.getPostComments = async function (id) {
       ids || null
     })`;
     const replyCommnetsList = await executeQuery(query);
-    return { commmentsList, replyCommnetsList };
+    return {
+      commmentsList,
+      replyCommnetsList,
+    };
   } else {
     return null;
   }
