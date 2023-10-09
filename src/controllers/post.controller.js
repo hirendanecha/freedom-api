@@ -34,23 +34,33 @@ exports.getPostByPostId = function (req, res) {
   });
 };
 
-exports.createPost = function (req, res) {
+exports.createPost = async function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const postData = new Post(req.body);
     console.log(postData);
-    Post.create(postData, function (err, post) {
-      if (err) {
-        return utils.send500(res, err);
-      } else {
-        return res.json({
-          error: false,
-          mesage: "Post created",
-          data: post,
-        });
-      }
-    });
+    const post = await Post.create(postData);
+    if (post) {
+      return res.json({
+        error: false,
+        mesage: "Post created",
+        data: post,
+      });
+    } else {
+      return utils.send500(res, "something went wrong!");
+    }
+    //   , function (err, post) {
+    //   if (err) {
+    //     return utils.send500(res, err);
+    //   } else {
+    //     return res.json({
+    //       error: false,
+    //       mesage: "Post created",
+    //       data: post,
+    //     });
+    //   }
+    // });
   }
 };
 
