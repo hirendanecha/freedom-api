@@ -10,7 +10,7 @@ router.get("/:id", postController.getPostByProfileId);
 router.get("/get/:id", postController.getPostByPostId);
 router.get("/comments/:id", postController.getPostComments);
 router.post("/get-meta", postController.getMeta);
-router.post("/create", postController.createPost);
+router.post("/create-post", postController.createPost);
 router.post(
   "/upload-video",
   uploadFileMiddleware.single("file"),
