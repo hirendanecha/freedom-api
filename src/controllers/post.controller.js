@@ -111,16 +111,15 @@ exports.getMeta = function (req, res) {
 
 exports.deletePost = function (req, res) {
   if (req.params.id) {
-    Post.delete(req.params.id, function (err) {
-      if (err) {
-        return utils.send500(res, err);
-      } else {
-        res.send({
-          error: false,
-          message: "Post deleted sucessfully",
-        });
-      }
-    });
+    const data = Post.delete(req.params.id);
+    if (data) {
+      res.send({
+        error: false,
+        message: "Post deleted sucessfully",
+      });
+    } else {
+      return utils.send500(res, err);
+    }
   } else {
     return utils.send404(res, err);
   }

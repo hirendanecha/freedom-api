@@ -119,7 +119,7 @@ Post.create = async function (postData) {
         const tag = postData?.tags[key];
 
         const notification = await createNotification({
-          notificationToProfileId: tag?.id, 
+          notificationToProfileId: tag?.id,
           postId: postData?.id || post.insertId,
           notificationByProfileId: postData?.profileid,
           actionType: "T",
@@ -148,16 +148,22 @@ Post.create = async function (postData) {
   return post;
 };
 
-Post.delete = function (id, result) {
-  db.query("DELETE FROM posts WHERE id = ?", [id], function (err, res) {
-    if (err) {
-      console.log("error", err);
-      result(err, null);
-    } else {
-      console.log("Post deleted sucessfully", res);
-      result(null, res);
-    }
-  });
+Post.delete = async function (id) {
+  // db.query("DELETE FROM posts WHERE id = ?", [id], function (err, res) {
+  //   if (err) {
+  //     console.log("error", err);
+  //     result(err, null);
+  //   } else {
+  //     console.log("Post deleted sucessfully", res);
+  //     result(null, res);
+  //   }
+  // });
+  const query = "DELETE FROM posts WHERE id = ?";
+  const query1 = "DELETE FROM comments WHERE postId = ?";
+  const value = [id];
+  const deletePost = await executeQuery(query, value);
+  const deleteComments = await executeQuery(query1, value);
+  return deletePost;
 };
 
 Post.deletePostComment = function (id, result) {
