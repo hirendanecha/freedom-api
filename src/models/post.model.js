@@ -19,8 +19,8 @@ var Post = function (post) {
   this.metaimage = post?.metaimage;
   this.streamname = post?.streamname;
   this.thumbfilename = post?.thumbfilename;
+  this.albumname = post?.albumname;
   this.communityId = post?.communityId;
-  this.file = post.file || {};
 };
 
 // Post.findAll = async function (limit, offset, search) {
