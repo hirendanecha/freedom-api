@@ -84,7 +84,7 @@ exports.getToken = async function (req, res) {
 
     if (token) {
       return res.json(token);
-    }else{
+    } else {
       return res.status(400).json({ message: "" });
     }
   } else {
@@ -447,8 +447,9 @@ exports.resendVerification = function (req, res) {
 };
 
 exports.logout = function (req, res) {
-  res.clearCookie('auth-user');
+  res.clearCookie("auth-user", "/", ".opash.in");
   res.clearCookie();
+  window.clearCookie();
   res.send({
     error: false,
     message: "logout successfully",
