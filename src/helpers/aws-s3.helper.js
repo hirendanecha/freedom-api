@@ -6,26 +6,29 @@ require("aws-sdk/lib/maintenance_mode_message").suppress = true;
 const s3 = new AWS.S3({
   accessKeyId: "XZ1L2U32Z7XMOW5S5ZBD",
   secretAccessKey: "2e3lYJoXmocA5W3mVSpaDQF4qrDbbUA3kuFOO2Pe",
-  endpoint: new AWS.Endpoint("s3.us-east-1.wasabisys.com"), // Wasabi endpoint
+  endpoint: new AWS.Endpoint("s3.wasabisys.com"), // Wasabi endpoint
   region: "us-east-2",
 });
-exports.uploadFileToWasabi = async (filePath, key) => {
+exports.uploadFileToWasabi = async (file, key) => {
   return new Promise((resolve, reject) => {
     try {
-      const params = {
-        Bucket: "freedom-social",
-        Key: key,
-        Body: filePath.path,
-      };
+      fs.readFile(file.path, function (err, buffer) {
+        if (err) throw err; // Something went wrong!
+        const params = {
+          Bucket: "freedom-social",
+          Key: key,
+          Body: buffer,
+        };
 
-      s3.upload(params, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log("data location => ", data.Location);
-          resolve(data.Location);
-          fs.unlinkSync(filePath.path);
-        }
+        s3.upload(params, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            console.log("data location => ", data.Location);
+            resolve(data.Location);
+          }
+        });
+        fs.unlinkSync(file.path);
       });
     } catch (error) {
       reject(error);

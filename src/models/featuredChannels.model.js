@@ -49,11 +49,11 @@ featuredChannels.createChannel = async function (reqBody) {
 featuredChannels.getVideos = async function (profileId, limit, offset) {
   const whereCondition = profileId
     ? `posttype = 'V' and streamname is not null and profileid = ${profileId}`
-    : "posttype = 'V' and streamname is not null ";
+    : "posttype = 'V' and streamname is not null";
   const searchCount = await executeQuery(
     `SELECT count(id) as count FROM posts WHERE ${whereCondition}`
   );
-  const query = `select * from posts where ${whereCondition} limit ? offset ? `;
+  const query = `select * from posts where ${whereCondition} order by postcreationdate desc limit ? offset ? `;
   const values = [limit, offset];
   const posts = await executeQuery(query, values);
   if (posts) {

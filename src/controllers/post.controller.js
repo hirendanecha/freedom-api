@@ -66,7 +66,7 @@ exports.createPost = async function (req, res) {
 
 exports.uploadVideo = async function (req, res) {
   console.log(req.file);
-  const url = await s3.uploadFileToWasabi(req.file, req.file.originalname);
+  const url = await s3.uploadFileToWasabi(req.file, req.file?.originalname);
   console.log(url);
   if (url) {
     return res.json({
@@ -173,6 +173,22 @@ exports.deleteAllData = async function (req, res) {
       error: false,
       message: "Data deleted successfully",
     });
+  } else {
+    return utils.send404(res, err);
+  }
+};
+
+exports.updateViewCount = async function (req, res) {
+  const { viewcount } = req.body;
+  if (req.params.id) {
+    const postData = await Post.updateViewCount(req.params.id, viewcount);
+    if (postData) {
+      res.send({
+        error: false,
+        message: "Data update successfully",
+        data: postData,
+      });
+    }
   } else {
     return utils.send404(res, err);
   }
