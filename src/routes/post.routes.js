@@ -17,6 +17,7 @@ router.post(
   postController.uploadVideo
 );
 router.post("/upload-post", utilsController.uploadPostImage);
+router.post("/update-views/:id", postController.updateViewCount);
 router.get("/files/:folder/:id", utilsController.getFiles);
 router.get("/:folder/:id/:filename", utilsController.readFile);
 router.delete("/:id", postController.deletePost);

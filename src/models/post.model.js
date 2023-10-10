@@ -233,4 +233,11 @@ Post.editPost = async function (post) {
   const postData = await executeQuery(query, values);
 };
 
+Post.updateViewCount = async function (id, viewcount) {
+  const query = "update posts set viewcount = ? where id = ?";
+  const values = [viewcount, id];
+  const postData = await executeQuery(query, values);
+  return postData;
+};
+
 module.exports = Post;
