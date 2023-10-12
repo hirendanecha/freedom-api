@@ -19,10 +19,12 @@ featuredChannels.getChannels = async function () {
     return channels;
   }
 };
-featuredChannels.getMyChannels = async function (id) {
-  const query = "select * from featured_channels where profileid =?";
+featuredChannels.getPostDetails = async function (id) {
+  const query =
+    "select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created,fc.id as channelId from posts as p left join featured_channels as fc on fc.profileid = p.profileid where p.id = ?";
   const values = [id];
   const channels = await executeQuery(query, values);
+  console.log(channels);
   if (channels) {
     return channels;
   }

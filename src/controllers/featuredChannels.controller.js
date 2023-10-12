@@ -11,9 +11,10 @@ exports.getChannels = async function (req, res) {
   }
 };
 
-exports.getMyChannels = async function (req, res) {
+exports.getPostDetails = async function (req, res) {
   const { id } = req.params;
-  const data = await featuredChannels.getMyChannels(id);
+  console.log(id);
+  const data = await featuredChannels.getPostDetails(id);
   if (data) {
     res.send(data);
   } else {
