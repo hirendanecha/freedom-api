@@ -88,18 +88,22 @@ createNewPost = async function (data) {
   console.log("post-data", data);
   const postData = {
     profileid: data?.profileid,
-    title: data?.meta?.title,
-    metadescription: data?.meta?.metadescription,
-    metaimage: data?.meta?.metaimage,
-    metalink: data?.meta?.metalink,
+    title: data?.meta?.title || null,
+    metadescription: data?.meta?.metadescription || null,
+    metaimage: data?.meta?.metaimage || null,
+    metalink: data?.meta?.metalink || null,
     postdescription: data?.postdescription,
     communityId: data?.communityId || null,
-    imageUrl: data?.imageUrl,
+    imageUrl: data?.imageUrl || null,
+    streamname: data?.streamname || null,
+    thumbfilename: data?.thumbfilename || null,
+    albumname: data?.albumname || null,
+    videoduration: data?.videoduration || null,
+    posttype: data?.posttype || "S",
   };
 
   postData.postcreationdate = new Date();
   postData.isdeleted = "N";
-  postData.posttype = "S";
   const query = data?.id
     ? `update posts set ? where id= ?`
     : `INSERT INTO posts set ?`;
