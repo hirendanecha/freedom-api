@@ -27,7 +27,10 @@ exports.sendMail = async function (mailObj) {
       { ...mailObj.templateData }
     );
     return transporter.sendMail({
-      from: 'freedom.social@your-server.de',
+      from: {
+        name: "Freedom Buzz",
+        address: "no-reply@freedom.buzz",
+      },
       to: mailObj.email,
       subject: mailObj.subject,
       html: emailTemplateSource,
