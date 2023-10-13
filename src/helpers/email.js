@@ -10,8 +10,8 @@ let transporter = nodemailer.createTransport({
   // },
   service: "gmail",
   auth: {
-    user: "ua.opash@gmail.com",
-    pass: "eglj cbzl qmnv drzq",
+    user: "freedom.buzzzz@gmail.com",
+    pass: "jyfc bbxk utnv bbvk",
   },
   sender: "no-reply@freedom.buzz",
   // host: "smtp.freedom.social",
