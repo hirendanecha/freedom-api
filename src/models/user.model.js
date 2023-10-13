@@ -43,6 +43,10 @@ User.login = function (email, Id, result) {
             p.CoverPicName,
             p.ProfilePicName,
             p.MobileNo,
+            p.MediaApproved,
+            p.ChannelType,
+            p.DefaultUniqueLink,
+            p.UniqueLink,
             cm.communityId
      FROM users as u left join profile as p on p.UserID = u.Id left join communityMembers as cm on cm.profileId = p.ID WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
     [email, email, Id],
