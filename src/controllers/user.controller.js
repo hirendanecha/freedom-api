@@ -260,7 +260,7 @@ exports.forgotPassword = async function (req, res) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const email = req.body.email;
-    const user = await User.findByEmail(email);
+    const user = await User.findByUsernameAndEmail(email);
     if (user) {
       const data = await utils.forgotPasswordMail(user);
       if (data.messageId) {
