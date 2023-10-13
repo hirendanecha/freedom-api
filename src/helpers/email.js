@@ -4,14 +4,19 @@ const path = require("path");
 const environment = require("../environments/environment");
 
 let transporter = nodemailer.createTransport({
-  tls: {
-    host: "freedom.social",
-    port: 993,
+  // tls: {
+  //   host: "freedom.social",
+  //   port: 993,
+  // },
+  service: "gmail",
+  auth: {
+    user: "ua.opash@gmail.com",
+    pass: "eglj cbzl qmnv drzq",
   },
-  host: "smtp.freedom.social",
-  port: 465,
-  sender: "no-reply@freedom.buzz",
-  auth: { user: environment.SMTP_USER, pass: environment.SMTP_PASS },
+  // host: "smtp.freedom.social",
+  // port: 465,
+  // sender: "no-reply@freedom.buzz",
+  // auth: { user: environment.SMTP_USER, pass: environment.SMTP_PASS },
 });
 
 exports.sendMail = async function (mailObj) {
