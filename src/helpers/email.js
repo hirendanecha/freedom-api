@@ -13,6 +13,7 @@ let transporter = nodemailer.createTransport({
     user: "ua.opash@gmail.com",
     pass: "eglj cbzl qmnv drzq",
   },
+  sender: "no-reply@freedom.buzz",
   // host: "smtp.freedom.social",
   // port: 465,
   // sender: "no-reply@freedom.buzz",
