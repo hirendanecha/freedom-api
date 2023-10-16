@@ -40,7 +40,7 @@ Profile.create = function (profileData, result) {
 
 Profile.FindById = function (profileId, result) {
   db.query(
-    `SELECT ID,
+    `SELECT ID as Id,
             FirstName,  
             LastName,
             UserID,
