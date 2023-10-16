@@ -228,9 +228,9 @@ Community.getCommunity = async function (id, pageType) {
   if (ids) {
     query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.pageType = '${pageType}' AND cm.communityId not in (${
       ids || ""
-    }) AND cm.profileId != ? group by c.Id;`;
+    }) AND cm.profileId != ? group by c.Id order by c.Id desc;`;
   } else {
-    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.pageType = '${pageType}' AND cm.profileId != ? group by c.Id;`;
+    query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND c.pageType = '${pageType}' AND cm.profileId != ? group by c.Id order by c.Id desc;`;
   }
   const communityList = await executeQuery(query, [id]);
   return communityList;
