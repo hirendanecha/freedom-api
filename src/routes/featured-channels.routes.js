@@ -5,8 +5,10 @@ const featuredChannels = require("../controllers/featuredChannels.controller");
 router.get("/", featuredChannels.getChannels);
 router.get("/:id", featuredChannels.getChannelById);
 router.get("/post/:id", featuredChannels.getPostDetails);
-router.post("/posts", featuredChannels.getVideos);
 router.get("/activate-channel", featuredChannels.channelsApprove);
+router.post("/get", featuredChannels.getAllChannels);
+router.post("/posts", featuredChannels.getVideos);
 router.post("/create-channel", featuredChannels.createChannel);
+router.delete("/:id", featuredChannels.deleteChannel);
 
 module.exports = router;

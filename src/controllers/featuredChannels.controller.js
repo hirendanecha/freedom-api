@@ -11,6 +11,25 @@ exports.getChannels = async function (req, res) {
   }
 };
 
+exports.getAllChannels = async (req, res) => {
+  const { page, size, search, startDate, endDate } = req.body;
+  const { limit, offset } = getPagination(page, size);
+  const searchCountData = await featuredChannels.getAllChannels(
+    limit,
+    offset,
+    search,
+    startDate,
+    endDate
+  );
+  return res.send(
+    getPaginationData(
+      { count: searchCountData.count, docs: searchCountData.data },
+      page,
+      limit
+    )
+  );
+};
+
 exports.getChannelById = async function (req, res) {
   const id = req.params.id;
   const data = await featuredChannels.getChannelById(id);
@@ -76,5 +95,12 @@ exports.getVideos = async function (req, res) {
     );
   } else {
     utils.send500(res, (err = { message: "data not found" }));
+  }
+};
+exports.deleteChannel = async function (req, res) {
+  const id = req.params.id;
+  const data = await featuredChannels.deleteChannel(id);
+  if (data) {
+    res.send({ message: "channel deleted successfully" });
   }
 };
