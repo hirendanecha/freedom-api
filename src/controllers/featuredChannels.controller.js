@@ -11,6 +11,16 @@ exports.getChannels = async function (req, res) {
   }
 };
 
+exports.getChannelById = async function (req, res) {
+  const id = req.params.id;
+  const data = await featuredChannels.getChannelById(id);
+  if (data) {
+    res.send({ data });
+  } else {
+    utils.send404(res, (err = { message: "data not found" }));
+  }
+};
+
 exports.getPostDetails = async function (req, res) {
   const { id } = req.params;
   console.log(id);

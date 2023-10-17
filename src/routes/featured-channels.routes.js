@@ -3,6 +3,7 @@ const router = express.Router();
 const featuredChannels = require("../controllers/featuredChannels.controller");
 
 router.get("/", featuredChannels.getChannels);
+router.get("/:id", featuredChannels.getChannelById);
 router.get("/post/:id", featuredChannels.getPostDetails);
 router.post("/posts", featuredChannels.getVideos);
 router.get("/activate-channel", featuredChannels.channelsApprove);
