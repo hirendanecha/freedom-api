@@ -20,6 +20,40 @@ featuredChannels.getChannels = async function () {
   }
 };
 
+featuredChannels.getAllChannels = async (
+  limit,
+  offset,
+  search,
+  startDate,
+  endDate
+) => {
+  let whereCondition = "";
+  if (search) {
+    whereCondition += `${search ? `WHERE f.firstname LIKE '%${search}%'` : ""}`;
+  }
+  if (startDate && endDate) {
+    whereCondition += `${
+      search ? `AND` : "WHERE"
+    } f.created >= '${startDate}' AND f.created <= '${endDate}'`;
+  } else if (startDate) {
+    whereCondition += `${search ? `AND` : "WHERE"} f.created >= '${startDate}'`;
+  } else if (endDate) {
+    whereCondition += `${search ? `AND` : "WHERE"} f.created <= '${endDate}'`;
+  }
+  const searchCount = await executeQuery(
+    `SELECT count(id) as count FROM featured_channels as f`
+  );
+  const searchData = await executeQuery(
+    `SELECT f.*,p.ID as profileId,p.ProfilePicName,p.Username,p.UserID,p.FirstName,p.LastName FROM featured_channels as f left join profile as p on p.ID = f.profileid ${whereCondition} order by f.created desc limit ? offset ?`,
+    [limit, offset]
+  );
+
+  return {
+    count: searchCount?.[0]?.count || 0,
+    data: searchData,
+  };
+};
+
 featuredChannels.getChannelById = async function (id) {
   const query = "select * from featured_channels where profileid = ?";
   const value = [id];
@@ -74,5 +108,15 @@ featuredChannels.getVideos = async function (profileId, limit, offset) {
     };
   }
 };
+
+featuredChannels.deleteChannel = async function (id) {
+  const query = "delete from featured_channels where id = ?";
+  const value = [id];
+  const channels = await executeQuery(query, value);
+  if (channels) {
+    return channels;
+  }
+};
+
 
 module.exports = featuredChannels;
