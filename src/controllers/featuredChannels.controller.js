@@ -104,3 +104,31 @@ exports.deleteChannel = async function (req, res) {
     res.send({ message: "channel deleted successfully" });
   }
 };
+
+exports.updateChannleFeature = function (req, res) {
+  console.log(req.params.id, req.query.feature);
+  const id = req.params.id;
+  const feature = req.query.feature;
+  featuredChannels.updateChannleFeature(
+    id,
+    feature,
+    async function (err, result) {
+      if (err) {
+        return utils.send500(err, null);
+      } else {
+        console.log(result);
+        if (feature === "Y") {
+          res.json({
+            error: false,
+            message: "Channel add in feature successfully",
+          });
+        } else {
+          res.json({
+            error: false,
+            message: "Channel removed from feature successfully",
+          });
+        }
+      }
+    }
+  );
+};
