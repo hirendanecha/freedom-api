@@ -118,13 +118,13 @@ exports.create = async function (req, res) {
       } else {
         return res.status(400).send({
           error: true,
-          message: "End user already exist, please enter a different email",
+          message: "Email already exists, please enter a different email",
         });
       }
     } else {
       return res.status(400).send({
         error: true,
-        message: "End user already exist, please enter a different username",
+        message: "Usernae already exists, please enter a different username",
       });
     }
   }
