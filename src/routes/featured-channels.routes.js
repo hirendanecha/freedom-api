@@ -6,6 +6,7 @@ router.get("/", featuredChannels.getChannels);
 router.get("/:id", featuredChannels.getChannelById);
 router.get("/post/:id", featuredChannels.getPostDetails);
 router.get("/activate-channel", featuredChannels.channelsApprove);
+router.get("/feature/:id", featuredChannels.updateChannleFeature);
 router.post("/get", featuredChannels.getAllChannels);
 router.post("/posts", featuredChannels.getVideos);
 router.post("/create-channel", featuredChannels.createChannel);
