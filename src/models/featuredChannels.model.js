@@ -55,8 +55,9 @@ featuredChannels.getAllChannels = async (
 };
 
 featuredChannels.getChannelById = async function (name) {
-  const query = "select * from featured_channels where unique_link = ?";
-  const value = [name];
+  const query =
+    "select * from featured_channels where Id = ? or unique_link = ?";
+  const value = [name, name];
   const channels = await executeQuery(query, value);
   if (channels) {
     return channels;
