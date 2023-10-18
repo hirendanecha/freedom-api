@@ -193,7 +193,7 @@ Post.deleteAllData = async function (id) {
   return;
 };
 
-Post.getPostComments = async function (id) {
+Post.getPostComments = async function (profileId, postId) {
   // db.query(
   //   "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.postId = ?",
   //   [id],
@@ -208,8 +208,8 @@ Post.getPostComments = async function (id) {
   // );
 
   const query =
-    "select c.*,pr.ProfilePicName,pr.Username, pr.FirstName, cl.actionType as react from comments as c left join commentsLikesDislikes as cl on cl.commentId = c.id left join profile as pr on pr.ID = c.profileId where c.postId = ? and c.parentCommentId is NULL";
-  const values = [id];
+    "select c.*,pr.ProfilePicName,pr.Username, pr.FirstName, cl.actionType as react from comments as c left join commentsLikesDislikes as cl on cl.profileId = ? AND cl.commentId = c.id left join profile as pr on pr.ID = c.profileId where c.postId = ? and c.parentCommentId is NULL";
+  const values = [profileId, postId];
   const commmentsList = await executeQuery(query, values);
   if (commmentsList.length >= 0) {
     const ids = commmentsList.map((ele) => Number(ele.id)).join(",");
