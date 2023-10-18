@@ -71,6 +71,7 @@ exports.channelsApprove = async function (req, res) {
 
 exports.createChannel = async function (req, res) {
   const data = new featuredChannels({ ...req.body });
+  data.feature = data.feature === true ? "Y" : "N";
   if (data) {
     const newChannel = await featuredChannels.createChannel(data);
     console.log(newChannel);
