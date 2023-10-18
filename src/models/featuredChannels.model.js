@@ -54,9 +54,9 @@ featuredChannels.getAllChannels = async (
   };
 };
 
-featuredChannels.getChannelById = async function (id) {
-  const query = "select * from featured_channels where profileid = ?";
-  const value = [id];
+featuredChannels.getChannelById = async function (name) {
+  const query = "select * from featured_channels where unique_link = ?";
+  const value = [name];
   const channels = await executeQuery(query, value);
   if (channels) {
     return channels;
@@ -83,11 +83,18 @@ featuredChannels.approveChannels = async function (id, feature) {
 };
 
 featuredChannels.createChannel = async function (reqBody) {
-  const query = "insert into featured_channels set ?";
-  const values = [reqBody];
-  const channels = await executeQuery(query, values);
-  if (channels) {
-    return channels;
+  const query1 = "select * from featured_channels where unique_link = ?";
+  const value = [reqBody.unique_link];
+  const oldchannels = await executeQuery(query1, value);
+  if (!oldchannels) {
+    const query = "insert into featured_channels set ?";
+    const values = [reqBody];
+    const channels = await executeQuery(query, values);
+    if (channels) {
+      return channels;
+    }
+  } else {
+    return [];
   }
 };
 
