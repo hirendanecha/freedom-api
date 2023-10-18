@@ -31,8 +31,8 @@ exports.getAllChannels = async (req, res) => {
 };
 
 exports.getChannelById = async function (req, res) {
-  const id = req.params.id;
-  const data = await featuredChannels.getChannelById(id);
+  const name = req.params.name;
+  const data = await featuredChannels.getChannelById(name);
   if (data) {
     res.send({ data });
   } else {
@@ -75,11 +75,13 @@ exports.createChannel = async function (req, res) {
   if (data) {
     const newChannel = await featuredChannels.createChannel(data);
     console.log(newChannel);
-    if (newChannel) {
+    if (newChannel.insertId) {
       res.send({
         error: false,
         data: newChannel.insertId,
       });
+    } else {
+      utils.send404(res, (err = { message: "channel already exists!" }));
     }
   } else {
     utils.send404(res, (err = { message: "data not found" }));
