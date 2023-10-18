@@ -126,7 +126,7 @@ exports.deletePost = function (req, res) {
 };
 
 exports.getPostComments = async function (req, res) {
-  if (req.params.id) {
+  if (req.body) {
     // Post.getPostComments(req.params.id, function (err, comments) {
     //   if (err) {
     //     return utils.send500(res, err);
@@ -137,8 +137,8 @@ exports.getPostComments = async function (req, res) {
     //     });
     //   }
     // });
-
-    const data = await Post.getPostComments(req.params.id);
+    const { profileId, postId } = req.body;
+    const data = await Post.getPostComments(profileId, postId);
     if (data) {
       res.send({
         error: false,

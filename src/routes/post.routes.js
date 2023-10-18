@@ -8,7 +8,7 @@ const uploadFileMiddleware = require("../middleware/upload");
 router.post("/", postController.findAll);
 router.get("/:id", postController.getPostByProfileId);
 router.get("/get/:id", postController.getPostByPostId);
-router.get("/comments/:id", postController.getPostComments);
+router.post("/comments/", postController.getPostComments);
 router.post("/get-meta", postController.getMeta);
 router.post("/create-post", postController.createPost);
 router.post(
