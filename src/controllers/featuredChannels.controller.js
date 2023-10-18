@@ -32,6 +32,7 @@ exports.getAllChannels = async (req, res) => {
 
 exports.getChannelById = async function (req, res) {
   const name = req.params.name;
+  console.log(name);
   const data = await featuredChannels.getChannelById(name);
   if (data) {
     res.send({ data });
