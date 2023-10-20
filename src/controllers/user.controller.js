@@ -124,7 +124,7 @@ exports.create = async function (req, res) {
     } else {
       return res.status(400).send({
         error: true,
-        message: "Usernae already exists, please enter a different username",
+        message: "Username already exists, please enter a different username",
       });
     }
   }
