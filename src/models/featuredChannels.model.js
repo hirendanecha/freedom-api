@@ -64,6 +64,17 @@ featuredChannels.getChannelById = async function (name) {
     return channels;
   }
 };
+
+featuredChannels.getChannelByUserId = async function (id) {
+  const query =
+    "select f.* from featured_channels as f left join profile as p on p.ID = f.profileid where f.profileid in(p.Id) and p.UserID = ? and feature = 'Y';";
+  const value = [id];
+  const channels = await executeQuery(query, value);
+  console.log(channels);
+  if (channels) {
+    return channels;
+  }
+};
 featuredChannels.getPostDetails = async function (id) {
   const query =
     "select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created,fc.id as channelId from posts as p left join featured_channels as fc on fc.profileid = p.profileid where p.id = ?";

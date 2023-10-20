@@ -40,6 +40,16 @@ exports.getChannelById = async function (req, res) {
     utils.send404(res, (err = { message: "data not found" }));
   }
 };
+exports.getChannelByUserId = async function (req, res) {
+  const id = req.params.id;
+  console.log(id);
+  const data = await featuredChannels.getChannelByUserId(id);
+  if (data) {
+    res.send({ data });
+  } else {
+    utils.send404(res, (err = { message: "data not found" }));
+  }
+};
 
 exports.getPostDetails = async function (req, res) {
   const { id } = req.params;
