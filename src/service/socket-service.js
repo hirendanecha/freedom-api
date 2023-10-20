@@ -148,6 +148,7 @@ createNewPost = async function (data) {
               userName: senderData[0].Username,
               firstName: userData[0].FirstName,
               lastName: userData[0].LastName,
+              type: "post",
             };
             await notificationMail(userDetails);
           }
@@ -387,6 +388,39 @@ createComments = async function (params) {
       notificationByProfileId: data?.profileId,
       actionType: "C",
     });
+    if (params?.tags?.length > 0) {
+      for (const key in params?.tags) {
+        if (Object.hasOwnProperty.call(params?.tags, key)) {
+          const tag = params?.tags[key];
+
+          const notification = await createNotification({
+            notificationToProfileId: tag?.id,
+            postId: data?.id || commentData.insertId,
+            notificationByProfileId: data?.profileId,
+            actionType: "T",
+          });
+          console.log(notification);
+          const findUser = `select u.Email,p.FirstName,p.LastName from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+          const values = [tag?.id];
+          const userData = await executeQuery(findUser, values);
+          const findSenderUser = `select p.ID,p.Username from profile as p where p.ID = ?`;
+          const values1 = [data?.profileId];
+          const senderData = await executeQuery(findSenderUser, values1);
+          notifications.push(notification);
+          if (tag?.id) {
+            const userDetails = {
+              email: userData[0].Email,
+              profileId: senderData[0].ID,
+              userName: senderData[0].Username,
+              firstName: userData[0].FirstName,
+              lastName: userData[0].LastName,
+              type: "comment",
+            };
+            await notificationMail(userDetails);
+          }
+        }
+      }
+    }
   }
   notifications.push(notification);
   console.log(notifications);
