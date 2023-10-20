@@ -116,7 +116,7 @@ exports.forgotPasswordMail = async (user) => {
 
 exports.notificationMail = async (userData) => {
   let name = userData.firstName + " " + userData.lastName;
-  let msg = `You were tagged in ${userData.userName}'s post.`;
+  let msg = `You were tagged in ${userData.userName}'s ${userData.type}.`;
   let redirectUrl = `${environment.FRONTEND_URL}`;
 
   const mailObj = {
