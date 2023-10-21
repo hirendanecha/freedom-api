@@ -118,7 +118,7 @@ featuredChannels.getVideos = async function (profileId, limit, offset) {
   const searchCount = await executeQuery(
     `SELECT count(id) as count FROM posts as p WHERE ${whereCondition}`
   );
-  const query = `select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created,fc.id as channelId from posts as p left join featured_channels as fc on fc.profileid = p.profileid where ${whereCondition} order by postcreationdate desc limit ? offset ? `;
+  const query = `select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created from posts as p left join featured_channels as fc on fc.profileid = p.profileid where ${whereCondition} order by postcreationdate desc limit ? offset ? `;
   const values = [limit, offset];
   const posts = await executeQuery(query, values);
   if (posts) {
