@@ -99,6 +99,19 @@ exports.createChannel = async function (req, res) {
   }
 };
 
+exports.getChannelVideos = async function (req, res) {
+  const { id, page, size } = req?.body;
+  const { limit, offset } = getPagination(page, size);
+  const posts = await featuredChannels.getChannelVideos(id, limit, offset);
+  if (posts.data) {
+    res.send(
+      getPaginationData({ count: posts.count, docs: posts.data }, page, limit)
+    );
+  } else {
+    utils.send500(res, (err = { message: "data not found" }));
+  }
+};
+
 exports.getVideos = async function (req, res) {
   const { id, page, size } = req?.body;
   const { limit, offset } = getPagination(page, size);
