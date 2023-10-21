@@ -10,6 +10,7 @@ router.get("/activate-channel", featuredChannels.channelsApprove);
 router.get("/feature/:id", featuredChannels.updateChannleFeature);
 router.post("/get", featuredChannels.getAllChannels);
 router.post("/posts", featuredChannels.getVideos);
+router.post("/my-posts", featuredChannels.getChannelVideos);
 router.post("/create-channel", featuredChannels.createChannel);
 router.delete("/:id", featuredChannels.deleteChannel);
 
