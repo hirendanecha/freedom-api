@@ -23,6 +23,7 @@ var Post = function (post) {
   this.thumbfilename = post?.thumbfilename;
   this.albumname = post?.albumname;
   this.communityId = post?.communityId;
+  this.channelId = post?.channelId || null;
 };
 
 // Post.findAll = async function (limit, offset, search) {
