@@ -22,6 +22,7 @@ var Post = function (post) {
   this.streamname = post?.streamname;
   this.thumbfilename = post?.thumbfilename;
   this.albumname = post?.albumname;
+  this.videoduration = post?.videoduration;
   this.communityId = post?.communityId;
   this.channelId = post?.channelId || null;
 };
