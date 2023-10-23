@@ -396,7 +396,7 @@ createComments = async function (params) {
 
           const notification = await createNotification({
             notificationToProfileId: tag?.id,
-            postId: data?.id || commentData.insertId,
+            postId: data?.id || data.postId,
             notificationByProfileId: data?.profileId,
             actionType: "T",
           });
