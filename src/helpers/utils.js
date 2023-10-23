@@ -36,7 +36,7 @@ exports.getactualfilename = (fname, folder, id) => {
 
 exports.registrationMail = async (userData, userId) => {
   let jwtSecretKey = environment.JWT_SECRET_KEY;
-  let name = userData.FirstName + " " + userData.LastName;
+  let name = userData?.Username || userData.FirstName + " " + userData.LastName;
 
   const token = jwt.sign(
     {
@@ -90,7 +90,7 @@ exports.forgotPasswordMail = async (user) => {
   console.log(user);
   if (user) {
     let jwtSecretKey = environment.JWT_SECRET_KEY;
-    let name = user?.FirstName + " " + user?.LastName;
+    let name = user?.Username || user?.FirstName + " " + user?.LastName;
     const token = jwt.sign(
       {
         userId: user?.Id,
@@ -115,7 +115,7 @@ exports.forgotPasswordMail = async (user) => {
 };
 
 exports.notificationMail = async (userData) => {
-  let name = userData.firstName + " " + userData.lastName;
+  let name = userData?.userName || userData.firstName + " " + userData.lastName;
   let msg = `You were tagged in ${userData.userName}'s ${userData.type}.`;
   let redirectUrl = `${environment.FRONTEND_URL}`;
 
