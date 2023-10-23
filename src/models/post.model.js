@@ -6,6 +6,7 @@ const { notificationMail } = require("../helpers/utils");
 const { createNotification } = require("../service/socket-service");
 
 var Post = function (post) {
+  this.id = post.id;
   this.postdescription = post.postdescription;
   this.keywords = post.keywords;
   this.posttoprofileid = post.posttoprofileid;
