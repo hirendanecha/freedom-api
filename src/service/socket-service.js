@@ -88,10 +88,11 @@ createNewPost = async function (data) {
   console.log("post-data", data);
   const postData = {
     profileid: data?.profileid,
-    title: data?.meta?.title || null,
-    metadescription: data?.meta?.metadescription || null,
-    metaimage: data?.meta?.metaimage || null,
-    metalink: data?.meta?.metalink || null,
+    title: data?.meta?.title || data?.title || null,
+    metadescription:
+      data?.meta?.metadescription || data?.metadescription || null,
+    metaimage: data?.meta?.metaimage || data?.metaimage || null,
+    metalink: data?.meta?.metalink || data?.metalink || null,
     postdescription: data?.postdescription,
     communityId: data?.communityId || null,
     imageUrl: data?.imageUrl || null,
