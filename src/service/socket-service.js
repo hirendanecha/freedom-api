@@ -149,6 +149,7 @@ createNewPost = async function (data) {
               firstName: userData[0].FirstName,
               lastName: userData[0].LastName,
               type: "post",
+              postId: notification?.postId || postData?.id,
             };
             await notificationMail(userDetails);
           }
@@ -415,6 +416,7 @@ createComments = async function (params) {
               firstName: userData[0].FirstName,
               lastName: userData[0].LastName,
               type: "comment",
+              postId: notification?.postId || postData?.id,
             };
             await notificationMail(userDetails);
           }

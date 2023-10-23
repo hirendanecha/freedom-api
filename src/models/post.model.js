@@ -141,6 +141,7 @@ Post.create = async function (postData) {
             userName: senderData[0].Username,
             firstName: userData[0].FirstName,
             lastName: userData[0].LastName,
+            postId: notification?.postId || postData?.id,
           };
           await notificationMail(userDetails);
         }
