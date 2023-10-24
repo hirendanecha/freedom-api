@@ -261,7 +261,7 @@ likeFeedPost = async function (params) {
     const values1 = [data];
     const post = await executeQuery(query, values);
     const likeData = await executeQuery(query1, values1);
-    const postData = await getCommunityPost({ page: 1, size: 15 });
+    const postData = await getPost({ page: 1, size: 15, profileId: profileId });
     return postData;
   }
 };
@@ -284,7 +284,7 @@ disLikeFeedPost = async function (params) {
     const values1 = [communityPostId, profileId];
     const post = await executeQuery(query, values);
     const likeData = await executeQuery(query1, values1);
-    const postData = await getCommunityPost({
+    const postData = await getPost({
       profileId: profileId,
       page: 1,
       size: 15,
@@ -455,7 +455,7 @@ likeFeedComment = async function (params) {
   const values1 = [data];
   const post = await executeQuery(query, values);
   const likeData = await executeQuery(query1, values1);
-  const postData = await getPost({ page: 1, size: 15 });
+  const postData = await getPost({ page: 1, size: 15, profileId: profileId });
   return postData;
 };
 
