@@ -85,7 +85,7 @@ socket.config = (server) => {
       const data = await socketService.createPost(params);
       console.log(data);
       if (data?.posts) {
-        socket.emit('new-post-added', data?.posts);
+        io.emit("new-post-added", data?.posts);
 
         if (data?.notifications) {
           for (const key in data?.notifications) {
@@ -201,7 +201,7 @@ socket.config = (server) => {
       if (params.actionType) {
         if (params.postId) {
           const data = await socketService.likeFeedPost(params);
-          socket.broadcast.emit("new-post", data);
+          io.emit("likeOrDislike", data.posts);
           const notification = await socketService.createNotification({
             notificationToProfileId: params.toProfileId,
             postId: params.postId,
@@ -232,11 +232,13 @@ socket.config = (server) => {
       } else {
         if (params.postId) {
           const data = await socketService.disLikeFeedPost(params);
-          socket.broadcast.emit("new-post", data);
-        } else if (params.communityPostId) {
-          const data = await socketService.disLikeFeedPost(params);
-          socket.broadcast.emit("community-post", data);
+          // socket.broadcast.emit("new-post", data);
+          io.emit("likeOrDislike", data.posts);
         }
+        // else if (params.communityPostId) {
+        //   const data = await socketService.disLikeFeedPost(params);
+        //   socket.broadcast.emit("community-post", data);
+        // }
       }
     });
 
@@ -253,7 +255,8 @@ socket.config = (server) => {
       console.log(params);
       const data = await socketService.createComments(params);
       if (data.comments) {
-        socket.emit("comments-on-post", data?.comments);
+        console.log("comments-on-post====>", data?.comments);
+        io.emit("comments-on-post", data?.comments);
       }
       if (data?.notifications) {
         for (const key in data?.notifications) {
@@ -279,7 +282,8 @@ socket.config = (server) => {
       });
       if (params.actionType) {
         const data = await socketService.likeFeedComment(params);
-        socket.broadcast.emit("new-post", data);
+        console.log(data.comments);
+        socket.broadcast.emit("likeOrDislikeComments", data.comments);
         const notification = await socketService.createNotification({
           notificationToProfileId: params.toProfileId,
           postId: params.postId,
@@ -295,7 +299,7 @@ socket.config = (server) => {
         );
       } else {
         const data = await socketService.disLikeFeedComment(params);
-          socket.broadcast.emit("new-post", data);
+        socket.broadcast.emit("new-post", data);
       }
     });
   });
