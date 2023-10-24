@@ -99,7 +99,8 @@ featuredChannels.createChannel = async function (reqBody) {
   const query1 = "select * from featured_channels where unique_link = ?";
   const value = [reqBody.unique_link];
   const oldchannels = await executeQuery(query1, value);
-  if (!oldchannels) {
+  console.log("oldchannels", oldchannels);
+  if (!oldchannels.length) {
     const query = "insert into featured_channels set ?";
     const values = [reqBody];
     const channels = await executeQuery(query, values);

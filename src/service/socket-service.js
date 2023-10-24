@@ -247,23 +247,30 @@ likeFeedPost = async function (params) {
         ActionDate: new Date(),
       });
     }
-    const postData = await getPost({ page: 1, size: 15 });
-    return postData;
-  } else if (communityPostId) {
-    const query = `update communityPosts set likescount = ? where Id =?`;
-    const query1 = `INSERT INTO postlikedislike set ?`;
-    const values = [likeCount, communityPostId];
-    const data = {
-      communityPostId: communityPostId,
-      ProfileID: profileId,
-      ActionType: actionType,
-    };
-    const values1 = [data];
-    const post = await executeQuery(query, values);
-    const likeData = await executeQuery(query1, values1);
-    const postData = await getPost({ page: 1, size: 15, profileId: profileId });
-    return postData;
+    const query3 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
+    const values3 = [postId];
+    const posts = await executeQuery(query3, values3);
+    return { posts };
   }
+  // else if (communityPostId) {
+  //   const query = `update communityPosts set likescount = ? where Id =?`;
+  //   const query1 = `INSERT INTO postlikedislike set ?`;
+  //   const values = [likeCount, communityPostId];
+  //   const data = {
+  //     communityPostId: communityPostId,
+  //     ProfileID: profileId,
+  //     ActionType: actionType,
+  //   };
+  //   const values1 = [data];
+  //   const post = await executeQuery(query, values);
+  //   const likeData = await executeQuery(query1, values1);
+  //   // const postData = await getPost({ page: 1, size: 15, profileId: profileId });
+  //   // return postData;
+  //   const query3 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
+  //   const values3 = [postId];
+  //   const posts = await executeQuery(query3, values3);
+  //   return { posts };
+  // }
 };
 
 disLikeFeedPost = async function (params) {
@@ -275,22 +282,31 @@ disLikeFeedPost = async function (params) {
     const values1 = [postId, profileId];
     const post = await executeQuery(query, values);
     const likeData = await executeQuery(query1, values1);
-    const postData = await getPost({ profileId: profileId, page: 1, size: 15 });
-    return postData;
-  } else if (communityPostId) {
-    const query = `update communityPosts set likescount = ? where id =?`;
-    const query1 = `delete from postlikedislike where communityPostId = ? AND ProfileID = ?`;
-    const values = [likeCount, communityPostId];
-    const values1 = [communityPostId, profileId];
-    const post = await executeQuery(query, values);
-    const likeData = await executeQuery(query1, values1);
-    const postData = await getPost({
-      profileId: profileId,
-      page: 1,
-      size: 15,
-    });
-    return postData;
+    const query3 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
+    const values3 = [postId];
+    const posts = await executeQuery(query3, values3);
+    return { posts };
+    // const postData = await getPost({ profileId: profileId, page: 1, size: 15 });
+    // return postData;
   }
+  // else if (communityPostId) {
+  //   const query = `update communityPosts set likescount = ? where id =?`;
+  //   const query1 = `delete from postlikedislike where communityPostId = ? AND ProfileID = ?`;
+  //   const values = [likeCount, communityPostId];
+  //   const values1 = [communityPostId, profileId];
+  //   const post = await executeQuery(query, values);
+  //   const likeData = await executeQuery(query1, values1);
+  //   // const postData = await getPost({
+  //   //   profileId: profileId,
+  //   //   page: 1,
+  //   //   size: 15,
+  //   // });
+  //   // return postData;
+  //   const query3 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
+  //   const values3 = [postId];
+  //   const posts = await executeQuery(query3, values3);
+  //   return { posts };
+  // }
 };
 
 createNotification = async function (params) {
@@ -455,8 +471,11 @@ likeFeedComment = async function (params) {
   const values1 = [data];
   const post = await executeQuery(query, values);
   const likeData = await executeQuery(query1, values1);
-  const postData = await getPost({ page: 1, size: 15, profileId: profileId });
-  return postData;
+  const query3 =
+    "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.id = ?";
+  const value3 = [commentId];
+  const comments = await executeQuery(query3, value3);
+  return { comments };
 };
 
 disLikeFeedComment = async function (params) {
@@ -468,7 +487,10 @@ disLikeFeedComment = async function (params) {
     const values1 = [commentId, profileId];
     const post = await executeQuery(query, values);
     const likeData = await executeQuery(query1, values1);
-    const postData = await getPost({ profileId: profileId, page: 1, size: 15 });
-    return postData;
+    const query3 =
+      "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.id = ?";
+    const value3 = [commentId];
+    const comments = await executeQuery(query3, value3);
+    return { comments };
   }
 };
