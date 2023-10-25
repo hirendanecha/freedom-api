@@ -15,7 +15,6 @@ var Post = function (post) {
   this.posttype = post.posttype || "S";
   this.profileid = post.profileid;
   this.isdeleted = "N";
-  this.postcreationdate = new Date();
   this.title = post?.title;
   this.metalink = post?.metalink;
   this.metadescription = post?.metadescription;
