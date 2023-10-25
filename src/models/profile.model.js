@@ -22,7 +22,6 @@ var Profile = function (profile) {
   this.CoverPicName = profile.CoverPicName;
   this.ProfilePicName = profile.ProfilePicName;
   this.IsActivated = profile.IsActive;
-  this.CreatedOn = new Date();
   this.AccountType = "I";
 };
 
