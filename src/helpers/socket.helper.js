@@ -299,7 +299,7 @@ socket.config = (server) => {
         );
       } else {
         const data = await socketService.disLikeFeedComment(params);
-        socket.broadcast.emit("new-post", data);
+        socket.broadcast.emit("likeOrDislikeComments", data.comments);
       }
     });
   });
