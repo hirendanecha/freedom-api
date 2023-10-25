@@ -42,7 +42,10 @@ exports.login = async function (req, res) {
     } else {
       return res
         .status(400)
-        .send({ error: true, message: "Password is incorrect" });
+        .send({
+          error: true,
+          message: "Have an existing account you need reset your password!",
+        });
     }
     // bcrypt.compare(password, user.Password, (error, isMatch) => {
     //   if (error) {
