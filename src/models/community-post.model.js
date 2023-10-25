@@ -9,7 +9,6 @@ var CommunityPost = function (post) {
   this.postType = post.posttype || "S";
   this.profileid = post.profileid;
   this.communityId = post.communityId;
-  this.createdDate = new Date();
   this.metalink = post.metalink;
 };
 

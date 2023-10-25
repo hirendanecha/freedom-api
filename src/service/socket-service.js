@@ -102,8 +102,6 @@ createNewPost = async function (data) {
     videoduration: data?.videoduration || null,
     posttype: data?.posttype || "S",
   };
-
-  postData.postcreationdate = new Date();
   postData.isdeleted = "N";
   const query = data?.id
     ? `update posts set ? where id= ?`
@@ -119,7 +117,6 @@ createNewPost = async function (data) {
         ProfileID: postData?.profileid,
         PostID: post?.insertId,
         ActionType: "P",
-        ActionDate: new Date(),
       });
     }
 
@@ -174,7 +171,6 @@ createCommunity = async function (params) {
 };
 
 createCommunityPost = async function (data) {
-  data.createdDate = new Date();
   const query = `INSERT INTO communityPosts set ?`;
   const values = [data];
   const post = await executeQuery(query, values);
@@ -244,7 +240,6 @@ likeFeedPost = async function (params) {
         ProfileID: profileId,
         PostID: postId,
         ActionType: "L",
-        ActionDate: new Date(),
       });
     }
     const query3 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
@@ -452,7 +447,6 @@ createComments = async function (params) {
     ProfileID: data?.profileId,
     PostID: data.postId,
     ActionType: "C",
-    ActionDate: new Date(),
   });
 
   return { notifications, comments };

@@ -12,7 +12,6 @@ var Community = function (community) {
   this.coverImg = community.coverImg;
   this.isApprove = community.isApprove || "N";
   this.pageType = community?.pageType;
-  this.creationDate = new Date();
 };
 
 Community.findAllCommunity = async function (

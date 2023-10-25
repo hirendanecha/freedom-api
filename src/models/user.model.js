@@ -10,7 +10,6 @@ var User = function (user) {
   this.Username = user.Username;
   this.Password = user.Password;
   this.IsActive = user.IsActive || "N";
-  this.DateCreation = new Date();
   this.IsAdmin = user.IsAdmin || "N";
   this.PartnerId = user.PartnerId;
   this.IsSuspended = user.IsSuspended || "N";
