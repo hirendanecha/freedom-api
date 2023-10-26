@@ -53,6 +53,17 @@ featuredChannels.getAllChannels = async (
   };
 };
 
+featuredChannels.searchAllData = async (search) => {
+  const query = `select * from featured_channels where firstname like '%${search}%' or unique_link like '%${search}%'`;
+  const channels = await executeQuery(query);
+  const query1 =
+    "select p.*,pr.Username,pr.ProfilePicName,pr.FirstName,pr.LastName from posts as p left join profile as pr on p.profileid = pr.ID where p.postdescription = ? or keywords = ? and posttype = 'V'";
+  const value1 = [search, search];
+  const posts = await executeQuery(query1, value1);
+  console.log(channels, posts);
+  return { channels, posts };
+};
+
 featuredChannels.getChannelById = async function (name) {
   const query =
     "select * from featured_channels where profileid = ? or unique_link = ?";

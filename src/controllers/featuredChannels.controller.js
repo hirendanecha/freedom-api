@@ -30,6 +30,12 @@ exports.getAllChannels = async (req, res) => {
   );
 };
 
+exports.searchAllData = async (req, res) => {
+  const { search } = req.body;
+  const searchData = await featuredChannels.searchAllData(search);
+  return res.send(searchData);
+};
+
 exports.getChannelById = async function (req, res) {
   const name = req.params.name;
   console.log(name);

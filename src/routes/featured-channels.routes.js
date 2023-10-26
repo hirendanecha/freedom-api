@@ -8,6 +8,7 @@ router.get("/my-channel/:id", featuredChannels.getChannelByUserId);
 router.get("/post/:id", featuredChannels.getPostDetails);
 router.get("/activate-channel", featuredChannels.channelsApprove);
 router.get("/feature/:id", featuredChannels.updateChannleFeature);
+router.post("/search-all", featuredChannels.searchAllData);
 router.post("/get", featuredChannels.getAllChannels);
 router.post("/posts", featuredChannels.getVideos);
 router.post("/my-posts", featuredChannels.getChannelVideos);
