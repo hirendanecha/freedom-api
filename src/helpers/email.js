@@ -10,9 +10,10 @@ let transporter = nodemailer.createTransport({
   //   host: "freedom.social",
   //   port: 993,
   // },
-  host: "smtp-relay.brevo.com",
+  headers: "X-PM-Message-Stream: transactional",
+  host: "smtp.postmarkapp.com",
   port: 587,
-  sender: "no-reply@freedom.buzz",
+  sender: "info@freedom.buzz",
   auth: { user: environment.SMTP_USER, pass: environment.SMTP_PASS },
 });
 
@@ -25,7 +26,7 @@ exports.sendMail = async function (mailObj) {
     return transporter.sendMail({
       from: {
         name: "Freedom.Buzz",
-        address: "no-reply@freedom.buzz",
+        address: "info@freedom.buzz",
       },
       to: mailObj.email,
       subject: mailObj.subject,

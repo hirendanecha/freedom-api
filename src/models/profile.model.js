@@ -23,6 +23,7 @@ var Profile = function (profile) {
   this.ProfilePicName = profile.ProfilePicName;
   this.IsActivated = profile.IsActive;
   this.AccountType = "I";
+  this.CreatedOn = new Date();
 };
 
 Profile.create = function (profileData, result) {
@@ -152,10 +153,14 @@ Profile.groupsAndPosts = async () => {
   const postsResult = await executeQuery(
     'SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid IN (?) ORDER BY ID DESC',
     [groupIds]
-  );   
+  );
 
-  const allGroupWithPosts = postsResult.map((post) => post.posttoprofileid).filter((value, index, self) => self.indexOf(value) === index);
-  const groupsWithPosts = groupsResult.filter((group) => allGroupWithPosts.includes(group.ID));
+  const allGroupWithPosts = postsResult
+    .map((post) => post.posttoprofileid)
+    .filter((value, index, self) => self.indexOf(value) === index);
+  const groupsWithPosts = groupsResult.filter((group) =>
+    allGroupWithPosts.includes(group.ID)
+  );
 
   const groupedPosts = groupsWithPosts.map((group) => {
     const groupPosts = postsResult
@@ -164,7 +169,8 @@ Profile.groupsAndPosts = async () => {
       .slice(0, 6);
 
     const groupPostsInfo = groupPosts.map((post) => {
-      let firstImage = "https://freedom.social/assets/newtemplate/images/mb-logo.png";
+      let firstImage =
+        "https://freedom.social/assets/newtemplate/images/mb-logo.png";
       if (post.metaimage) {
         firstImage = post.metaimage;
       } else if (post.imageUrl) {
@@ -196,24 +202,29 @@ Profile.groupsAndPosts = async () => {
 };
 
 Profile.getGroups = async () => {
-  const groupsResult = await executeQuery('SELECT ID, UniqueLink, FirstName FROM profile WHERE AccountType = "G" AND IsDeleted = "N" AND IsActivated = "Y" ORDER BY FirstName');
+  const groupsResult = await executeQuery(
+    'SELECT ID, UniqueLink, FirstName FROM profile WHERE AccountType = "G" AND IsDeleted = "N" AND IsActivated = "Y" ORDER BY FirstName'
+  );
 
   return groupsResult;
 };
 
 Profile.getGroupBasicDetails = async (uniqueLink) => {
-  const groupsResult = await executeQuery('SELECT * FROM profile WHERE AccountType = "G" AND IsDeleted = "N" AND IsActivated = "Y" AND UniqueLink=? ORDER BY FirstName', [uniqueLink]);
+  const groupsResult = await executeQuery(
+    'SELECT * FROM profile WHERE AccountType = "G" AND IsDeleted = "N" AND IsActivated = "Y" AND UniqueLink=? ORDER BY FirstName',
+    [uniqueLink]
+  );
 
   return groupsResult?.[0] || {};
 };
 
 Profile.getGroupPostById = async (id, limit, offset) => {
-  let query = `SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid=${id} ORDER BY ID DESC `;  
+  let query = `SELECT * FROM posts WHERE isdeleted = "N" AND posttoprofileid IS NOT NULL AND posttype NOT IN ("CHAT", "TA") AND posttoprofileid=${id} ORDER BY ID DESC `;
 
   if (limit > 0 && offset >= 0) {
-    query += `LIMIT ${limit} OFFSET ${offset}`
+    query += `LIMIT ${limit} OFFSET ${offset}`;
   }
-  const posts = await executeQuery(query);   
+  const posts = await executeQuery(query);
 
   return posts || [];
 };
@@ -222,7 +233,7 @@ Profile.getGroupFileResourcesById = async (id) => {
   const posts = await executeQuery(
     "SELECT p.ID AS PostID, p.PostDescription, p.PostCreationDate AS UploadedOn, ph.PhotoName as FileName FROM posts AS p LEFT JOIN photos as ph on p.ID = ph.PostID WHERE isdeleted = 'N' AND  p.posttype = 'F' AND (p.ProfileID = ? OR p.PostToProfileID = ?)",
     [id, id]
-  );   
+  );
 
   return posts || [];
 };
