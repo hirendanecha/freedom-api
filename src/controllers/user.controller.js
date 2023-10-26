@@ -40,12 +40,10 @@ exports.login = async function (req, res) {
         }
       });
     } else {
-      return res
-        .status(400)
-        .send({
-          error: true,
-          message: "Have an existing account? you need to reset your password!",
-        });
+      return res.status(400).send({
+        error: true,
+        message: "Have an existing account? you need to reset your password!",
+      });
     }
     // bcrypt.compare(password, user.Password, (error, isMatch) => {
     //   if (error) {
@@ -398,7 +396,15 @@ exports.changeAccountType = function (req, res) {
 exports.getZipData = function (req, res) {
   User.getZipData(req.params.zip, req.query.country, function (err, data) {
     if (err) return utils.send500(res, err);
-    res.send(data);
+    if (data.length) {
+      res.send(data);
+    } else {
+      res.send({
+        error: true,
+        message:
+          "Your postal code is not found in our database, Please enter a nearby postal code.",
+      });
+    }
   });
 };
 
