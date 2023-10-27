@@ -387,8 +387,8 @@ User.getZipData = function (zip, country, result) {
         response.country_code = el.country_code;
         response.state = el.state;
         response.city = el.city;
-        // response.places =
-        //   (response.places ? response.places + "," : "") + el.place;
+        response.places =
+          (response.places ? response.places + "," : "") + el.place;
         response.country = el.country;
         return response;
       });
