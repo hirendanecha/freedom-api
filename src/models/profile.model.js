@@ -11,6 +11,7 @@ var Profile = function (profile) {
   this.Address = profile.Address;
   this.Country = profile.Country;
   this.City = profile.City;
+  this.County = profile.County;
   this.State = profile.State;
   this.Zip = profile.Zip;
   this.UserID = profile.UserID;
