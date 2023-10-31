@@ -12,15 +12,8 @@ exports.findAll = async function (req, res) {
 };
 
 exports.getPostByProfileId = async function (req, res) {
-  console.log(req.params.id);
-  const startDate = req.query.startDate;
-  const endDate = req.query.endDate;
-  console.log("in ==>", req.query.startDate, req.query.endDate);
-  const postList = await Post.getPostByProfileId(
-    req.params.id,
-    startDate,
-    endDate
-  );
+  console.log(req.body);
+  const postList = await Post.getPostByProfileId(req.body);
   if (postList) {
     res.send({ data: postList });
   }

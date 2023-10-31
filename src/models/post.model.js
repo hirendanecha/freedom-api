@@ -73,7 +73,9 @@ Post.findAll = async function (params) {
   );
 };
 
-Post.getPostByProfileId = async function (profileId, startDate, endDate) {
+Post.getPostByProfileId = async function (params) {
+  const { page, size, profileId, startDate, endDate } = params;
+  const { limit, offset } = getPagination(page, size);
   let whereCondition = "";
   if (startDate && endDate) {
     whereCondition += `AND p.postcreationdate >= '${startDate}' AND p.postcreationdate <= '${endDate}'`;
@@ -83,11 +85,18 @@ Post.getPostByProfileId = async function (profileId, startDate, endDate) {
   } else if (endDate) {
     whereCondition += `AND p.postcreationdate <= '${endDate}'`;
   }
-
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? ${whereCondition} order by p.postcreationdate DESC;`;
-  const values = [profileId];
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
+  const values = [profileId, limit, offset];
   const postData = await executeQuery(query, values);
-  return postData;
+  // return postData;
+  return getPaginationData(
+    {
+      count: postData.length,
+      docs: postData,
+    },
+    page,
+    limit
+  );
 };
 Post.getPostByPostId = function (profileId, result) {
   db.query(
