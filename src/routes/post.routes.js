@@ -6,7 +6,7 @@ const utilsController = require("../controllers/utils.controller");
 const uploadFileMiddleware = require("../middleware/upload");
 
 router.post("/", postController.findAll);
-router.get("/:id", postController.getPostByProfileId);
+router.post("/get-my-post", postController.getPostByProfileId);
 router.get("/get/:id", postController.getPostByPostId);
 router.post("/comments/", postController.getPostComments);
 router.post("/get-meta", postController.getMeta);
