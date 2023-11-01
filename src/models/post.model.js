@@ -85,7 +85,7 @@ Post.getPostByProfileId = async function (params) {
   } else if (endDate) {
     whereCondition += `AND p.postcreationdate <= '${endDate}'`;
   }
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.profileid =? and p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
   const values = [profileId, limit, offset];
   const postData = await executeQuery(query, values);
   // return postData;
