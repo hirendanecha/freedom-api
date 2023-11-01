@@ -132,7 +132,7 @@ createNewPost = async function (data) {
             actionType: "T",
           });
           console.log(notification);
-          const findUser = `select u.Email,p.FirstName,p.LastName from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+          const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
           const values = [tag?.id];
           const userData = await executeQuery(findUser, values);
           const findSenderUser = `select p.ID,p.Username from profile as p where p.ID = ?`;
@@ -143,12 +143,13 @@ createNewPost = async function (data) {
             const userDetails = {
               email: userData[0].Email,
               profileId: senderData[0].ID,
-              userName: senderData[0].Username,
+              userName: userData[0].Username,
               firstName: userData[0].FirstName,
               lastName: userData[0].LastName,
               type: "post",
               postId: notification?.postId || postData?.id,
             };
+            console.log("userDetails===>", userDetails);
             await notificationMail(userDetails);
           }
         }
