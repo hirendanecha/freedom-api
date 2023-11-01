@@ -37,6 +37,7 @@ User.login = function (email, Id, result) {
             u.City,
             u.State,
             u.Zip,
+            u.IsSuspended,
             u.AccountType,
             p.ID as profileId,
             p.CoverPicName,
@@ -46,9 +47,9 @@ User.login = function (email, Id, result) {
             p.ChannelType,
             p.DefaultUniqueLink,
             p.UniqueLink,
+            p.AccountType,
             cm.communityId
-     FROM users as u left join profile as p on p.UserID = u.Id left join communityMembers as cm on cm.profileId = p.ID WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
-
+     FROM users as u left join profile as p on p.UserID = u.Id AND p.AccountType in ('I','M') left join communityMembers as cm on cm.profileId = p.ID WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
     [email, email, Id],
     async function (err, res) {
       if (err) {
@@ -56,6 +57,7 @@ User.login = function (email, Id, result) {
         return result(err, null);
       } else {
         const user = res[0];
+        console.log(user, "user===>");
         if (user?.IsActive === "N") {
           return result(
             {
@@ -66,7 +68,7 @@ User.login = function (email, Id, result) {
             null
           );
         }
-        if (user.IsSuspended === "N") {
+        if (user?.IsSuspended === "Y") {
           return result(
             {
               message: "This user has been suspended by admin",
