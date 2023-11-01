@@ -355,14 +355,14 @@ createNotification = async function (params) {
     const value = [data.postId, data.notificationByProfileId];
     const oldData = await executeQuery(find, value);
     console.log(oldData);
-    if (oldData.length) {
-      return oldData[0];
-    } else {
-      const query1 = "insert into notifications set ?";
-      const values1 = [data];
-      const notificationData = await executeQuery(query1, values1);
-      return { ...data, id: notificationData.insertId };
-    }
+    // if (oldData.length) {
+    //   return oldData[0];
+    // } else {
+    // }
+    const query1 = "insert into notifications set ?";
+    const values1 = [data];
+    const notificationData = await executeQuery(query1, values1);
+    return { ...data, id: notificationData.insertId };
   }
 };
 
