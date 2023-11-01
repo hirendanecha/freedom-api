@@ -222,6 +222,13 @@ exports.createCommunityAdminByMA = function (req, res) {
 
 // Client Api //
 
+exports.getLocalCommunities = async function (req, res) {
+  const communityList = await Community.getLocalCommunities();
+  if (communityList) {
+    res.send(communityList);
+  }
+};
+
 exports.getCommunity = async function (req, res) {
   const userId = req.query.id;
   const { pageType } = req.query;

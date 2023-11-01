@@ -218,6 +218,12 @@ Community.createCommunityAdminByMA = async function (data) {
   }
 };
 
+Community.getLocalCommunities = async function () {
+  const query = "select * from community where pageType = 'community'";
+  const communities = await executeQuery(query);
+  return communities;
+};
+
 Community.getCommunity = async function (id, pageType) {
   console.log("get==>", id, pageType);
   const query1 = "select communityId from communityMembers where profileId = ?";
