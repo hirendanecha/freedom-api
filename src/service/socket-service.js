@@ -89,7 +89,9 @@ createNewPost = async function (data) {
     profileid: data?.profileid,
     title: data?.meta?.title || data?.title || null,
     metadescription:
-      data?.meta?.metadescription || data?.metadescription || null,
+      data?.meta?.metadescription.toString() ||
+      data?.metadescription.toString() ||
+      null,
     metaimage: data?.meta?.metaimage || data?.metaimage || null,
     metalink: data?.meta?.metalink || data?.metalink || null,
     postdescription: data?.postdescription,
@@ -102,6 +104,8 @@ createNewPost = async function (data) {
     posttype: data?.posttype || "S",
   };
   postData.isdeleted = "N";
+
+  console.log("postData", postData);
   const query = data?.id
     ? `update posts set ? where id= ?`
     : `INSERT INTO posts set ?`;
