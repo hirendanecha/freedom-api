@@ -323,6 +323,10 @@ createNotification = async function (params) {
       userData[0]?.FirstName || userData[0]?.Username
     } liked your Comment.`;
     console.log("desc===>", desc);
+  } else if (commentId && actionType === "T") {
+    desc = `You were tagged in ${
+      userData[0]?.FirstName || userData[0]?.Username
+    }'s comment.`;
   } else {
     desc =
       actionType === "R"
