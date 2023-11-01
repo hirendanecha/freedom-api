@@ -456,7 +456,7 @@ User.resendVerification = async function (email, result) {
 };
 
 User.setPassword = async function (user_id, password) {
-  const query = `UPDATE users SET password=? WHERE Id=?`;
+  const query = `UPDATE users SET Password=? WHERE Id=?`;
   const values = [password, user_id];
   const user = await executeQuery(query, values);
   return user;

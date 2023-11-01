@@ -74,12 +74,10 @@ exports.login = async function (req, res) {
     //   }
     // });
   } else {
-    return res
-      .status(400)
-      .send({
-        error: true,
-        message: "Invalid Email and Password. Kindly try again!",
-      });
+    return res.status(400).send({
+      error: true,
+      message: "Invalid Email and Password. Kindly try again!",
+    });
   }
 };
 exports.getToken = async function (req, res) {
