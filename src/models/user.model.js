@@ -91,7 +91,7 @@ User.login = function (email, Id, result) {
           const value = [Id];
           const channelId = await executeQuery(query, value);
           console.log("channelId", channelId);
-          user.channelId = channelId[0].id;
+          user.channelId = channelId[0]?.id;
           return result(null, {
             userId: user.Id,
             user: user,
