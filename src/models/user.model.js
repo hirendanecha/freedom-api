@@ -48,6 +48,7 @@ User.login = function (email, Id, result) {
             p.UniqueLink,
             cm.communityId
      FROM users as u left join profile as p on p.UserID = u.Id left join communityMembers as cm on cm.profileId = p.ID WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
+
     [email, email, Id],
     async function (err, res) {
       if (err) {
@@ -85,6 +86,12 @@ User.login = function (email, Id, result) {
           );
         } else {
           const token = await generateJwtToken(res[0]);
+          const query =
+            "select f.id from featured_channels as f left join profile as p on p.ID = f.profileid where f.profileid = p.ID and f.feature = 'Y' and p.UserID = ?;";
+          const value = [Id];
+          const channelId = await executeQuery(query, value);
+          console.log("channelId", channelId);
+          user.channelId = channelId[0].id;
           return result(null, {
             userId: user.Id,
             user: user,
