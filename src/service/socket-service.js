@@ -89,8 +89,8 @@ createNewPost = async function (data) {
     profileid: data?.profileid,
     title: data?.meta?.title || data?.title || null,
     metadescription:
-      data?.meta?.metadescription.toString() ||
-      data?.metadescription.toString() ||
+      data?.meta?.metadescription?.toString() ||
+      data?.metadescription?.toString() ||
       null,
     metaimage: data?.meta?.metaimage || data?.metaimage || null,
     metalink: data?.meta?.metalink || data?.metalink || null,
