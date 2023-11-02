@@ -60,7 +60,8 @@ Profile.FindById = function (profileId, result) {
             EmailVerified,
             CreatedOn,
             AccountType,
-            MediaApproved
+            MediaApproved,
+            County
     FROM profile WHERE ID=? `,
     profileId,
     function (err, res) {
