@@ -102,6 +102,7 @@ createNewPost = async function (data) {
     albumname: data?.albumname || null,
     videoduration: data?.videoduration || null,
     posttype: data?.posttype || "S",
+    keywords: data?.keywords || null,
   };
   postData.isdeleted = "N";
 

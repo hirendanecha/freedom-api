@@ -25,6 +25,7 @@ var Post = function (post) {
   this.videoduration = post?.videoduration;
   this.communityId = post?.communityId;
   this.channelId = post?.channelId || null;
+  this.keywords = post?.keywords || null;
 };
 
 // Post.findAll = async function (limit, offset, search) {
