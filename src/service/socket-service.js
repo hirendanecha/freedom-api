@@ -373,6 +373,13 @@ createComments = async function (params) {
     comment: params?.comment,
     parentCommentId: params?.parentCommentId,
     imageUrl: params?.imageUrl,
+    title: params?.meta?.title || params?.title || null,
+    metadescription:
+      params?.meta?.metadescription?.toString() ||
+      params?.metadescription?.toString() ||
+      null,
+    metaimage: params?.meta?.metaimage || params?.metaimage || null,
+    metalink: params?.meta?.metalink || params?.metalink || null,
   };
   const query = params.id
     ? "update comments set ? where Id = ?"
