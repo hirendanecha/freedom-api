@@ -273,8 +273,13 @@ exports.forgotPassword = async function (req, res) {
           message: "please check your mail for reset password",
         });
       } else {
-        return res.json({ error: "error", message: data.error });
+        return res.json({ error: true, message: data.error });
       }
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "please check your mail for reset password",
+      });
     }
   }
 };
