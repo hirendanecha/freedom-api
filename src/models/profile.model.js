@@ -18,7 +18,7 @@ var Profile = function (profile) {
   this.DateofBirth = profile.DateofBirth;
   this.Gender = profile.Gender;
   this.MobileNo = profile.MobileNo;
-  this.AccountType = profile?.AccountType || 'I';
+  this.AccountType = profile?.AccountType || "I";
   this.Business_NP_TypeID = profile.Business_NP_TypeID || 0;
   this.CoverPicName = profile.CoverPicName;
   this.ProfilePicName = profile.ProfilePicName;
@@ -171,8 +171,7 @@ Profile.groupsAndPosts = async () => {
       .slice(0, 6);
 
     const groupPostsInfo = groupPosts.map((post) => {
-      let firstImage =
-        "https://freedom.social/assets/newtemplate/images/mb-logo.png";
+      let firstImage = "";
       if (post.metaimage) {
         firstImage = post.metaimage;
       } else if (post.imageUrl) {
