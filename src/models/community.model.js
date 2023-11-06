@@ -13,10 +13,10 @@ var Community = function (community) {
   this.coverImg = community.coverImg;
   this.isApprove = community.isApprove || "N";
   this.pageType = community?.pageType;
-  this.Country = community?.Country
-  this.City = community?.City
-  this.State = community?.State
-  this.Zip = community?.Zip
+  this.Country = community?.Country;
+  this.City = community?.City;
+  this.State = community?.State;
+  this.Zip = community?.Zip;
 };
 
 Community.findAllCommunity = async function (
@@ -83,19 +83,25 @@ Community.findUnApproveCommunity = async function (
 };
 
 Community.create = async function (communityData) {
-  // db.query("INSERT INTO community set ?", communityData, function (err, res) {
-  //   if (err) {
-  //     result(err, null);
-  //   } else {
-  //     result(null, res.insertId);
-  //   }
-  // });
-  const query = communityData.Id
-    ? '"update community set ? where Id = ?'
-    : '"INSERT INTO community set ?';
-  const values = communityData.Id
-    ? [communityData, communityData.Id]
-    : { communityData };
+  db.query("INSERT INTO community set ?", communityData, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res.insertId);
+    }
+  });
+  // const query = communityData.Id
+  //   ? '"update community set ? where Id = ?'
+  //   : '"INSERT INTO community set ?';
+  // const values = communityData.Id
+  //   ? [communityData, communityData.Id]
+  //   : { communityData };
+  // const community = await executeQuery(query, values);
+  // return community;
+};
+Community.edit = async function (communityData) {
+  const query = "update community set ? where Id = ?";
+  const values = [communityData, communityData.Id];
   const community = await executeQuery(query, values);
   return community;
 };

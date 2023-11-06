@@ -20,6 +20,7 @@ router.get("/change-user-type/:id", communityController.changeAccountType);
 router.get("/files/:folder/:id", utilsController.getFiles);
 router.post("/upload-community", utilsController.uploadPostImage);
 router.post("/create", communityController.createCommunity);
+router.post("/edit", communityController.editCommunity);
 router.post("/join-community", communityController.joinCommunity);
 router.post(
   "/create-community-admin-by-MA",

@@ -47,38 +47,34 @@ exports.createCommunity = async function (req, res) {
   } else {
     const communityData = new Community(req.body);
     console.log(communityData);
-    // Community.create(communityData, function (err, community) {
-    //   if (err) {
-    //     return utils.send500(res, err);
-    //   } else {
-    //     return res.json({
-    //       error: false,
-    //       message: "Your community will be approve by admin",
-    //       data: community,
-    //     });
-    //   }
-    // });
-    const community = await Community.create(communityData);
-    if (community) {
-      if (community?.insertId) {
-        return res.json({
-          error: false,
-          message: "Your community will be approve by admin",
-          data: community?.insertId,
-        });
+    Community.create(communityData, function (err, community) {
+      if (err) {
+        return utils.send500(res, err);
       } else {
         return res.json({
           error: false,
-          message: "update community successfully",
+          message: "Your community will be approve by admin",
           data: community,
         });
       }
-    } else {
-      res.status(500).send({
-        error: true,
-        message: "something went wrong, please try again!",
-      });
-    }
+    });
+  }
+};
+exports.editCommunity = async function name(req, res) {
+  const communityData = new Community(req.body);
+  console.log(communityData);
+  const community = await Community.edit(communityData);
+  if (community) {
+    return res.json({
+      error: false,
+      message: "update community successfully",
+      data: community,
+    });
+  } else {
+    res.status(500).send({
+      error: true,
+      message: "something went wrong, please try again!",
+    });
   }
 };
 
