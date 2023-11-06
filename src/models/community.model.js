@@ -100,9 +100,9 @@ Community.create = async function (communityData, result) {
   // const community = await executeQuery(query, values);
   // return community;
 };
-Community.edit = async function (communityData) {
+Community.edit = async function (communityData, Id) {
   const query = "update community set ? where Id = ?";
-  const values = [communityData, communityData.Id];
+  const values = [communityData, Id];
   const community = await executeQuery(query, values);
   return community;
 };
