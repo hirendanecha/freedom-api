@@ -43,7 +43,7 @@ Community.findAllCommunity = async function (
     `SELECT count(c.Id) as count FROM community as c WHERE ${whereCondition}`
   );
   const searchData = await executeQuery(
-    `select c.*,count(cm.profileId) as members,p.Country,p.City,p.State,p.Zip from community as c left join communityMembers as cm on cm.communityId = c.Id left join profile as p on p.ID = c.profileId where ${whereCondition} GROUP BY c.Id order by c.creationDate desc limit ? offset ?`,
+    `select c.*,count(cm.profileId) as members,c.Country,c.City,c.State,c.Zip,c.County from community as c left join communityMembers as cm on cm.communityId = c.Id left join profile as p on p.ID = c.profileId where ${whereCondition} GROUP BY c.Id order by c.creationDate desc limit ? offset ?`,
     [limit, offset]
   );
   return {
