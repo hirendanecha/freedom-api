@@ -61,15 +61,14 @@ exports.createCommunity = async function (req, res) {
   }
 };
 exports.editCommunity = async function name(req, res) {
-  const Id = new Community(req.params.id);
+  const Id = req.params.id;
   const communityData = new Community(req.body);
-  console.log(communityData);
+  console.log(communityData, Id);
   const community = await Community.edit(communityData, Id);
   if (community) {
     return res.json({
       error: false,
       message: "update community successfully",
-      data: community,
     });
   } else {
     res.status(500).send({
