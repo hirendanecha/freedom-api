@@ -17,6 +17,7 @@ var Community = function (community) {
   this.City = community?.City;
   this.State = community?.State;
   this.Zip = community?.Zip;
+  this.County = community?.County;
 };
 
 Community.findAllCommunity = async function (
