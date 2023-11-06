@@ -103,6 +103,7 @@ createNewPost = async function (data) {
     videoduration: data?.videoduration || null,
     posttype: data?.posttype || "S",
     keywords: data?.keywords || null,
+    pdfUrl: data?.pdfUrl || null,
   };
   postData.isdeleted = "N";
 
