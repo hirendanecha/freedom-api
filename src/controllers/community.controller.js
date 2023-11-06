@@ -61,9 +61,10 @@ exports.createCommunity = async function (req, res) {
   }
 };
 exports.editCommunity = async function name(req, res) {
+  const Id = new Community(req.params.id);
   const communityData = new Community(req.body);
   console.log(communityData);
-  const community = await Community.edit(communityData);
+  const community = await Community.edit(communityData, Id);
   if (community) {
     return res.json({
       error: false,
