@@ -8,11 +8,12 @@ const uploadFileMiddleware = require("../middleware/upload");
 router.post("/", postController.findAll);
 router.post("/get-my-post", postController.getPostByProfileId);
 router.get("/get/:id", postController.getPostByPostId);
+router.get("/get-pdfs/:id", postController.getPdfsFile);
 router.post("/comments/", postController.getPostComments);
 router.post("/get-meta", postController.getMeta);
 router.post("/create-post", postController.createPost);
 router.post(
-  "/upload-video",
+  "/upload",
   uploadFileMiddleware.single("file"),
   postController.uploadVideo
 );

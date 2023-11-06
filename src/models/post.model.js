@@ -116,6 +116,23 @@ Post.getPostByPostId = function (profileId, result) {
   );
 };
 
+Post.getPdfsFile = function (profileId, result) {
+  db.query(
+    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.pdfUrl is not null and p.profileid =? ;",
+    +profileId,
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        // console.log("post: ", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
 Post.create = async function (postData) {
   const query = postData?.id
     ? `update posts set ? where id= ?`

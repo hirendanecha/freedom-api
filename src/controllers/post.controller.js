@@ -27,6 +27,14 @@ exports.getPostByPostId = function (req, res) {
   });
 };
 
+exports.getPdfsFile = function (req, res) {
+  console.log(req.params.id);
+  Post.getPdfsFile(req.params.id, function (err, post) {
+    if (err) return utils.send500(res, err);
+    res.send(post);
+  });
+};
+
 exports.createPost = async function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
@@ -59,7 +67,10 @@ exports.createPost = async function (req, res) {
 
 exports.uploadVideo = async function (req, res) {
   console.log(req.file);
-  const url = await s3.uploadFileToWasabi(req.file, req.file?.originalname);
+  const url = await s3.uploadFileToWasabi(
+    req.file,
+    req.file?.originalname.trim()
+  );
   console.log(url);
   if (url) {
     return res.json({
