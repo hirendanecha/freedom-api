@@ -41,23 +41,44 @@ exports.findUnApproveCommunity = async function (req, res) {
   );
 };
 
-exports.createCommunity = function (req, res) {
+exports.createCommunity = async function (req, res) {
   if (Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const communityData = new Community(req.body);
     console.log(communityData);
-    Community.create(communityData, function (err, community) {
-      if (err) {
-        return utils.send500(res, err);
-      } else {
+    // Community.create(communityData, function (err, community) {
+    //   if (err) {
+    //     return utils.send500(res, err);
+    //   } else {
+    //     return res.json({
+    //       error: false,
+    //       message: "Your community will be approve by admin",
+    //       data: community,
+    //     });
+    //   }
+    // });
+    const community = await Community.create(communityData);
+    if (community) {
+      if (community?.insertId) {
         return res.json({
           error: false,
           message: "Your community will be approve by admin",
+          data: community?.insertId,
+        });
+      } else {
+        return res.json({
+          error: false,
+          message: "update community successfully",
           data: community,
         });
       }
-    });
+    } else {
+      res.status(500).send({
+        error: true,
+        message: "something went wrong, please try again!",
+      });
+    }
   }
 };
 
