@@ -48,9 +48,9 @@ app.use(helmet()); // Add Helmet as a middleware
 
 app.use(morgan("tiny"));
 
-app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '1024mb' }));
 app.use(bodyParser.json({
-  limit: '100mb'
+  limit: '1024mb'
 }));
 
 app.use(cookieParser())
