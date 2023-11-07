@@ -69,7 +69,7 @@ exports.uploadVideo = async function (req, res) {
   console.log(req.file);
   const url = await s3.uploadFileToWasabi(
     req.file,
-    req.file?.originalname.trim()
+    req.file?.originalname.replace(" ", "-")
   );
   console.log(url);
   if (url) {

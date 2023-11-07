@@ -77,31 +77,36 @@ socket.config = (server) => {
       }
     });
 
-    socket.on("create-new-post", async (params) => {
+    socket.on("create-new-post", async (params, cb) => {
       logger.info("Create new post", {
         method: "Create new post",
         params: params,
       });
-      const data = await socketService.createPost(params);
-      console.log(data);
-      if (data?.posts) {
-        io.emit("new-post-added", data?.posts);
+      try {
+        const data = await socketService.createPost(params);
+        console.log(data);
+        if (data?.posts) {
+          io.emit("new-post-added", data?.posts);
 
-        if (data?.notifications) {
-          for (const key in data?.notifications) {
-            if (Object.hasOwnProperty.call(data?.notifications, key)) {
-              const notification = data?.notifications[key];
+          if (data?.notifications) {
+            for (const key in data?.notifications) {
+              if (Object.hasOwnProperty.call(data?.notifications, key)) {
+                const notification = data?.notifications[key];
 
-              io.to(`${notification.notificationToProfileId}`).emit(
-                "notification",
-                notification
-              );
+                io.to(`${notification.notificationToProfileId}`).emit(
+                  "notification",
+                  notification
+                );
+              }
             }
           }
-        }
 
-        const socketData = await socketService.getPost(params);
-        socket.broadcast.emit("new-post", socketData);
+          const socketData = await socketService.getPost(params);
+          if (typeof cb === "function") cb(socketData);
+          socket.broadcast.emit("new-post", socketData);
+        }
+      } catch (error) {
+        console.log(error);
       }
     });
 
