@@ -8,7 +8,13 @@ exports.getPost = async function (data) {
   return await getPost(data);
 };
 exports.createPost = function (data) {
-  return createNewPost(data);
+  try {
+    return createNewPost(data);
+    
+  } catch (error) {
+    console.log('createpost', error);
+    return Promise.reject(error)
+  }
 };
 exports.createCommunity = async function (data) {
   return await createCommunity(data);
@@ -55,7 +61,7 @@ exports.disLikeFeedComment = async function (data) {
   return await disLikeFeedComment(data);
 };
 
-getPost = async function (params) {
+const getPost = async function (params) {
   const { page, size, profileId, communityId } = params;
   const { limit, offset } = getPagination(page, size);
   const communityCondition = communityId
@@ -84,7 +90,8 @@ getPost = async function (params) {
   return posts;
 };
 
-createNewPost = async function (data) {
+const createNewPost = async function (data) {
+  console.log(data);
   const postData = {
     profileid: data?.profileid,
     title: data?.meta?.title || data?.title || null,

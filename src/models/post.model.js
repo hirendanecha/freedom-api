@@ -26,6 +26,7 @@ var Post = function (post) {
   this.communityId = post?.communityId;
   this.channelId = post?.channelId || null;
   this.keywords = post?.keywords || null;
+  this.pdfUrl = post?.pdfUrl || null;
 };
 
 // Post.findAll = async function (limit, offset, search) {
