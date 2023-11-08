@@ -10,7 +10,7 @@ const db = mysql.createConnection({
   host: '65.108.254.22',
   user: 'root',
   password: 'JYq1Nyr2l7Cf',
-  database: 'freedom2021db-live'
+  database: 'freedom-buzz'
 });
 
 db.connect(function (err) {
