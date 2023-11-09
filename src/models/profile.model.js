@@ -113,6 +113,17 @@ Profile.getNotificationById = async function (id) {
   }
 };
 
+Profile.getNotification = async function (id) {
+  if (id) {
+    const query = "select * from notifications where id = ?";
+    const values = [id];
+    const notificationData = await executeQuery(query, values);
+    return notificationData;
+  } else {
+    return { error: "data not found" };
+  }
+};
+
 Profile.editNotifications = function (id, isRead, result) {
   db.query(
     "update notifications set isRead=? WHERE id = ?",

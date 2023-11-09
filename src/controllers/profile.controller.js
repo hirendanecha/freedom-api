@@ -115,6 +115,14 @@ exports.getNotificationById = async function (req, res) {
     data: data,
   });
 };
+exports.getNotification = async function (req, res) {
+  const { id } = req.params;
+  const data = await Profile.getNotification(id);
+  return res.send({
+    error: false,
+    data: data,
+  });
+};
 
 exports.deleteNotification = function (req, res) {
   Profile.deleteNotification(req.params.id, function (err, result) {

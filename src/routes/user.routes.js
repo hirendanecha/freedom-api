@@ -24,6 +24,7 @@ router.get("/profile/:id", profileController.FindProfieById);
 router.put("/:id", userController.update);
 router.put("/profile/:id", authorize, profileController.updateProfile);
 router.get("/zip/:zip", userController.getZipData);
+router.get("/notification/:id", profileController.getNotification);
 router.get("/get-notification/:id", profileController.getNotificationById);
 router.post("/user/verification/resend", userController.resendVerification);
 router.get("/user/verification/:token", userController.verification);
