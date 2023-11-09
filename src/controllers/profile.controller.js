@@ -3,6 +3,7 @@ const utils = require("../helpers/utils");
 const environments = require("../environments/environment");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 const User = require("../models/user.model");
+const { query } = require("../../config/db.config");
 
 exports.create = function (req, res) {
   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
@@ -36,14 +37,23 @@ exports.FindProfieById = function (req, res) {
   }
 };
 
-exports.updateProfile = function (req, res) {
+exports.updateProfile = async function (req, res) {
   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
     const profileId = req.params.id;
     const reqBody = req.body;
     const profile = new Profile({ ...reqBody });
-    
+    const existingUsername = req.user.username;
+    const isOccupied = await getUsername(reqBody.Username, existingUsername);
+
+    console.log(isOccupied);
+    if (isOccupied.length) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Username is already exist" });
+    }
+
     if (req.body.UserID) {
       const updateUserData = {
         Username: reqBody?.Username,
@@ -69,6 +79,14 @@ exports.updateProfile = function (req, res) {
       });
     });
   }
+};
+
+const getUsername = async function (username, exisingusername) {
+  const query =
+    "select Username from users where Username = ? and Username not in (?)";
+  const value = [username, exisingusername];
+  const user = await utils.executeQuery(query, value);
+  return user;
 };
 
 exports.getUsersByUsername = async function (req, res) {
@@ -108,7 +126,7 @@ exports.deleteNotification = function (req, res) {
 exports.groupsAndPosts = async function (req, res) {
   try {
     const groupedPosts = await Profile.groupsAndPosts();
-  
+
     return res.send(groupedPosts);
   } catch (error) {
     return utils.send500(res, error);
@@ -128,7 +146,7 @@ exports.getGroupBasicDetails = async function (req, res) {
   try {
     const { uniqueLink } = req.params;
     const groupDetails = await Profile.getGroupBasicDetails(uniqueLink);
-  
+
     return res.send(groupDetails);
   } catch (error) {
     return utils.send500(res, error);
@@ -139,13 +157,13 @@ exports.getGroupPostById = async function (req, res) {
   try {
     const { id } = req.params;
     const { page, limit } = req.query;
-    const offset = page > 0 ? (page - 1)*limit : 0;
+    const offset = page > 0 ? (page - 1) * limit : 0;
 
     const posts = await Profile.getGroupPostById(id, limit, offset);
-  
+
     return res.send(posts);
   } catch (error) {
-    console.log('error : ', error);
+    console.log("error : ", error);
     return utils.send500(res, error);
   }
 };
@@ -154,7 +172,7 @@ exports.getGroupFileResourcesById = async function (req, res) {
   try {
     const { id } = req.params;
     const posts = await Profile.getGroupFileResourcesById(id);
-  
+
     return res.send(posts);
   } catch (error) {
     return utils.send500(res, error);
