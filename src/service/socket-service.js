@@ -10,10 +10,9 @@ exports.getPost = async function (data) {
 exports.createPost = function (data) {
   try {
     return createNewPost(data);
-    
   } catch (error) {
-    console.log('createpost', error);
-    return Promise.reject(error)
+    console.log("createpost", error);
+    return Promise.reject(error);
   }
 };
 exports.createCommunity = async function (data) {
@@ -59,6 +58,9 @@ exports.likeFeedComment = async function (data) {
 
 exports.disLikeFeedComment = async function (data) {
   return await disLikeFeedComment(data);
+};
+exports.deletePost = async function (data) {
+  return await deletePost(data);
 };
 
 const getPost = async function (params) {
@@ -172,14 +174,14 @@ const createNewPost = async function (data) {
   }
 };
 
-createCommunity = async function (params) {
+const createCommunity = async function (params) {
   const query = `INSERT INTO community set ?`;
   const values = [data];
   const community = await executeQuery(query, values);
   return community.insertId;
 };
 
-createCommunityPost = async function (data) {
+const createCommunityPost = async function (data) {
   const query = `INSERT INTO communityPosts set ?`;
   const values = [data];
   const post = await executeQuery(query, values);
@@ -191,7 +193,7 @@ createCommunityPost = async function (data) {
   }
 };
 
-getCommunityPost = async function (params) {
+const getCommunityPost = async function (params) {
   const { page, size, profileId } = params;
   const { limit, offset } = getPagination(page, size);
   const query = `SELECT p.*,pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName from communityPosts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.communityPostId = p.Id left join profile as pr on p.profileId = pr.ID order by p.createdDate DESC limit ? offset ?`;
@@ -200,7 +202,7 @@ getCommunityPost = async function (params) {
   return posts;
 };
 
-getCommunity = async function (params) {
+const getCommunity = async function (params) {
   const { id } = params;
   const query =
     "select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' AND cm.profileId != ? group by c.Id;";
@@ -210,7 +212,7 @@ getCommunity = async function (params) {
 
 // socket for admin //
 
-getUnApproveCommunity = async function (params) {
+const getUnApproveCommunity = async function (params) {
   const { page, size } = params;
   const { limit, offset } = getPagination(page, size);
   const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'N' group by c.Id order by c.creationDate DESC limit ? offset ?`;
@@ -219,7 +221,7 @@ getUnApproveCommunity = async function (params) {
   return communitYList;
 };
 
-getApproveCommunity = async function (params) {
+const getApproveCommunity = async function (params) {
   const { page, size } = params;
   const { limit, offset } = getPagination(page, size);
   const query = `select c.*,count(cm.profileId) as members from community as c left join communityMembers as cm on cm.communityId = c.Id where c.isApprove = 'Y' group by c.Id order by c.creationDate DESC limit ? offset ?`;
@@ -228,7 +230,7 @@ getApproveCommunity = async function (params) {
   return communitYList;
 };
 
-likeFeedPost = async function (params) {
+const likeFeedPost = async function (params) {
   const { postId, communityPostId, profileId, likeCount, actionType } = params;
   if (postId) {
     const query = `update posts set likescount = ? where id =?`;
@@ -275,7 +277,7 @@ likeFeedPost = async function (params) {
   // }
 };
 
-disLikeFeedPost = async function (params) {
+const disLikeFeedPost = async function (params) {
   const { postId, communityPostId, profileId, likeCount } = params;
   if (postId) {
     const query = `update posts set likescount = ? where id =?`;
@@ -311,7 +313,7 @@ disLikeFeedPost = async function (params) {
   // }
 };
 
-createNotification = async function (params) {
+const createNotification = async function (params) {
   const {
     notificationToProfileId,
     postId,
@@ -375,7 +377,7 @@ createNotification = async function (params) {
   }
 };
 
-createComments = async function (params) {
+const createComments = async function (params) {
   const data = {
     postId: params?.postId,
     profileId: params?.profileId,
@@ -470,7 +472,7 @@ createComments = async function (params) {
   return { notifications, comments };
 };
 
-likeFeedComment = async function (params) {
+const likeFeedComment = async function (params) {
   const { commentId, profileId, likeCount, actionType } = params;
   const query = `update comments set likeCount = ? where id =?`;
   const query1 = `INSERT INTO commentsLikesDislikes set ?`;
@@ -490,7 +492,7 @@ likeFeedComment = async function (params) {
   return { comments };
 };
 
-disLikeFeedComment = async function (params) {
+const disLikeFeedComment = async function (params) {
   const { commentId, profileId, likeCount } = params;
   if (commentId) {
     const query = `update comments set likeCount = ? where id =?`;
@@ -505,4 +507,15 @@ disLikeFeedComment = async function (params) {
     const comments = await executeQuery(query3, value3);
     return { comments };
   }
+};
+
+const deletePost = async function (params) {
+  const { id } = params;
+  console.log('delete-post-id',id)
+  const query = "DELETE FROM posts WHERE id = ?";
+  const query1 = "DELETE FROM comments WHERE postId = ?";
+  const value = [id];
+  const deletePost = await executeQuery(query, value);
+  const deleteComments = await executeQuery(query1, value);
+  return deletePost;
 };

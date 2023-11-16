@@ -307,6 +307,17 @@ socket.config = (server) => {
         socket.broadcast.emit("likeOrDislikeComments", data.comments);
       }
     });
+
+    socket.on("deletePost", async (params) => {
+      logger.info("like", {
+        method: "delete post",
+        params: params,
+      });
+      if (params.id) {
+        const data = await socketService.deletePost(params);
+        io.emit("deletePost", data);
+      }
+    });
   });
 };
 

@@ -60,32 +60,6 @@ exports.registrationMail = async (userData, userId) => {
   return;
 };
 
-exports.partnerRegistrationMail = async (userData, userId) => {
-  let jwtSecretKey = environment.JWT_SECRET_KEY;
-  let name = userData.user_full_name;
-
-  const token = jwt.sign(
-    {
-      userId: userId,
-      email: userData.Email,
-    },
-    jwtSecretKey,
-    { expiresIn: "730 days" }
-  );
-
-  let registerUrl = `${environment.API_URL}customers/user/verification/${token}`;
-
-  const mailObj = {
-    email: userData.Username,
-    subject: "freedom.social Registration",
-    root: "../email-templates/partner-registration.ejs",
-    templateData: { name: name, url: registerUrl },
-  };
-
-  await email.sendMail(mailObj);
-  return;
-};
-
 exports.forgotPasswordMail = async (user) => {
   console.log(user);
   if (user) {
@@ -115,9 +89,8 @@ exports.forgotPasswordMail = async (user) => {
 };
 
 exports.notificationMail = async (userData) => {
-  let name = userData?.userName
-  //  || userData.firstName + " " + userData.lastName;
-  let msg = `You were tagged in ${userData.firstName}'s ${userData.type}.`;
+  let name = userData?.userName || userData.firstName + " " + userData.lastName;
+  let msg = `You were tagged in ${name}'s ${userData.type}.`;
   let redirectUrl = `${environment.FRONTEND_URL}post/${userData.postId}`;
 
   const mailObj = {
