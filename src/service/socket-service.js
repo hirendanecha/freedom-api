@@ -461,7 +461,7 @@ const createComments = async function (params) {
   notifications.push(notification);
   const query3 =
     "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.id = ?";
-  const value3 = [commentData.insertId];
+  const value3 = [params?.id || commentData.insertId];
   const comments = await executeQuery(query3, value3);
 
   await UserRewardDetails.create({
