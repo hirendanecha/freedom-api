@@ -110,7 +110,9 @@ exports.communityApproveEmail = async (profileId, isApprove) => {
   const values = [profileId];
   const userData = await this.executeQuery(query, values);
   if (userData) {
-    let name = userData[0]?.FirstName + " " + userData[0]?.LastName;
+    let name =
+      userData[0]?.Username ||
+      userData[0]?.FirstName + " " + userData[0]?.LastName;
     let msg = "";
     if (isApprove === "Y") {
       msg = `Your community has been aprroved by Master Admin.`;
