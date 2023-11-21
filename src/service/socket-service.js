@@ -74,7 +74,8 @@ const getPost = async function (params) {
   from 
   posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id  left join profile as pr on p.profileid = pr.ID 
   where ${communityCondition}
-  p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
+  p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) DESC, p.id DESC limit ? offset ?`;
+  // AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?)
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
   // if (posts.length > 0) {
@@ -511,7 +512,7 @@ const disLikeFeedComment = async function (params) {
 
 const deletePost = async function (params) {
   const { id } = params;
-  console.log('delete-post-id',id)
+  console.log("delete-post-id", id);
   const query = "DELETE FROM posts WHERE id = ?";
   const query1 = "DELETE FROM comments WHERE postId = ?";
   const value = [id];
