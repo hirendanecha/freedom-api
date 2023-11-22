@@ -239,7 +239,7 @@ Community.createCommunityAdminByMA = async function (data) {
 
 Community.getLocalCommunities = async function () {
   const query =
-    "select * from community where pageType = 'community' order by creationDate desc limit 3";
+    "select * from community where pageType = 'community' and isApprove = 'Y' order by creationDate desc limit 3";
   const communities = await executeQuery(query);
   return communities;
 };
