@@ -114,6 +114,7 @@ const createNewPost = async function (data) {
     posttype: data?.posttype || "S",
     keywords: data?.keywords || null,
     pdfUrl: data?.pdfUrl || null,
+    textpostdesc: data?.textpostdesc || null,
   };
   postData.isdeleted = "N";
 
