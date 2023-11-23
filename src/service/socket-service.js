@@ -330,27 +330,27 @@ const createNotification = async function (params) {
   let desc = "";
   if (commentId && actionType === "L") {
     desc = `${
-      userData[0]?.FirstName || userData[0]?.Username
+      userData[0]?.Username || userData[0]?.FirstName
     } liked your Comment.`;
   } else if (commentId && actionType === "T") {
     desc = `You were tagged in ${
-      userData[0]?.FirstName || userData[0]?.Username
+      userData[0]?.Username || userData[0]?.FirstName
     }'s comment.`;
   } else {
     desc =
       actionType === "R"
         ? `${
-            userData[0]?.FirstName || userData[0]?.Username
+            userData[0]?.Username || userData[0]?.FirstName
           } replied to your comment`
         : actionType === "C"
         ? `${
-            userData[0]?.FirstName || userData[0]?.Username
+            userData[0]?.Username || userData[0]?.FirstName
           } commented on your post`
         : actionType === "T"
         ? `You were tagged in ${
-            userData[0]?.FirstName || userData[0]?.Username
+            userData[0]?.Username || userData[0]?.FirstName
           }'s post.`
-        : `${userData[0]?.FirstName || userData[0]?.Username} liked your post.`;
+        : `${userData[0]?.Username || userData[0]?.FirstName} liked your post.`;
   }
   console.log("desc===>", desc);
 
