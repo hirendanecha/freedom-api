@@ -271,20 +271,22 @@ Community.getCommunityByUserId = async function (id, pageType) {
 };
 
 Community.getJoinedCommunityByProfileId = async function (id, pageType) {
-  const query = `SELECT 
-    c.*, COUNT(cm.profileId) AS members
-    FROM
-    community AS c
-        LEFT JOIN
-    communityMembers AS cm ON cm.communityId = c.Id and cm.profileId != c.profileId
-    WHERE
-    c.isApprove = 'Y'
-    AND c.pageType = '${pageType}'
-        AND cm.profileId = ?
-    GROUP BY c.Id`;
+  const query = `SELECT c.* FROM community AS c WHERE c.isApprove = 'Y' AND c.pageType = '${pageType}' AND c.profileId = ? GROUP BY c.Id`;
   const values = [id];
   const communityList = await executeQuery(query, values);
-  console.log(communityList);
-  return communityList;
+  const joinedCommunityList = [];
+  for (const key in communityList) {
+    const query1 =
+      "select count(cm.profileId) as members from communityMembers as cm where communityId = ?";
+    if (Object.hasOwnProperty.call(communityList, key)) {
+      const community = communityList[key];
+      const values1 = [community.Id];
+      const members = await executeQuery(query1, values1);
+      community.members = members[0].members;
+      console.log(community);
+      joinedCommunityList.push(community);
+    }
+  }
+  return joinedCommunityList;
 };
 module.exports = Community;
