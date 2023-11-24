@@ -271,9 +271,9 @@ Community.getCommunityByUserId = async function (id, pageType) {
 };
 
 Community.getJoinedCommunityByProfileId = async function (id, pageType) {
-  const query = `SELECT c.* FROM community AS c WHERE c.isApprove = 'Y' AND c.pageType = '${pageType}' AND c.profileId = ? GROUP BY c.Id`;
+  const query = `SELECT c.* FROM community AS c WHERE c.isApprove = 'Y' AND c.pageType = '${pageType}' GROUP BY c.Id`;
   const values = [id];
-  const communityList = await executeQuery(query, values);
+  const communityList = await executeQuery(query);
   const joinedCommunityList = [];
   for (const key in communityList) {
     const query1 =
