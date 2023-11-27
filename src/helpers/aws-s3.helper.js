@@ -1,7 +1,5 @@
 const AWS = require("aws-sdk");
 const fs = require("fs");
-const { param } = require("../routes/post.routes");
-const { error } = require("console");
 require("aws-sdk/lib/maintenance_mode_message").suppress = true;
 const s3 = new AWS.S3({
   accessKeyId: "XZ1L2U32Z7XMOW5S5ZBD",

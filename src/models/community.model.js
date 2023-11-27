@@ -83,6 +83,7 @@ Community.findUnApproveCommunity = async function (
 };
 
 Community.create = async function (communityData, result) {
+  console.log(communityData);
   db.query("INSERT INTO community set ?", communityData, function (err, res) {
     if (err) {
       result(err, null);
