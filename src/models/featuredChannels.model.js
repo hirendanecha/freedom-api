@@ -60,7 +60,7 @@ featuredChannels.searchAllData = async (search) => {
   console.log("query1: ", query1);
   const value1 = [search, search];
   const posts = await executeQuery(query1);
-  console.log(channels, posts);
+  //console.log(channels, posts);
   return { channels, posts };
 };
 
