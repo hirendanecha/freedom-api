@@ -464,7 +464,7 @@ exports.resendVerification = function (req, res) {
 };
 
 exports.logout = function (req, res) {
-  res.clearCookie("auth-user", "/", ".opash.in");
+  res.clearCookie("auth-user", "/", environments.domain);
   res.clearCookie();
   window.clearCookie();
   res.send({
