@@ -466,7 +466,6 @@ exports.resendVerification = function (req, res) {
 exports.logout = function (req, res) {
   res.clearCookie("auth-user", "/", environments.domain);
   res.clearCookie();
-  window.clearCookie();
   res.send({
     error: false,
     message: "logout successfully",
