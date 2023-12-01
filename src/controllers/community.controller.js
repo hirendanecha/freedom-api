@@ -240,7 +240,8 @@ exports.createCommunityAdminByMA = function (req, res) {
 // Client Api //
 
 exports.getLocalCommunities = async function (req, res) {
-  const communityList = await Community.getLocalCommunities();
+  const { id } = req.params;
+  const communityList = await Community.getLocalCommunities(id);
   if (communityList) {
     res.send(communityList);
   }

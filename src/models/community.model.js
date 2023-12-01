@@ -238,10 +238,10 @@ Community.createCommunityAdminByMA = async function (data) {
   }
 };
 
-Community.getLocalCommunities = async function () {
+Community.getLocalCommunities = async function (id) {
   const query =
-    "select * from community where pageType = 'community' and isApprove = 'Y' order by creationDate desc limit 3";
-  const communities = await executeQuery(query);
+    "select * from community where profileId = ? and isApprove = 'Y' order by creationDate desc limit 3";
+  const communities = await executeQuery(query, [id]);
   return communities;
 };
 
