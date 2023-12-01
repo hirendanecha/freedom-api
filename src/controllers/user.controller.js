@@ -465,12 +465,12 @@ exports.resendVerification = function (req, res) {
 
 exports.logout = function (req, res) {
   console.log("cookies");
+  res.clearCookie("auth-user");
   res.cookie("auth-user", 'Hello', {
     expire: new Date(Date.now() - 900000),
     secure: true,
     sameSite: "none",
     domain: environments.domain,
   });
-  res.clearCookie("auth-user");
   res.end();
 };
