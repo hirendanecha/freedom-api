@@ -158,8 +158,8 @@ const createNewPost = async function (data) {
               email: userData[0].Email,
               profileId: senderData[0].ID,
               userName: userData[0].Username,
-              firstName: senderData[0].FirstName,
-              lastName: senderData[0].LastName,
+              senderUsername: senderData[0].Username,
+              firstName: userData[0].FirstName,
               type: "post",
               postId: notification?.postId || postData?.id,
             };
@@ -448,8 +448,8 @@ const createComments = async function (params) {
               email: userData[0].Email,
               profileId: senderData[0].ID,
               userName: userData[0].Username,
-              firstName: senderData[0].FirstName,
-              lastName: senderData[0].LastName,
+              firstName: userData[0].FirstName,
+              senderUsername: senderData[0].Username,
               type: "comment",
               postId: notification?.postId || postData?.id,
             };
