@@ -31,7 +31,7 @@ exports.login = async function (req, res) {
           return res.status(400).send({ error: true, message: err });
         } else {
           res.cookie("auth-user", token, {
-            expire: new Date(Date.now() + 1),
+            // expire: new Date(Date.now() + 900000),
             secure: true,
             sameSite: "none",
             domain: environments.domain,
@@ -465,12 +465,16 @@ exports.resendVerification = function (req, res) {
 
 exports.logout = function (req, res) {
   console.log("cookies");
-  res.cookie("auth-user", 'Hello', {
-    expire: new Date(Date.now() - 900000),
-    secure: true,
+  res.clearCookie("auth-user", {
     sameSite: "none",
+    secure: true,
     domain: environments.domain,
   });
-  res.clearCookie("auth-user");
+  // res.cookie("auth-user", 'Hello', {
+  //   expire: new Date(Date.now() - 900000),
+  //   secure: true,
+  //   sameSite: "none",
+  //   domain: environments.domain,
+  // });
   res.end();
 };
