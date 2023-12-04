@@ -241,7 +241,7 @@ Community.createCommunityAdminByMA = async function (data) {
 Community.getLocalCommunities = async function (id) {
   const query =
     // "select * from community where profileId = ? and isApprove = 'Y' order by creationDate desc limit 3";
-    `SELECT c.* FROM community AS c LEFT JOIN communityMembers AS cm ON cm.communityId = c.Id WHERE c.isApprove = 'Y' AND cm.profileId = ? GROUP BY c.Id`;
+    `SELECT c.* FROM community AS c LEFT JOIN communityMembers AS cm ON cm.communityId = c.Id WHERE c.isApprove = 'Y' AND cm.profileId = ? GROUP BY c.Id limit 3`;
   const communities = await executeQuery(query, [id]);
   return communities;
 };
