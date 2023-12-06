@@ -410,7 +410,7 @@ exports.getZipData = function (req, res) {
       res.send({
         error: true,
         message:
-          "Your postal code is not found in our database, Please enter a nearby postal code.",
+          "If Your postal code is not found in our database, Please enter a postal code nearest to you",
       });
     }
   });
