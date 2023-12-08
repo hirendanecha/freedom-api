@@ -104,6 +104,22 @@ exports.notificationMail = async (userData) => {
   return;
 };
 
+exports.channelNotificationEmail = async (userData) => {
+  let name = userData?.Username;
+  let msg = `you are assigned in FT channel by MasterAdmin`;
+  let redirectUrl = `${environment.FRONTEND_URL}`;
+
+  const mailObj = {
+    email: userData.Email,
+    subject: "Freedom notification",
+    root: "../email-templates/notification.ejs",
+    templateData: { name: name, msg: msg, url: redirectUrl },
+  };
+
+  await email.sendMail(mailObj);
+  return;
+};
+
 exports.communityApproveEmail = async (profileId, isApprove) => {
   const query =
     "select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.ID =?";

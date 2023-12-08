@@ -1,7 +1,7 @@
 "use strict";
 var db = require("../../config/db.config");
 require("../common/common")();
-const { executeQuery } = require("../helpers/utils");
+const { executeQuery, channelNotificationEmail } = require("../helpers/utils");
 
 var featuredChannels = function (data) {
   this.profileid = data.profileid;
@@ -75,6 +75,38 @@ featuredChannels.getChannelById = async function (name) {
   }
 };
 
+featuredChannels.findChannelById = async function (id) {
+  const query1 =
+    "select f.*,p.Username,count(ca.profileId) as Admins from featured_channels as f left join profile as p on p.ID = f.profileId left join channelAdmins as ca on ca.channelId = f.id where f.id=?;";
+  const query2 =
+    "select ca.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName,p.CoverPicName,u.Email,p.UserID from channelAdmins as ca left join profile as p on p.ID = ca.profileId left join users as u on u.Id = p.UserID  where ca.channelId = ?;";
+  const values = [id];
+  const community = await executeQuery(query1, values);
+  const members = await executeQuery(query2, values);
+  community.map((e) => {
+    e.memberList = members;
+    return e;
+  });
+  return community;
+};
+
+featuredChannels.getUsersByUsername = async function (searchText) {
+  if (searchText) {
+    const query1 = "select profileId from channelAdmins";
+    const ids = await executeQuery(query1);
+    const profileIds = [];
+    ids.map((e) => profileIds.push(e.profileId));
+    const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin='N' AND u.IsSuspended='N' AND p.Username LIKE ? and p.ID not in (?) order by p.Username limit 500`;
+    const values = [`${searchText}%`, profileIds];
+    const searchData = await executeQuery(query, values);
+    console.log(searchData, profileIds);
+
+    return searchData;
+  } else {
+    return { error: "data not found" };
+  }
+};
+
 featuredChannels.getChannelByUserId = async function (id) {
   const query =
     "select f.* from featured_channels as f left join profile as p on p.ID = f.profileid where f.profileid in(p.Id) and p.UserID = ? and feature = 'Y';";
@@ -84,6 +116,26 @@ featuredChannels.getChannelByUserId = async function (id) {
   if (channels) {
     return channels;
   }
+};
+
+featuredChannels.CreateSubAdmin = async function (data, result) {
+  console.log(data);
+
+  const query = `select u.Email,u.Username from users as u left join profile as p on u.Id = p.UserID where p.ID = ${data.profileId} `;
+  const user = await executeQuery(query);
+  console.log("user", user);
+  const userData = {
+    Username: user[0].Username,
+    Email: user[0].Email,
+  };
+  await channelNotificationEmail(userData);
+  db.query("insert into channelAdmins set ?", data, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res.insertId);
+    }
+  });
 };
 featuredChannels.getPostDetails = async function (id) {
   const query =
@@ -177,6 +229,20 @@ featuredChannels.updateChannleFeature = function (feature, id, result) {
         result(err, null);
       } else {
         console.log(res);
+        result(null, res);
+      }
+    }
+  );
+};
+
+featuredChannels.removeFormChannel = function (profileId, channelId, result) {
+  db.query(
+    "delete from channelAdmins where profileId=? and channelId=?",
+    [profileId, channelId],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
         result(null, res);
       }
     }

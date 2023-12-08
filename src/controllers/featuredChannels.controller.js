@@ -36,6 +36,29 @@ exports.searchAllData = async (req, res) => {
   return res.send(searchData);
 };
 
+exports.findChannelById = async function (req, res) {
+  if (req.params.id) {
+    const community = await featuredChannels.findChannelById(req.params.id);
+    if (community) {
+      res.send(community);
+    } else {
+      res.status(400).send({
+        error: true,
+        message: "Community not found",
+      });
+    }
+  }
+};
+
+exports.getUsersByUsername = async function (req, res) {
+  const { searchText } = req.query;
+  const data = await featuredChannels.getUsersByUsername(searchText);
+  return res.send({
+    error: false,
+    data: data,
+  });
+};
+
 exports.getChannelById = async function (req, res) {
   const name = req.params.name;
   console.log(name);
@@ -55,6 +78,20 @@ exports.getChannelByUserId = async function (req, res) {
   } else {
     utils.send404(res, (err = { message: "data not found" }));
   }
+};
+
+exports.CreateSubAdmin = function (req, res) {
+  const data = { ...req.body };
+  featuredChannels.CreateSubAdmin(data, function (err, result) {
+    if (err) {
+      return utils.send500(res, err);
+    } else {
+      return res.json({
+        error: false,
+        data: result,
+      });
+    }
+  });
 };
 
 exports.getPostDetails = async function (req, res) {
@@ -162,6 +199,21 @@ exports.updateChannleFeature = function (req, res) {
           });
         }
       }
+    }
+  );
+};
+
+exports.removeFormChannel = function (req, res) {
+  const { profileId, channelId } = req.query;
+  featuredChannels.removeFormChannel(
+    profileId,
+    channelId,
+    function (err, result) {
+      if (err) return utils.send500(res, err);
+      res.json({
+        error: false,
+        message: "removed successfully",
+      });
     }
   );
 };
