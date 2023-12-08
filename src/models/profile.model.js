@@ -38,7 +38,7 @@ Profile.create = function (profileData, result) {
   });
 };
 
-Profile.FindById = async function (profileId) {
+Profile.FindById = async function (profileId, result) {
   db.query(
     `SELECT ID as Id,
             FirstName,
@@ -73,37 +73,37 @@ Profile.FindById = async function (profileId) {
       }
     }
   );
-//   const query = `SELECT ID as Id,
-//   FirstName,  
-//   LastName,
-//   UserID,
-//   MobileNo,
-//   Gender,
-//   DateofBirth,
-//   Address,
-//   City,
-//   State,
-//   Zip,
-//   Country,
-//   Business_NP_TypeID,
-//   CoverPicName,
-//   IsActivated,
-//   Username,
-//   ProfilePicName,
-//   EmailVerified,
-//   CreatedOn,
-//   AccountType,
-//   MediaApproved,
-//   County
-// FROM profile WHERE ID=?`;
-//   const values = profileId;
-//   const [profile] = await executeQuery(query, values);
-//   const query1 =
-//     "select c.channelId from channelAdmins as c left join profile as p on p.ID = c.profileId where c.profileId = p.ID and p.UserID = ?;";
-//   const value1 = [profile.UserID];
-//   const channelId = await executeQuery(query1, value1);
-//   profile.channelId = channelId[0]?.channelId;
-//   return profile;
+  //   const query = `SELECT ID as Id,
+  //   FirstName,
+  //   LastName,
+  //   UserID,
+  //   MobileNo,
+  //   Gender,
+  //   DateofBirth,
+  //   Address,
+  //   City,
+  //   State,
+  //   Zip,
+  //   Country,
+  //   Business_NP_TypeID,
+  //   CoverPicName,
+  //   IsActivated,
+  //   Username,
+  //   ProfilePicName,
+  //   EmailVerified,
+  //   CreatedOn,
+  //   AccountType,
+  //   MediaApproved,
+  //   County
+  // FROM profile WHERE ID=?`;
+  //   const values = profileId;
+  //   const [profile] = await executeQuery(query, values);
+  //   const query1 =
+  //     "select c.channelId from channelAdmins as c left join profile as p on p.ID = c.profileId where c.profileId = p.ID and p.UserID = ?;";
+  //   const value1 = [profile.UserID];
+  //   const channelId = await executeQuery(query1, value1);
+  //   profile.channelId = channelId[0]?.channelId;
+  //   return profile;
 };
 
 Profile.update = function (profileId, profileData, result) {
