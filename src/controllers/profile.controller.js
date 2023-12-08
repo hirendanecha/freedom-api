@@ -22,22 +22,37 @@ exports.create = function (req, res) {
   }
 };
 
-exports.FindProfieById = async function (req, res) {
+// exports.FindProfieById = async function (req, res) {
+//   if (req.params.id) {
+//     const id = req.params.id;
+//     console.log(id);
+//     const profile = await Profile.FindById(id);
+//     if (!profile) {
+//       return utils.send500({ error: true, message: "not found" });
+//     } else {
+//       return res.json({ data: profile, error: false });
+//     }
+//     // Profile.FindById(id, async function   (err, profile) {
+//     //   if (err) {
+//     //     console.log(err);
+//     //   } else {
+//     //   }
+//     // });
+//   }
+// };
+
+exports.FindProfieById = function (req, res) {
   if (req.params.id) {
     const id = req.params.id;
     console.log(id);
-    const profile = await Profile.FindById(id);
-    if (!profile) {
-      return utils.send500({ error: true, message: "not found" });
-    } else {
-      return res.json({ data: profile, error: false });
-    }
-    // Profile.FindById(id, async function   (err, profile) {
-    //   if (err) {
-    //     console.log(err);
-    //   } else {
-    //   }
-    // });
+    Profile.FindById(id, async function (err, profile) {
+      if (err) {
+        console.log(err);
+        return utils.send500(res, err);
+      } else {
+        return res.json({ data: profile, error: false });
+      }
+    });
   }
 };
 
