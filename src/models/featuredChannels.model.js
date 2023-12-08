@@ -77,7 +77,7 @@ featuredChannels.getChannelById = async function (name) {
 
 featuredChannels.findChannelById = async function (id) {
   const query1 =
-    "select f.*,p.Username,count(ca.profileId) as Admins from featured_channels as f left join profile as p on p.ID = f.profileId left join channelAdmins as ca on ca.channelId = f.id where f.id=?;";
+    "select f.*,p.Username,u.Email,count(ca.profileId) as Admins from featured_channels as f left join profile as p on p.ID = f.profileId left join users as u on u.Id = p.UserID left join channelAdmins as ca on ca.channelId = f.id where f.id=?;";
   const query2 =
     "select ca.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName,p.CoverPicName,u.Email,p.UserID from channelAdmins as ca left join profile as p on p.ID = ca.profileId left join users as u on u.Id = p.UserID  where ca.channelId = ?;";
   const values = [id];
