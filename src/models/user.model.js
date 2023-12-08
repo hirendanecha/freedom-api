@@ -89,11 +89,11 @@ User.login = function (email, Id, result) {
         } else {
           const token = await generateJwtToken(res[0]);
           const query =
-            "select f.id from featured_channels as f left join profile as p on p.ID = f.profileid where f.profileid = p.ID and f.feature = 'Y' and p.UserID = ?;";
+            "select c.channelId from channelAdmins as c left join profile as p on p.ID = c.profileId where c.profileId = p.ID and p.UserID = ?;";
           const value = [Id];
           const channelId = await executeQuery(query, value);
           console.log("channelId", channelId);
-          user.channelId = channelId[0]?.id;
+          user.channelId = channelId[0]?.channelId;
           return result(null, {
             userId: user.Id,
             user: user,
