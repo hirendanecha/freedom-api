@@ -61,9 +61,8 @@ Profile.FindById = async function (profileId) {
             CreatedOn,
             AccountType,
             MediaApproved,
-            County,
-            channelId
-    FROM profile as p left join channelAdmins as c on p.ID = c.profileId  WHERE ID=? `,
+            County
+    FROM profile WHERE ID=? `,
     profileId,
     function (err, res) {
       if (err) {
