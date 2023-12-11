@@ -91,15 +91,30 @@ Community.create = async function (communityData, result) {
       result(null, res.insertId);
     }
   });
-  // const query = communityData.Id
-  //   ? '"update community set ? where Id = ?'
-  //   : '"INSERT INTO community set ?';
-  // const values = communityData.Id
-  //   ? [communityData, communityData.Id]
-  //   : { communityData };
-  // const community = await executeQuery(query, values);
-  // return community;
 };
+
+Community.CreateAdvertizementLink = async function (communityLinkData, result) {
+  console.log(communityLinkData);
+  db.query(
+    "INSERT INTO advertizement_Link set ?",
+    communityLinkData,
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res.insertId);
+      }
+    }
+  );
+};
+
+Community.editAdvertizeMentLink = async function (communityLinkData) {
+  const query = "update advertizement_Link set ? where communityId =?";
+  const values = [communityLinkData, communityLinkData.communityId];
+  const updateLink = await executeQuery(query, values);
+  return updateLink;
+};
+
 Community.edit = async function (communityData, Id) {
   const query = "update community set ? where Id = ?";
   const values = [communityData, Id];
@@ -131,6 +146,20 @@ Community.deleteCommunity = function (id, result) {
       result(null, res);
     }
   });
+};
+
+Community.getLink = function (id, result) {
+  db.query(
+    "select * from advertizement_Link where communityId=?",
+    id,
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
 };
 
 Community.leaveFromCommunity = function (profileId, communityId, result) {
