@@ -56,7 +56,7 @@ featuredChannels.getAllChannels = async (
 featuredChannels.searchAllData = async (search) => {
   const query = `select * from featured_channels where firstname like '%${search}%' or unique_link like '%${search}%'`;
   const channels = await executeQuery(query);
-  const query1 = `select p.* ,pr.Username,pr.ProfilePicName,pr.FirstName,pr.LastName from posts as p left join profile as pr on p.profileid = pr.ID WHERE p.posttype = 'V' and p.isdeleted = "N" and (p.videoduration is not NULL or p.videoduration != 0 or p.videoduration != "0" ) and (p.postdescription like '%${search}%' or p.keywords like '%${search}%' or p.title like '%${search}%') order by p.id desc`;
+  const query1 = `select p.* ,pr.Username,pr.ProfilePicName,pr.FirstName,pr.LastName,fc.firstname as channelName from posts as p left join profile as pr on p.profileid = pr.ID left join featured_channels as fc on fc.id = p.channelId WHERE p.posttype = 'V' and p.isdeleted = "N" and (p.videoduration is not NULL or p.videoduration != 0 or p.videoduration != "0" ) and (p.postdescription like '%${search}%' or p.keywords like '%${search}%' or p.title like '%${search}%') order by p.id desc`;
   console.log("query1: ", query1);
   const value1 = [search, search];
   const posts = await executeQuery(query1);
