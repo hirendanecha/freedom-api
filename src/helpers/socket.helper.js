@@ -318,6 +318,17 @@ socket.config = (server) => {
         io.emit("deletePost", data);
       }
     });
+
+    socket.on("isReadNotification", async (params) => {
+      logger.info("like", {
+        method: "read notification",
+        params: params,
+      });
+      if (params.profileId) {
+        params["isRead"] = "Y";
+        io.to(`${params.profileId}`).emit("isReadNotification_ack", params);
+      }
+    });
   });
 };
 
