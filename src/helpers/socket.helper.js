@@ -326,7 +326,7 @@ socket.config = (server) => {
       });
       if (params.profileId) {
         params["isRead"] = "Y";
-        io.emit("isReadNotification_ack", params);
+        io.to(`${params.profileId}`).emit("isReadNotification", params);
       }
     });
   });
