@@ -170,7 +170,7 @@ const createNewPost = async function (data) {
       }
     }
 
-    const query1 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.id=?`;
+    const query1 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.isdeleted ='N' and p.id =? ;`;
     const values1 = [data?.id || post.insertId];
     const posts = await executeQuery(query1, values1);
     return { notifications, posts };
