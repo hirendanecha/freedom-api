@@ -101,9 +101,9 @@ socket.config = (server) => {
             }
           }
 
-          const socketData = await socketService.getPost(params);
-          if (typeof cb === "function") cb(socketData);
-          socket.broadcast.emit("new-post", socketData);
+          // const socketData = await socketService.getPost(params);
+          // if (typeof cb === "function") cb(socketData);
+          // socket.broadcast.emit("new-post", socketData);
         }
       } catch (error) {
         console.log(error);
