@@ -1,6 +1,7 @@
 const { executeQuery } = require("../helpers/utils");
 const { notificationMail } = require("../helpers/utils");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
+const og = require("open-graph");
 const { param } = require("../routes");
 const UserRewardDetails = require("../models/userRewardDetails.model");
 
@@ -61,6 +62,10 @@ exports.disLikeFeedComment = async function (data) {
 };
 exports.deletePost = async function (data) {
   return await deletePost(data);
+};
+
+exports.getMeta = function (data) {
+  return getMetaD(data);
 };
 
 const getPost = async function (params) {
@@ -521,4 +526,26 @@ const deletePost = async function (params) {
   const deletePost = await executeQuery(query, value);
   const deleteComments = await executeQuery(query1, value);
   return deletePost;
+};
+
+const ogPromise = (url) => {
+  return new Promise((resolve, reject) => {
+    og(url, async function (err, meta) {
+      if (err) {
+        reject(err)
+      } else {
+        const data = meta;
+        resolve(data)
+      }
+    });
+  })
+}
+
+const getMetaD = async function (params) {
+  const { url } = params;
+  if (url) {
+    return await ogPromise(url)
+  } else {
+    return null;
+  }
 };
