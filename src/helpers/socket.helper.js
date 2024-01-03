@@ -329,6 +329,21 @@ socket.config = (server) => {
         io.to(`${params.profileId}`).emit("isReadNotification_ack", params);
       }
     });
+
+    socket.on("get-meta", async (params) => {
+      logger.info("meta", {
+        method: "get Meta",
+        params: params,
+      });
+      if (params.url) {
+        const data = await socketService.getMeta(params);
+        if (data) {
+          // console.log("meta-data", data);
+          socket.emit("get-meta", data);
+          // return data;
+        }
+      }
+    });
   });
 };
 
