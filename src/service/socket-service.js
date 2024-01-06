@@ -121,6 +121,7 @@ const createNewPost = async function (data) {
     pdfUrl: data?.pdfUrl || null,
     textpostdesc: data?.textpostdesc || null,
     parentPostId: data?.parentPostId || null,
+    posttoprofileid: data?.posttoprofileid || null,
   };
   postData.isdeleted = "N";
 
