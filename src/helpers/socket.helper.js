@@ -2,6 +2,9 @@ let logger = console;
 const socket = {};
 const { post, param } = require("../routes");
 const socketService = require("../service/socket-service");
+const chatService = require("../service/chat-service");
+const environment = require("../environments/environment");
+const jwt = require("jsonwebtoken");
 
 socket.config = (server) => {
   const io = require("socket.io")(server, {
@@ -12,6 +15,33 @@ socket.config = (server) => {
   });
   socket.io = io;
   console.log("io");
+
+  // io.use((socket, next) => {
+  //   try {
+  //     const { token } = socket.handshake.headers;
+
+  //     if (!token) {
+  //       console.log("Unauthorized Access via socket");
+  //       const err = new Error("Unauthorized Access");
+  //       return next(err);
+  //     }
+  //     let decoded = jwt.decode(token);
+
+  //     jwt.verify(token, environment.JWT_SECRET_KEY, async (err, user) => {
+  //       if (err) {
+  //         console.log("Invalid or Expired Token in socket");
+  //         const err = new Error("Invalid or Expired Token");
+  //         return next(err);
+  //       }
+  //       socket.user = decoded;
+  //       next();
+  //     });
+  //   } catch (error) {
+  //     console.log("Socket Conn Error ==> ", error?.message);
+  //     const err = new Error("Invalid or Expired Token");
+  //     return next(err);
+  //   }
+  // });
 
   io.sockets.on("connection", (socket) => {
     let address = socket.request.connection.remoteAddress;
@@ -324,9 +354,13 @@ socket.config = (server) => {
         method: "read notification",
         params: params,
       });
-      if (params.profileId) {
-        params["isRead"] = "Y";
-        io.to(`${params.profileId}`).emit("isReadNotification_ack", params);
+      try {
+        if (params.profileId) {
+          params["isRead"] = "Y";
+          io.to(`${params.profileId}`).emit("isReadNotification_ack", params);
+        }
+      } catch (error) {
+        return error;
       }
     });
 
@@ -342,6 +376,162 @@ socket.config = (server) => {
           socket.emit("get-meta", data);
           // return data;
         }
+      }
+    });
+
+    // Message Socket //
+    socket.on("join-chat-room", async (params) => {
+      socket.join(params.room, {
+        ...params,
+      });
+      logger.info("join", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "join",
+      });
+    });
+
+    socket.on("get-chat-list", async (params, cb) => {
+      logger.info("get-chat", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "get-chat",
+      });
+      try {
+        if (params) {
+          const chatList = await chatService.getChatList(params);
+          if (cb) {
+            // socket.emit("chat-list", chatList);
+            return cb(chatList);
+          } else {
+            console.log("cb is not defined");
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
+    socket.on("check-room", async (params, cb) => {
+      logger.info("join", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "join",
+      });
+      try {
+        if (params) {
+          const room = await chatService.checkRoomCreated(params);
+          console.log(room);
+          if (cb) {
+            // socket.emit("chat-list", chatList);
+            return cb(room);
+          } else {
+            console.log("cb is not defined");
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
+    socket.on("create-room", async (params, cb) => {
+      logger.info("join", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "join",
+      });
+      try {
+        if (params) {
+          const data = await chatService.createChatRoom(params);
+          console.log(data);
+          if (data?.room) {
+            // io.to(`${params.profileId2}`).emit("new-room", data.id);
+            if (data?.notification) {
+              if (data?.notification) {
+                io.to(`${data.notification?.notificationToProfileId}`).emit(
+                  "notification",
+                  data?.notification
+                );
+              }
+            }
+            return cb({ room: data.room });
+          } else {
+            return cb({ message: "Room already created" });
+          }
+        }
+      } catch (error) {
+        cd(error);
+      }
+    });
+
+    socket.on("send-message", async (params, cb) => {
+      logger.info("send-message", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "send-message",
+      });
+      try {
+        if (params) {
+          const data = await chatService.sendMessage(params);
+          if (data.newMessage) {
+            io.to(`${params.profileId}`).emit("new-message", data.newMessage);
+            if (data?.notification) {
+              if (data?.notification) {
+                io.to(`${data.notification?.notificationToProfileId}`).emit(
+                  "notification",
+                  data?.notification
+                );
+              }
+            }
+            return cb(data.newMessage);
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
+    socket.on("read-message", async (params, cb) => {
+      logger.info("read-message", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "read-message",
+      });
+      try {
+        if (params) {
+          const data = await chatService.readMessage(params);
+          // io.to(params.profileId).emit("update-message", data.ids);
+          if (data) {
+            return cb(data.ids);
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
+    socket.on("accept-room", async (params, cb) => {
+      logger.info("read-message", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "read-message",
+      });
+      try {
+        if (params) {
+          const data = await chatService.acceptRoom(params);
+          if (data) {
+            return cb(data);
+          }
+        }
+      } catch (error) {
+        return cb(error);
       }
     });
   });
