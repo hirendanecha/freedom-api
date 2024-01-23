@@ -71,7 +71,6 @@ ORDER BY
     r.id;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
-    console.log(chatList);
     return chatList;
   } catch (error) {
     console.log(error);
@@ -234,16 +233,17 @@ const acceptRoom = async function (params) {
     const updatedRoom = await executeQuery(query, values);
     console.log(updatedRoom);
     const room = await getRoom(params.roomId);
-    const notification = {};
+    let notification = {};
     if (room) {
       notification = await createNotification({
         notificationToProfileId: room?.createdBy,
-        roomId: data?.roomId,
+        roomId: room?.roomId,
         notificationByProfileId: room?.profileId,
         actionType: "M",
-        msg: `${room?.Username || room?.FirstName} has accept your invitation`,
+        msg: `has accept your chat invitation`,
       });
     }
+    console.log(notification);
 
     return { room, notification };
   } catch (error) {

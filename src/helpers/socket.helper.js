@@ -526,10 +526,15 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.acceptRoom(params);
+          console.log("accept-invitation", data);
           if (data) {
             io.to(`${data?.notification?.notificationToProfileId}`).emit(
               "notification",
               data?.notification
+            );
+            io.to(`${data?.notification?.notificationToProfileId}`).emit(
+              "accept-invitation",
+              data?.room
             );
             return cb(data?.room);
           }
