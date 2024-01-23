@@ -30,6 +30,14 @@ exports.createNotification = async function (data) {
   return await createNotification(data);
 };
 
+exports.editMessage = async function (data) {
+  return await editMessage(data);
+};
+
+exports.deleteMessage = async function (data) {
+  return await deleteMessage(data);
+};
+
 const getChatList = async function (params) {
   try {
     // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
@@ -38,7 +46,7 @@ const getChatList = async function (params) {
     //               END left join messages as m on m.roomId = roomId and m.sentBy != ${params.profileId} and m.isRead = 'N' where r.profileId1 = ? or r.profileId2 = ? order by roomId`;
     const query = `SELECT
                   r.id AS roomId,
-                  COUNT(m.id) AS unReadMessage,
+                  COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
                   r.profileId1 AS createdBy,
                   r.isAccepted,
                   p.ID AS profileId,
@@ -60,7 +68,7 @@ WHERE
 GROUP BY
     r.id, r.profileId1, r.isAccepted, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
 ORDER BY
-    r.id desc;`;
+    r.id;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
     console.log(chatList);
@@ -114,7 +122,7 @@ const createChatRoom = async function (params) {
         roomId: room?.insertId,
         notificationByProfileId: data?.profileId1,
         actionType: "M",
-        msg: "invite you in chat",
+        msg: "invite you in private chat",
       });
       const newRoom = await getRoom(room.insertId);
       return { room: newRoom, notification };
@@ -226,9 +234,18 @@ const acceptRoom = async function (params) {
     const updatedRoom = await executeQuery(query, values);
     console.log(updatedRoom);
     const room = await getRoom(params.roomId);
-    return room;
-    // if (updatedRoom) {
-    // }
+    const notification = {};
+    if (room) {
+      notification = await createNotification({
+        notificationToProfileId: room?.createdBy,
+        roomId: data?.roomId,
+        notificationByProfileId: room?.profileId,
+        actionType: "M",
+        msg: `${room?.Username || room?.FirstName} has accept your invitation`,
+      });
+    }
+
+    return { room, notification };
   } catch (error) {
     return error;
   }
@@ -243,6 +260,51 @@ const getRoom = async function (id) {
     if (room) {
       return room;
     }
+  } catch (error) {
+    return error;
+  }
+};
+
+const editMessage = async function (params) {
+  try {
+    const data = {
+      id: params.id,
+      messageText: params.messageText,
+      roomId: params.roomId,
+      sentBy: params.sentBy,
+      messageMedia: params.messageMedia,
+    };
+    const query = "update messages set ? where id = ?";
+    const values = [data, data.id];
+    const message = await executeQuery(query, values);
+
+    const query1 = "select * from messages where id = ?";
+    const values1 = [data?.id];
+    const [editMessage] = await executeQuery(query1, values1);
+    console.log("update", editMessage);
+    return editMessage;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+const deleteMessage = async function (params) {
+  try {
+    const data = {
+      id: params.id,
+      roomId: params.roomId,
+      sentBy: params.sentBy,
+    };
+    const query = "delete from messages where id = ?";
+    const values = [data.id];
+    const message = await executeQuery(query, values);
+
+    // const query1 = "select * from messages where roomId = ?";
+    // const values1 = data.roomId;
+    // const messageList = await executeQuery(query1, values1);
+    data.isDeleted = true;
+    return data;
   } catch (error) {
     return error;
   }

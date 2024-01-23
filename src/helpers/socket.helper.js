@@ -527,6 +527,50 @@ socket.config = (server) => {
         if (params) {
           const data = await chatService.acceptRoom(params);
           if (data) {
+            io.to(`${data?.notification?.notificationToProfileId}`).emit(
+              "notification",
+              data?.notification
+            );
+            return cb(data?.room);
+          }
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    });
+
+    socket.on("edit-message", async (params, cb) => {
+      logger.info("edit-message", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "edit-message",
+      });
+      try {
+        if (params) {
+          const data = await chatService.editMessage(params);
+          io.to(`${params?.profileId}`).emit("new-message", data);
+          if (data) {
+            return cb(data);
+          }
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    });
+
+    socket.on("delete-message", async (params, cb) => {
+      logger.info("delete-message", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "delete-message",
+      });
+      try {
+        if (params) {
+          const data = await chatService.deleteMessage(params);
+          io.to(`${params?.profileId}`).emit("new-message", data);
+          if (data) {
             return cb(data);
           }
         }
