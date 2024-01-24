@@ -4,12 +4,12 @@ module.exports = function () {
   this.generateJwtToken = (user) => {
     const payload = {
       user: {
-        id: user.Id,
+        id: user.profileId,
         username: user.Username,
         active: user.IsActive,
       },
     };
 
-    return jwt.sign(payload, "MyS3cr3t", { expiresIn: "7d" });
+    return jwt.sign(payload, "MyS3cr3t", { expiresIn: "1d" });
   };
 };

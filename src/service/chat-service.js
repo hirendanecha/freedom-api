@@ -1,5 +1,5 @@
 const { executeQuery } = require("../helpers/utils");
-const { notificationMail } = require("../helpers/utils");
+const { notificationMailOnInvite } = require("../helpers/utils");
 const socketService = require("./socket-service");
 
 exports.getChatList = async function (params) {
@@ -121,8 +121,23 @@ const createChatRoom = async function (params) {
         roomId: room?.insertId,
         notificationByProfileId: data?.profileId1,
         actionType: "M",
-        msg: "invite you in private chat",
+        msg: "invited you to private chat",
       });
+      const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+      const values1 = [notification.notificationToProfileId];
+      const userData = await executeQuery(findUser, values1);
+      const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
+      const values2 = [notification.notificationByProfileId];
+      const senderData = await executeQuery(findSenderUser, values2);
+      const userDetails = {
+        email: userData[0].Email,
+        profileId: senderData[0].ID,
+        userName: userData[0].Username,
+        senderUsername: senderData[0].Username,
+        firstName: userData[0].FirstName,
+        msg: `${senderData[0].Username} invited you to private chat`,
+      };
+      await notificationMailOnInvite(userDetails);
       const newRoom = await getRoom(room.insertId);
       return { room: newRoom, notification };
     } else {
@@ -240,9 +255,24 @@ const acceptRoom = async function (params) {
         roomId: room?.roomId,
         notificationByProfileId: room?.profileId,
         actionType: "M",
-        msg: `has accept your chat invitation`,
+        msg: `has accepted your messaging invite`,
       });
     }
+    const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+    const values1 = [notification.notificationToProfileId];
+    const userData = await executeQuery(findUser, values1);
+    const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
+    const values2 = [notification.notificationByProfileId];
+    const senderData = await executeQuery(findSenderUser, values2);
+    const userDetails = {
+      email: userData[0].Email,
+      profileId: senderData[0].ID,
+      userName: userData[0].Username,
+      senderUsername: senderData[0].Username,
+      firstName: userData[0].FirstName,
+      msg: `${senderData[0].Username} has accepted your messaging invite`,
+    };
+    await notificationMailOnInvite(userDetails);
     console.log(notification);
 
     return { room, notification };
