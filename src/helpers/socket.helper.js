@@ -16,27 +16,27 @@ socket.config = (server) => {
   socket.io = io;
   let onlineUsers = [];
 
-  io.use((socket, next) => {
-    try {
-      const token = socket.handshake.auth?.Authorization.split(" ")[1];
-      if (!token) {
-        const err = new Error("Unauthorized Access");
-        return next(err);
-      }
-      let decoded = jwt.decode(token);
-      jwt.verify(token, environment.JWT_SECRET_KEY, async (err, user) => {
-        if (err) {
-          const err = new Error("Invalid or Expired Token");
-          return next(err);
-        }
-        socket.user = decoded.user;
-        next();
-      });
-    } catch (error) {
-      const err = new Error("Invalid or Expired Token");
-      return next(err);
-    }
-  });
+  // io.use((socket, next) => {
+  //   try {
+  //     const token = socket.handshake.auth?.Authorization.split(" ")[1];
+  //     if (!token) {
+  //       const err = new Error("Unauthorized Access");
+  //       return next(err);
+  //     }
+  //     let decoded = jwt.decode(token);
+  //     jwt.verify(token, environment.JWT_SECRET_KEY, async (err, user) => {
+  //       if (err) {
+  //         const err = new Error("Invalid or Expired Token");
+  //         return next(err);
+  //       }
+  //       socket.user = decoded.user;
+  //       next();
+  //     });
+  //   } catch (error) {
+  //     const err = new Error("Invalid or Expired Token");
+  //     return next(err);
+  //   }
+  // });
 
   io.sockets.on("connection", (socket) => {
     let address = socket.request.connection.remoteAddress;
@@ -66,19 +66,19 @@ socket.config = (server) => {
         method: "join",
       });
     });
-    socket.on("online-users", (cb) => {
-      logger.info("online user", {
-        id: socket.id,
-        method: "online",
-        type: typeof cb,
-      });
-      const newUserId = socket.user.id;
-      if (!onlineUsers.some((user) => user.userId === newUserId)) {
-        onlineUsers.push({ userId: newUserId, socketId: socket.id });
-      }
-      io.emit("get-users", onlineUsers);
-      // return cb(onlineUsers);
-    });
+    // socket.on("online-users", (cb) => {
+    //   logger.info("online user", {
+    //     id: socket.id,
+    //     method: "online",
+    //     type: typeof cb,
+    //   });
+    //   const newUserId = socket.user.id;
+    //   if (!onlineUsers.some((user) => user.userId === newUserId)) {
+    //     onlineUsers.push({ userId: newUserId, socketId: socket.id });
+    //   }
+    //   io.emit("get-users", onlineUsers);
+    //   // return cb(onlineUsers);
+    // });
 
     socket.on("offline", () => {
       // remove user from active users
