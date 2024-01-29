@@ -149,9 +149,9 @@ exports.communityApproveEmail = async (profileId, isApprove) => {
       userData[0]?.FirstName + " " + userData[0]?.LastName;
     let msg = "";
     if (isApprove === "Y") {
-      msg = `FreedomTube has approved your Community account.`;
+      msg = `FreedomBuzz has approved your Community account.`;
     } else {
-      msg = `FreedomTube has approved your Community account.`;
+      msg = `FreedomBuzz has approved your Community account.`;
     }
     let redirectUrl = `${environment.FRONTEND_URL}`;
     const mailObj = {
