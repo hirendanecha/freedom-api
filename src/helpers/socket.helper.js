@@ -570,6 +570,26 @@ socket.config = (server) => {
         return cb(error);
       }
     });
+
+    socket.on("delete-room", async (params, cb) => {
+      logger.info("delete-room", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "delete-room",
+      });
+      try {
+        if (params) {
+          const data = await chatService.deleteRoom(params);
+          io.to(`${params?.profileId}`).emit("new-message", data);
+          if (data) {
+            return cb(data);
+          }
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    });
   });
 };
 

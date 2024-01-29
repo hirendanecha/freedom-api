@@ -38,6 +38,10 @@ exports.deleteMessage = async function (data) {
   return await deleteMessage(data);
 };
 
+exports.deleteRoom = async function (data) {
+  return await deleteRoom(data);
+};
+
 const getChatList = async function (params) {
   try {
     // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
@@ -71,6 +75,7 @@ ORDER BY
     r.id;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
+    console.log("chatList===========>", chatList);
     return chatList;
   } catch (error) {
     console.log(error);
@@ -327,6 +332,25 @@ const deleteMessage = async function (params) {
       sentBy: params.sentBy,
     };
     const query = "delete from messages where id = ?";
+    const values = [data.id];
+    const message = await executeQuery(query, values);
+
+    // const query1 = "select * from messages where roomId = ?";
+    // const values1 = data.roomId;
+    // const messageList = await executeQuery(query1, values1);
+    data.isDeleted = true;
+    return data;
+  } catch (error) {
+    return error;
+  }
+};
+
+const deleteRoom = async function (params) {
+  try {
+    const data = {
+      id: params.id,
+    };
+    const query = "delete from chatRooms where id = ?";
     const values = [data.id];
     const message = await executeQuery(query, values);
 
