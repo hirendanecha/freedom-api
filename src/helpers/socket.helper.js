@@ -397,7 +397,6 @@ socket.config = (server) => {
           if (cb) {
             // socket.emit("chat-list", chatList);
             return cb(chatList);
-          } else {
           }
         }
       } catch (error) {
