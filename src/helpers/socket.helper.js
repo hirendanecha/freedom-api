@@ -589,6 +589,44 @@ socket.config = (server) => {
         return cb(error);
       }
     });
+
+    socket.on("start-call", async (params, cb) => {
+      logger.info("start-call", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "start-call",
+      });
+      try {
+        if (params) {
+          const data = await chatService.startCall(params);
+          console.log("call==>", data);
+          io.to(`${data?.notificationToProfileId}`).emit("notification", data);
+          return cb(true);
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    });
+
+    socket.on("decile-call", async (params, cb) => {
+      logger.info("decile-call", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "decile-call",
+      });
+      try {
+        if (params) {
+          const data = await chatService.decileCall(params);
+          console.log("decile-call==>", data);
+          io.to(`${data?.notificationToProfileId}`).emit("notification", data);
+          return cb(true);
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    });
   });
 };
 

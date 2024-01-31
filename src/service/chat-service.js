@@ -42,6 +42,14 @@ exports.deleteRoom = async function (data) {
   return await deleteRoom(data);
 };
 
+exports.startCall = async function (data) {
+  return await startCall(data);
+};
+
+exports.decileCall = async function (data) {
+  return await decileCall(data);
+};
+
 const getChatList = async function (params) {
   try {
     // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
@@ -75,7 +83,6 @@ ORDER BY
     r.id;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
-    console.log("chatList===========>", chatList);
     return chatList;
   } catch (error) {
     console.log(error);
@@ -115,12 +122,10 @@ const createChatRoom = async function (params) {
       data.profileId2,
     ];
     const oldRoom = await executeQuery(query, values);
-    console.log(oldRoom);
     if (!oldRoom.length) {
       const query = "Insert Into chatRooms set ?";
       const values = [data];
       const room = await executeQuery(query, values);
-      console.log(room.insertId);
       const notification = await createNotification({
         notificationToProfileId: data?.profileId2,
         roomId: room?.insertId,
@@ -215,7 +220,6 @@ const createNotification = async function (params) {
     const values = [notificationByProfileId];
     const userData = await executeQuery(query, values);
     let desc = `${userData[0]?.Username || userData[0]?.FirstName} ${msg}`;
-    console.log("desc===>", desc);
 
     const data = {
       notificationToProfileId: Number(notificationToProfileId),
@@ -251,7 +255,6 @@ const acceptRoom = async function (params) {
       "update chatRooms set isAccepted = 'Y' where id = ? and profileId2 =?";
     const values = [params.roomId, params.profileId];
     const updatedRoom = await executeQuery(query, values);
-    console.log(updatedRoom);
     const room = await getRoom(params.roomId);
     let notification = {};
     if (room) {
@@ -278,7 +281,6 @@ const acceptRoom = async function (params) {
       msg: `${senderData[0].Username} has accepted your messaging invite`,
     };
     await notificationMailOnInvite(userDetails);
-    console.log(notification);
 
     return { room, notification };
   } catch (error) {
@@ -316,7 +318,6 @@ const editMessage = async function (params) {
     const query1 = "select * from messages where id = ?";
     const values1 = [data?.id];
     const [editMessage] = await executeQuery(query1, values1);
-    console.log("update", editMessage);
     return editMessage;
   } catch (error) {
     console.log(error);
@@ -359,6 +360,47 @@ const deleteRoom = async function (params) {
     // const messageList = await executeQuery(query1, values1);
     data.isDeleted = true;
     return data;
+  } catch (error) {
+    return error;
+  }
+};
+
+const startCall = async function (params) {
+  try {
+    if (params) {
+      const data = {
+        notificationToProfileId: params?.notificationToProfileId,
+        roomId: params?.roomId,
+        notificationByProfileId: params?.notificationByProfileId,
+        actionType: "VC",
+        msg: "incoming call...",
+      };
+      const notification = await createNotification(data);
+      notification["link"] = params?.link;
+      const query = `select p.Username,p.FirstName,p.LastName,p.ProfilePicName from profile as p where p.ID = ${params?.notificationByProfileId}`;
+      const [profile] = await executeQuery(query);
+      notification["Username"] = profile?.Username;
+      notification["ProfilePicName"] = profile?.ProfilePicName;
+      return notification;
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
+const decileCall = async function (params) {
+  try {
+    if (params) {
+      const data = {
+        notificationToProfileId: params?.notificationToProfileId,
+        roomId: params?.roomId,
+        notificationByProfileId: params?.notificationByProfileId,
+        actionType: "DC",
+        msg: "decile call..",
+      };
+      const notification = await createNotification(data);
+      return notification;
+    }
   } catch (error) {
     return error;
   }
