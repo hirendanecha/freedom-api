@@ -396,7 +396,7 @@ const decileCall = async function (params) {
         roomId: params?.roomId,
         notificationByProfileId: params?.notificationByProfileId,
         actionType: "DC",
-        msg: "decile call..",
+        msg: "Decline call..",
       };
       const notification = await createNotification(data);
       return notification;
