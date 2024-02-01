@@ -357,11 +357,18 @@ const deleteMessage = async function (params) {
       const values = data.roomId;
       const [messageList] = await executeQuery(query, values);
       console.log("messageList", messageList);
-      const date = new Date();
-      const query1 = `update chatRooms set lastMessageText = ${messageList?.messageText},updatedDate = ? where id = ?`;
-      const values1 = [messageList.createdDate, data.roomId];
-      const updatedRoom = await executeQuery(query1, values1);
+      if (messageList) {
+        const query1 = `update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?`;
+        const values1 = [
+          messageList?.messageText,
+          messageList.createdDate,
+          data.roomId,
+        ];
+        const updatedRoom = await executeQuery(query1, values1);
+        console.log("updateRoom->", updatedRoom);
+      }
     }
+    console.log("return");
     data.isDeleted = true;
     return data;
   } catch (error) {
