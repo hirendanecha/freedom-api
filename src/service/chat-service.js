@@ -360,7 +360,7 @@ const deleteMessage = async function (params) {
       if (messageList) {
         const query1 = `update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?`;
         const values1 = [
-          messageList?.messageText,
+          (messageList?.messageText || null),
           messageList.createdDate,
           data.roomId,
         ];
