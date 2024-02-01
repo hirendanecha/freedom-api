@@ -63,6 +63,7 @@ const getChatList = async function (params) {
                   r.isAccepted,
                   r.lastMessageText,
                   r.updatedDate,
+                  r.createdDate,
                   p.ID AS profileId,
                   p.Username,
                   p.FirstName,
