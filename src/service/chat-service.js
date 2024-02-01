@@ -324,7 +324,13 @@ const editMessage = async function (params) {
     const query = "update messages set ? where id = ?";
     const values = [data, data.id];
     const message = await executeQuery(query, values);
-
+    if (message) {
+      const date = new Date();
+      const query =
+        "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
+      const values = [data.messageText, date, data.roomId];
+      const updatedRoom = await executeQuery(query, values);
+    }
     const query1 = "select * from messages where id = ?";
     const values1 = [data?.id];
     const [editMessage] = await executeQuery(query1, values1);
@@ -345,7 +351,12 @@ const deleteMessage = async function (params) {
     const query = "delete from messages where id = ?";
     const values = [data.id];
     const message = await executeQuery(query, values);
-
+    if (message) {
+      const date = new Date();
+      const query = "update chatRooms set updatedDate = ? where id = ?";
+      const values = [date, data.roomId];
+      const updatedRoom = await executeQuery(query, values);
+    }
     // const query1 = "select * from messages where roomId = ?";
     // const values1 = data.roomId;
     // const messageList = await executeQuery(query1, values1);
