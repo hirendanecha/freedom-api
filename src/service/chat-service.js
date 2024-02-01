@@ -261,8 +261,8 @@ const createNotification = async function (params) {
 
 const acceptRoom = async function (params) {
   try {
-    const query =
-      "update chatRooms set isAccepted = 'Y' where id = ? and profileId2 =?";
+    const date = new Date();
+    const query = `update chatRooms set isAccepted = 'Y',updatedDate = ${date} where id = ? and profileId2 =?`;
     const values = [params.roomId, params.profileId];
     const updatedRoom = await executeQuery(query, values);
     const room = await getRoom(params.roomId);
