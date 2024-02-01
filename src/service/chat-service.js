@@ -352,14 +352,16 @@ const deleteMessage = async function (params) {
     const values = [data.id];
     const message = await executeQuery(query, values);
     if (message) {
+      const query =
+        "select * from messages where roomId = ? order by createdDate desc limit 1";
+      const values = data.roomId;
+      const [messageList] = await executeQuery(query, values);
+      console.log("messageList", messageList);
       const date = new Date();
-      const query = "update chatRooms set updatedDate = ? where id = ?";
-      const values = [date, data.roomId];
-      const updatedRoom = await executeQuery(query, values);
+      const query1 = `update chatRooms set lastMessageText = ${messageList?.messageText},updatedDate = ? where id = ?`;
+      const values1 = [messageList.createdDate, data.roomId];
+      const updatedRoom = await executeQuery(query1, values1);
     }
-    // const query1 = "select * from messages where roomId = ?";
-    // const values1 = data.roomId;
-    // const messageList = await executeQuery(query1, values1);
     data.isDeleted = true;
     return data;
   } catch (error) {
