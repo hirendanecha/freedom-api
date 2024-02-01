@@ -61,6 +61,8 @@ const getChatList = async function (params) {
                   COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
                   r.profileId1 AS createdBy,
                   r.isAccepted,
+                  r.lastMessageText,
+                  r.updatedDate,
                   p.ID AS profileId,
                   p.Username,
                   p.FirstName,
@@ -78,9 +80,9 @@ LEFT JOIN
 WHERE
     r.profileId1 = ? OR r.profileId2 = ?
 GROUP BY
-    r.id, r.profileId1, r.isAccepted, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
+    r.id, r.profileId1, r.isAccepted,r.updatedDate, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
 ORDER BY
-    r.id;`;
+r.updatedDate desc;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
     return chatList;
@@ -177,6 +179,13 @@ const sendMessage = async function (params) {
       const query1 = "select * from messages where id = ?";
       const values1 = message.insertId;
       const [newMessage] = await executeQuery(query1, values1);
+      if (newMessage) {
+        const date = new Date();
+        const query =
+          "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
+        const values = [data.messageText, date, data.roomId];
+        const updatedRoom = await executeQuery(query, values);
+      }
       const notification = await createNotification({
         notificationToProfileId: params?.profileId,
         roomId: data?.roomId,
