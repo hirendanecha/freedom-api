@@ -10,6 +10,6 @@ module.exports = function () {
       },
     };
 
-    return jwt.sign(payload, "MyS3cr3t", { expiresIn: "1d" });
+    return jwt.sign(payload, "MyS3cr3t", { expiresIn: "7d" });
   };
 };
