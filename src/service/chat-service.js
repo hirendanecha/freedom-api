@@ -46,8 +46,12 @@ exports.startCall = async function (data) {
   return await startCall(data);
 };
 
-exports.decileCall = async function (data) {
-  return await decileCall(data);
+exports.declineCall = async function (data) {
+  return await declineCall(data);
+};
+
+exports.pickUpCall = async function (data) {
+  return await pickUpCall(data);
 };
 
 const getChatList = async function (params) {
@@ -241,10 +245,10 @@ const createNotification = async function (params) {
     if (data.notificationByProfileId === data.notificationToProfileId) {
       return true;
     } else {
-      const find =
-        "select * from notifications where roomId= ? and notificationByProfileId = ?";
-      const value = [data.roomId, data.notificationByProfileId];
-      const oldData = await executeQuery(find, value);
+      // const find =
+      //   "select * from notifications where roomId= ? and notificationByProfileId = ?";
+      // const value = [data.roomId, data.notificationByProfileId];
+      // const oldData = await executeQuery(find, value);
       // if (oldData.length) {
       //   return oldData[0];
       // } else {
@@ -360,7 +364,7 @@ const deleteMessage = async function (params) {
       if (messageList) {
         const query1 = `update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?`;
         const values1 = [
-          (messageList?.messageText || null),
+          messageList?.messageText || null,
           messageList.createdDate,
           data.roomId,
         ];
@@ -418,7 +422,7 @@ const startCall = async function (params) {
   }
 };
 
-const decileCall = async function (params) {
+const declineCall = async function (params) {
   try {
     if (params) {
       const data = {
@@ -429,6 +433,25 @@ const decileCall = async function (params) {
         msg: "Decline call..",
       };
       const notification = await createNotification(data);
+      return notification;
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
+const pickUpCall = async function (params) {
+  try {
+    if (params) {
+      const data = {
+        notificationToProfileId: params?.notificationToProfileId,
+        roomId: params?.roomId,
+        notificationByProfileId: params?.notificationByProfileId,
+        actionType: "SC",
+        msg: "call start...",
+      };
+      const notification = await createNotification(data);
+      notification["link"] = params?.link;
       return notification;
     }
   } catch (error) {

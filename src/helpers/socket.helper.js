@@ -609,17 +609,36 @@ socket.config = (server) => {
       }
     });
 
-    socket.on("decile-call", async (params, cb) => {
+    socket.on("decline-call", async (params, cb) => {
       logger.info("decile-call", {
         ...params,
         address,
         id: socket.id,
-        method: "decile-call",
+        method: "decline-call",
       });
       try {
         if (params) {
-          const data = await chatService.decileCall(params);
-          console.log("decile-call==>", data);
+          const data = await chatService.declineCall(params);
+          console.log("decline-call==>", data);
+          io.to(`${data?.notificationToProfileId}`).emit("notification", data);
+          return cb(true);
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    });
+
+    socket.on("pick-up-call", async (params, cb) => {
+      logger.info("decile-call", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "pick-up-call",
+      });
+      try {
+        if (params) {
+          const data = await chatService.pickUpCall(params);
+          console.log("pick-up-call==>", data);
           io.to(`${data?.notificationToProfileId}`).emit("notification", data);
           return cb(true);
         }
