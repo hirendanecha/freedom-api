@@ -7,14 +7,15 @@ var Messages = function (data) {
   this.sentBy = data.sentBy;
   this.messageMedia = data.messageMedia;
   this.isRead = data.isRead || "N";
+  this.groupId = data.groupId;
 };
 
-Messages.getMessages = async (limit, offset, roomId) => {
+Messages.getMessages = async (limit, offset, roomId, groupId) => {
   const searchCount = await executeQuery(
-    `SELECT count(m.id) as count FROM messages as m WHERE roomId = ${roomId}`
+    `SELECT count(m.id) as count FROM messages as m WHERE roomId = ${roomId} or groupId = ${groupId}`
   );
   const searchData = await executeQuery(
-    `select * from messages where roomId =${roomId} GROUP BY id order by createdDate limit ? offset ?`,
+    `select * from messages where roomId =${roomId} or groupId = ${groupId} GROUP BY id order by createdDate limit ? offset ?`,
     [limit, offset]
   );
   return {

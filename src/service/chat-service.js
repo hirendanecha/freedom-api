@@ -54,6 +54,14 @@ exports.pickUpCall = async function (data) {
   return await pickUpCall(data);
 };
 
+exports.createGroups = async function (data) {
+  return await createGroups(data);
+};
+
+exports.getGroupList = async function (data) {
+  return await getGroupList(data);
+};
+
 const getChatList = async function (params) {
   try {
     // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
@@ -169,7 +177,8 @@ const sendMessage = async function (params) {
   try {
     const data = {
       messageText: params.messageText,
-      roomId: params.roomId,
+      roomId: params?.roomId,
+      groupId: params?.groupId,
       sentBy: params.sentBy,
       messageMedia: params.messageMedia,
     };
@@ -185,11 +194,20 @@ const sendMessage = async function (params) {
       const values1 = message.insertId;
       const [newMessage] = await executeQuery(query1, values1);
       if (newMessage) {
-        const date = new Date();
-        const query =
-          "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
-        const values = [data.messageText, date, data.roomId];
-        const updatedRoom = await executeQuery(query, values);
+        if (data.roomId) {
+          const date = new Date();
+          const query =
+            "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
+          const values = [data.messageText, date, data.roomId];
+          const updatedRoom = await executeQuery(query, values);
+        }
+        if (data.groupId) {
+          const date = new Date();
+          const query =
+            "update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?";
+          const values = [data.messageText, date, data.groupId];
+          const updatedGroup = await executeQuery(query, values);
+        }
       }
       const notification = await createNotification({
         notificationToProfileId: params?.profileId,
@@ -225,6 +243,7 @@ const createNotification = async function (params) {
     const {
       notificationToProfileId,
       roomId,
+      groupId,
       notificationByProfileId,
       actionType,
       msg,
@@ -237,7 +256,8 @@ const createNotification = async function (params) {
 
     const data = {
       notificationToProfileId: Number(notificationToProfileId),
-      roomId: roomId,
+      roomId: roomId || null,
+      groupId: groupId || null,
       notificationByProfileId: Number(notificationByProfileId),
       actionType: actionType,
       notificationDesc: desc,
@@ -321,19 +341,27 @@ const editMessage = async function (params) {
     const data = {
       id: params.id,
       messageText: params.messageText,
-      roomId: params.roomId,
+      roomId: params?.roomId,
+      groupId: params?.groupId,
       sentBy: params.sentBy,
       messageMedia: params.messageMedia,
     };
     const query = "update messages set ? where id = ?";
     const values = [data, data.id];
     const message = await executeQuery(query, values);
-    if (message) {
+    if (data.roomId) {
       const date = new Date();
       const query =
         "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
       const values = [data.messageText, date, data.roomId];
       const updatedRoom = await executeQuery(query, values);
+    }
+    if (data.groupId) {
+      const date = new Date();
+      const query =
+        "update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?";
+      const values = [data.messageText, date, data.groupId];
+      const updatedGroup = await executeQuery(query, values);
     }
     const query1 = "select * from messages where id = ?";
     const values1 = [data?.id];
@@ -347,34 +375,57 @@ const editMessage = async function (params) {
 
 const deleteMessage = async function (params) {
   try {
-    const data = {
+    let data = {
       id: params.id,
-      roomId: params.roomId,
+      roomId: params?.roomId,
+      groupId: params?.groupId,
       sentBy: params.sentBy,
     };
     const query = "delete from messages where id = ?";
     const values = [data.id];
     const message = await executeQuery(query, values);
+    console.log("message", message);
     if (message) {
-      const query =
-        "select * from messages where roomId = ? order by createdDate desc limit 1";
-      const values = data.roomId;
-      const [messageList] = await executeQuery(query, values);
-      console.log("messageList", messageList);
-      if (messageList) {
-        const query1 = `update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?`;
-        const values1 = [
-          messageList?.messageText || null,
-          messageList.createdDate,
-          data.roomId,
-        ];
-        const updatedRoom = await executeQuery(query1, values1);
-        console.log("updateRoom->", updatedRoom);
+      let messageList = [];
+      if (data?.roomId) {
+        const query =
+          "select * from messages where roomId = ? order by createdDate desc limit 1";
+        const values = data.roomId;
+        [messageList] = await executeQuery(query, values);
+        if (messageList) {
+          const query1 = `update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?`;
+          const values1 = [
+            messageList?.messageText || null,
+            messageList.createdDate,
+            data.roomId,
+          ];
+          const updatedRoom = await executeQuery(query1, values1);
+          console.log("updateRoom->", updatedRoom);
+          data.isDeleted = true;
+          return data;
+        }
       }
+      if (data?.groupId) {
+        const query =
+          "select * from messages where groupId = ? order by createdDate desc limit 1";
+        const values = data.groupId;
+        [messageList] = await executeQuery(query, values);
+        if (messageList) {
+          const query1 = `update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?`;
+          const values1 = [
+            messageList?.messageText || null,
+            messageList.createdDate,
+            data.groupId,
+          ];
+          const updatedRoom = await executeQuery(query1, values1);
+          console.log("updateRoom->", updatedRoom);
+          data.isDeleted = true;
+          return data;
+        }
+      }
+      console.log("messageList", messageList);
     }
     console.log("return");
-    data.isDeleted = true;
-    return data;
   } catch (error) {
     return error;
   }
@@ -391,7 +442,7 @@ const deleteRoom = async function (params) {
 
     // const query1 = "select * from messages where roomId = ?";
     // const values1 = data.roomId;
-    // const messageList = await executeQuery(query1, values1);
+    // const messageList = await executeQuery(query1, values1);.0
     data.isDeleted = true;
     return data;
   } catch (error) {
@@ -454,6 +505,113 @@ const pickUpCall = async function (params) {
       notification["link"] = params?.link;
       return notification;
     }
+  } catch (error) {
+    return error;
+  }
+};
+
+const createGroups = async function (params) {
+  try {
+    if (params) {
+      const data = {
+        profileId: params?.profileId,
+        groupName: params?.groupName,
+        profileImage: params?.profileImage,
+      };
+      const query = "insert into chatGroups set ?";
+      const values = [data];
+      const group = await executeQuery(query, values);
+      const adminData = {
+        groupId: group.insertId,
+        profileId: data.profileId,
+        isAdmin: "Y",
+      };
+      await addMembers(adminData);
+      let notifications = [];
+      let groupList = [];
+      if (params.profileIds.length >= 0) {
+        for (const key in params.profileIds) {
+          if (Object.hasOwnProperty.call(params.profileIds, key)) {
+            const id = params.profileIds[key];
+            console.log("ids==>", id);
+            const data = {
+              groupId: group.insertId,
+              profileId: id,
+            };
+            await addMembers(data);
+            groupList = await getGroup(group.insertId);
+            const notification = await createNotification({
+              notificationByProfileId: params?.profileId,
+              notificationToProfileId: id,
+              actionType: "M",
+              groupId: group.insertId,
+              msg: `added you in ${data.groupName} chat group`,
+            });
+            notifications.push(notification);
+          }
+        }
+        return { notifications, groupList };
+      }
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
+const addMembers = async function (data) {
+  try {
+    const query = "insert into groupMembers set ?";
+    const values = [data];
+    const member = await executeQuery(query, values);
+    return member.insertId;
+  } catch (error) {
+    return error;
+  }
+};
+
+const getGroup = async function (id) {
+  try {
+    const query =
+      "select g.*,count(gm.profileId) as members from chatGroups as g left join profile as p on p.ID = g.profileId left join groupMembers as gm on gm.groupId = g.id where g.id=?";
+    const values = [id];
+    const [groups] = await executeQuery(query, values);
+    if (groups.id) {
+      const getMembersQuery =
+        "select gm.*,p.Username, p.ProfilePicName,p.FirstName,p.LastName from groupMembers as gm left join profile as p on p.ID = gm.profileId where gm.groupId = ?;";
+      const members = await executeQuery(getMembersQuery, [groups?.id]);
+      groups["memberList"] = members;
+    }
+    return groups;
+  } catch (error) {
+    return error;
+  }
+};
+
+const getGroupList = async function (params) {
+  try {
+    const query = `SELECT g.id AS groupId,
+                g.profileId AS createdBy,
+                g.profileImage,
+                g.groupName,
+                g.createdDate,
+                g.lastMessageText,
+                g.updatedDate,
+                COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
+                p.Username,
+                p.ProfilePicName,
+                p.ID AS profileId
+            FROM chatGroups AS g
+            LEFT JOIN groupMembers AS gm ON gm.groupId = g.id
+            LEFT JOIN profile AS p ON p.ID = g.profileId
+            LEFT JOIN messages AS m ON m.groupId = g.id
+                                   AND m.sentBy != ?
+                                   AND m.isRead = 'N'
+            WHERE gm.profileId = ?
+            GROUP BY g.id
+            ORDER BY g.updatedDate DESC`;
+    const values = [params.profileId, params.profileId];
+    const groupsList = await executeQuery(query, values);
+    return groupsList;
   } catch (error) {
     return error;
   }

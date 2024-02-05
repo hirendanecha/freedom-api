@@ -77,6 +77,7 @@ socket.config = (server) => {
         onlineUsers.push({ userId: newUserId, socketId: socket.id });
       }
       io.emit("get-users", onlineUsers);
+      io.to(`${newUserId}`).emit("notification", {});
       // return cb(onlineUsers);
     });
 
@@ -560,6 +561,7 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.deleteMessage(params);
+          console.log("data", data);
           io.to(`${params?.profileId}`).emit("new-message", data);
           if (data) {
             return cb(data);
@@ -644,6 +646,56 @@ socket.config = (server) => {
         }
       } catch (error) {
         return cb(error);
+      }
+    });
+
+    // Group chats //
+    socket.on("create-group", async (params, cb) => {
+      logger.info("create-group", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "create-group",
+      });
+      try {
+        if (params) {
+          const data = await chatService.createGroups(params);
+          console.log("add-group==>", data);
+          if (data?.notifications) {
+            for (const key in data?.notifications) {
+              if (Object.hasOwnProperty.call(data?.notifications, key)) {
+                const notification = data?.notifications[key];
+                io.to(`${notification.notificationToProfileId}`).emit(
+                  "notification",
+                  notification
+                );
+              }
+            }
+          }
+          return cb(data?.groupList);
+        }
+      } catch (error) {
+        return cb(error);
+      }
+    });
+
+    socket.on("get-group-list", async (params, cb) => {
+      logger.info("get-group", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "get-group",
+      });
+      try {
+        if (params) {
+          const groupList = await chatService.getGroupList(params);
+          console.log(groupList);
+          if (cb) {
+            return cb(groupList);
+          }
+        }
+      } catch (error) {
+        cb(error);
       }
     });
   });
