@@ -62,6 +62,14 @@ exports.getGroupList = async function (data) {
   return await getGroupList(data);
 };
 
+exports.getGroup = async function (data) {
+  return await getGroup(data);
+};
+
+exports.removeMember = async function (data) {
+  return await removeMember(data);
+};
+
 const getChatList = async function (params) {
   try {
     // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
@@ -190,7 +198,8 @@ const sendMessage = async function (params) {
       const values = [data];
       const message = await executeQuery(query, values);
 
-      const query1 = "select * from messages where id = ?";
+      const query1 =
+        "select m.*,p.Username,p.ProfilePicName,p.FirstName from messages as m left join profile as p on p.ID = m.sentBy where m.id = ?";
       const values1 = message.insertId;
       const [newMessage] = await executeQuery(query1, values1);
       if (newMessage) {
@@ -200,6 +209,14 @@ const sendMessage = async function (params) {
             "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
           const values = [data.messageText, date, data.roomId];
           const updatedRoom = await executeQuery(query, values);
+          const notification = await createNotification({
+            notificationToProfileId: params?.profileId,
+            roomId: data?.roomId,
+            notificationByProfileId: data?.sentBy,
+            actionType: "M",
+            msg: "sent you a message",
+          });
+          return { newMessage, notification };
         }
         if (data.groupId) {
           const date = new Date();
@@ -207,16 +224,35 @@ const sendMessage = async function (params) {
             "update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?";
           const values = [data.messageText, date, data.groupId];
           const updatedGroup = await executeQuery(query, values);
+          const notification = await createNotification({
+            notificationToProfileId: params.profileId,
+            groupId: data?.groupId,
+            notificationByProfileId: data?.sentBy,
+            actionType: "M",
+            msg: "sent you a message in group",
+          });
+          return { newMessage, notification };
         }
       }
-      const notification = await createNotification({
-        notificationToProfileId: params?.profileId,
-        roomId: data?.roomId,
-        notificationByProfileId: data?.sentBy,
-        actionType: "M",
-        msg: "sent you a message",
-      });
-      return { newMessage, notification };
+      // let notifications = [];
+      // if (params?.profileIds.length >= 0) {
+      //   console.log("in===>");
+      //   for (const key in params?.profileIds) {
+      //     if (Object.hasOwnProperty.call(params?.profileIds, key)) {
+      //       const id = params?.profileIds[key];
+      //       const notification = await createNotification({
+      //         notificationByProfileId: data?.sentBy,
+      //         notificationToProfileId: id,
+      //         groupId: params?.groupId,
+      //         roomId: params?.roomId,
+      //         actionType: "M",
+      //         msg: "sent you a message",
+      //       });
+      //       notifications.push(notification);
+      //     }
+      //   }
+      //   // return { newMessage, notifications };
+      // }
     } else {
       return false;
     }
@@ -262,22 +298,27 @@ const createNotification = async function (params) {
       actionType: actionType,
       notificationDesc: desc,
     };
-    if (data.notificationByProfileId === data.notificationToProfileId) {
-      return true;
-    } else {
-      // const find =
-      //   "select * from notifications where roomId= ? and notificationByProfileId = ?";
-      // const value = [data.roomId, data.notificationByProfileId];
-      // const oldData = await executeQuery(find, value);
-      // if (oldData.length) {
-      //   return oldData[0];
-      // } else {
-      // }
+    if (data.notificationByProfileId !== data.notificationToProfileId) {
       const query1 = "insert into notifications set ?";
       const values1 = [data];
       const notificationData = await executeQuery(query1, values1);
       return { ...data, id: notificationData.insertId };
+      // return true;
     }
+    // else {
+    //   // const find =
+    //   //   "select * from notifications where roomId= ? and notificationByProfileId = ?";
+    //   // const value = [data.roomId, data.notificationByProfileId];
+    //   // const oldData = await executeQuery(find, value);
+    //   // if (oldData.length) {
+    //   //   return oldData[0];
+    //   // } else {
+    //   // }
+    //   const query1 = "insert into notifications set ?";
+    //   const values1 = [data];
+    //   const notificationData = await executeQuery(query1, values1);
+    //   return { ...data, id: notificationData.insertId };
+    // }
   } catch (error) {
     return error;
   }
@@ -450,23 +491,82 @@ const deleteRoom = async function (params) {
   }
 };
 
+// const startCall = async function (params) {
+//   try {
+//     if (params) {
+//       // const data = {
+//       //   // notificationToProfileId: params?.notificationToProfileId,
+//       //   roomId: params?.roomId,
+//       //   groupId: params?.groupId,
+//       //   notificationByProfileId: params?.notificationByProfileId,
+//       //   actionType: "VC",
+//       //   msg: "incoming call...",
+//       // };
+//       let notifications = [];
+//       if (params.notificationToProfileIds.length >= 0) {
+//         for (const key in params.notificationToProfileIds) {
+//           if (
+//             Object.hasOwnProperty.call(params.notificationToProfileIds, key)
+//           ) {
+//             const id = params.notificationToProfileIds[key];
+//             const notification = await createNotification({
+//               notificationByProfileId: params?.notificationByProfileId,
+//               notificationToProfileId: id,
+//               actionType: "VC",
+//               groupId: params?.groupId,
+//               roomId: params?.roomId,
+//               msg: "incoming call...",
+//             });
+//             notification["link"] = params?.link;
+//             const query = `select p.Username,p.FirstName,p.LastName,p.ProfilePicName from profile as p where p.ID = ${params?.notificationByProfileId}`;
+//             const [profile] = await executeQuery(query);
+//             notification["Username"] = profile?.Username;
+//             notification["ProfilePicName"] = profile?.ProfilePicName;
+//             notifications.push(notification);
+//           }
+//         }
+//         return { notifications };
+//       }
+//     }
+//   } catch (error) {
+//     return error;
+//   }
+// };
+
 const startCall = async function (params) {
   try {
     if (params) {
-      const data = {
-        notificationToProfileId: params?.notificationToProfileId,
-        roomId: params?.roomId,
-        notificationByProfileId: params?.notificationByProfileId,
-        actionType: "VC",
-        msg: "incoming call...",
-      };
-      const notification = await createNotification(data);
-      notification["link"] = params?.link;
-      const query = `select p.Username,p.FirstName,p.LastName,p.ProfilePicName from profile as p where p.ID = ${params?.notificationByProfileId}`;
-      const [profile] = await executeQuery(query);
-      notification["Username"] = profile?.Username;
-      notification["ProfilePicName"] = profile?.ProfilePicName;
-      return notification;
+      if (params.roomId) {
+        const data = {
+          notificationToProfileId: params?.notificationToProfileId,
+          groupId: params?.groupId,
+          notificationByProfileId: params?.notificationByProfileId,
+          actionType: "VC",
+          msg: "incoming call...",
+        };
+        const notification = await createNotification(data);
+        notification["link"] = params?.link;
+        const query = `select p.Username,p.FirstName,p.LastName,p.ProfilePicName from profile as p where p.ID = ${params?.notificationByProfileId}`;
+        const [profile] = await executeQuery(query);
+        notification["Username"] = profile?.Username;
+        notification["ProfilePicName"] = profile?.ProfilePicName;
+        return { notification };
+      } else {
+        const data = {
+          notificationToProfileId: params?.notificationToProfileId,
+          groupId: params?.groupId,
+          notificationByProfileId: params?.notificationByProfileId,
+          actionType: "VC",
+          msg: "incoming call...",
+        };
+        const notification = await createNotification(data);
+        notification["link"] = params?.link;
+        const query = `select p.Username,p.FirstName,p.LastName,p.ProfilePicName from profile as p where p.ID = ${params?.notificationByProfileId}`;
+        const [profile] = await executeQuery(query);
+        notification["Username"] = profile?.Username;
+        notification["ProfilePicName"] = profile?.ProfilePicName;
+        return { notification };
+      }
     }
   } catch (error) {
     return error;
@@ -518,39 +618,56 @@ const createGroups = async function (params) {
         groupName: params?.groupName,
         profileImage: params?.profileImage,
       };
-      const query = "insert into chatGroups set ?";
-      const values = [data];
-      const group = await executeQuery(query, values);
-      const adminData = {
-        groupId: group.insertId,
-        profileId: data.profileId,
-        isAdmin: "Y",
-      };
-      await addMembers(adminData);
+      if (!params?.groupId) {
+        const query = "insert into chatGroups set ?";
+        const values = [data];
+        const group = await executeQuery(query, values);
+        params["groupId"] = group?.insertId;
+        const adminData = {
+          groupId: group.insertId,
+          profileId: data.profileId,
+          isAdmin: "Y",
+        };
+        await addMembers(adminData);
+      }
+      if (params?.groupId) {
+        const data = {
+          groupName: params.groupName,
+          profileImage: params.profileImage,
+          updatedDate: new Date(),
+        };
+        const query = "update chatGroups set ? where id = ?";
+        const values = [data, params?.groupId];
+        const updateGroup = await executeQuery(query, values);
+      }
       let notifications = [];
-      let groupList = [];
-      if (params.profileIds.length >= 0) {
+      let groupList = {};
+      if (params.profileIds.length > 0) {
         for (const key in params.profileIds) {
           if (Object.hasOwnProperty.call(params.profileIds, key)) {
             const id = params.profileIds[key];
             console.log("ids==>", id);
             const data = {
-              groupId: group.insertId,
+              groupId: params.groupId,
               profileId: id,
             };
             await addMembers(data);
-            groupList = await getGroup(group.insertId);
+            groupList = await getGroup(params?.groupId);
             const notification = await createNotification({
               notificationByProfileId: params?.profileId,
               notificationToProfileId: id,
               actionType: "M",
-              groupId: group.insertId,
+              groupId: params?.groupId,
               msg: `added you in chat group`,
             });
             notifications.push(notification);
           }
+          return { notifications, groupList };
         }
-        return { notifications, groupList };
+      } else {
+        groupList = await getGroup(params);
+        console.log("getttt===>");
+        return { groupList };
       }
     }
   } catch (error) {
@@ -569,11 +686,11 @@ const addMembers = async function (data) {
   }
 };
 
-const getGroup = async function (id) {
+const getGroup = async function (params) {
   try {
     const query =
       "select g.*,count(gm.profileId) as members from chatGroups as g left join profile as p on p.ID = g.profileId left join groupMembers as gm on gm.groupId = g.id where g.id=?";
-    const values = [id];
+    const values = [params?.groupId];
     const [groups] = await executeQuery(query, values);
     if (groups.id) {
       const getMembersQuery =
@@ -612,6 +729,19 @@ const getGroupList = async function (params) {
     const values = [params.profileId, params.profileId];
     const groupsList = await executeQuery(query, values);
     return groupsList;
+  } catch (error) {
+    return error;
+  }
+};
+
+const removeMember = async function (params) {
+  try {
+    const query =
+      "delete from groupMembers where profileId = ? and groupId = ?";
+    const values = [params.profileId, params.groupId];
+    const member = await executeQuery(query, values);
+    const group = await getGroup(params);
+    return group;
   } catch (error) {
     return error;
   }

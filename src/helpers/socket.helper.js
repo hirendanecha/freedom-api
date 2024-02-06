@@ -77,7 +77,6 @@ socket.config = (server) => {
         onlineUsers.push({ userId: newUserId, socketId: socket.id });
       }
       io.emit("get-users", onlineUsers);
-      io.to(`${newUserId}`).emit("notification", {});
       // return cb(onlineUsers);
     });
 
@@ -466,16 +465,41 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.sendMessage(params);
+          console.log("new-message", data);
           if (data.newMessage) {
-            io.to(`${params.profileId}`).emit("new-message", data.newMessage);
-            if (data?.notification) {
+            if (params.groupId) {
+              io.to(`${params.groupId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
-                io.to(`${data.notification?.notificationToProfileId}`).emit(
-                  "notification",
-                  data?.notification
-                );
+                if (data?.notification) {
+                  io.to(`${params.groupId}`).emit(
+                    "notification",
+                    data?.notification
+                  );
+                }
+              }
+            } else {
+              console.log("in=========>");
+              io.to(`${params.profileId}`).emit("new-message", data.newMessage);
+              if (data?.notification) {
+                if (data?.notification) {
+                  io.to(`${data.notification.notificationToProfileId}`).emit(
+                    "notification",
+                    data?.notification
+                  );
+                }
               }
             }
+            // if (data?.notifications) {
+            //   for (const key in data?.notifications) {
+            //     if (Object.hasOwnProperty.call(data?.notifications, key)) {
+            //       const notification = data?.notifications[key];
+            //       io.to(`${notification.notificationToProfileId}`).emit(
+            //         "notification",
+            //         notification
+            //       );
+            //     }
+            //   }
+            // }
             return cb(data.newMessage);
           }
         }
@@ -541,7 +565,11 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.editMessage(params);
-          io.to(`${params?.profileId}`).emit("new-message", data);
+          if (params.groupId) {
+            io.to(`${params?.groupId}`).emit("new-message", data);
+          } else {
+            io.to(`${params?.profileId}`).emit("new-message", data);
+          }
           if (data) {
             return cb(data);
           }
@@ -561,7 +589,6 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.deleteMessage(params);
-          console.log("data", data);
           io.to(`${params?.profileId}`).emit("new-message", data);
           if (data) {
             return cb(data);
@@ -602,9 +629,40 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.startCall(params);
-          console.log("call==>", data);
-          io.to(`${data?.notificationToProfileId}`).emit("notification", data);
-          return cb(true);
+          if (data?.notification) {
+            if (params.groupId) {
+              console.log("in=========>");
+              io.to(`${params.groupId}`).emit("new-message", data.newMessage);
+              if (data?.notification) {
+                if (data?.notification) {
+                  io.to(`${params.groupId}`).emit(
+                    "notification",
+                    data?.notification
+                  );
+                }
+              }
+            } else {
+              console.log("in=========>");
+              io.to(`${params.profileId}`).emit("new-message", data.newMessage);
+              if (data?.notification) {
+                if (data?.notification) {
+                  io.to(`${data.notification.notificationToProfileId}`).emit(
+                    "notification",
+                    data?.notification
+                  );
+                }
+              }
+            }
+            // for (const key in data?.notifications) {
+            //   if (Object.hasOwnProperty.call(data?.notifications, key)) {
+            //     const notification = data?.notifications[key];
+            //     io.to(`${notification.notificationToProfileId}`).emit(
+            //       "notification",
+            //       notification
+            //     );
+            //   }
+            // }
+          }
         }
       } catch (error) {
         return cb(error);
@@ -621,7 +679,6 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.declineCall(params);
-          console.log("decline-call==>", data);
           io.to(`${data?.notificationToProfileId}`).emit("notification", data);
           return cb(true);
         }
@@ -640,7 +697,6 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.pickUpCall(params);
-          console.log("pick-up-call==>", data);
           io.to(`${data?.notificationToProfileId}`).emit("notification", data);
           return cb(true);
         }
@@ -660,7 +716,7 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.createGroups(params);
-          console.log("add-group==>", data);
+          console.log("group", data.notification);
           if (data?.notifications) {
             for (const key in data?.notifications) {
               if (Object.hasOwnProperty.call(data?.notifications, key)) {
@@ -689,7 +745,52 @@ socket.config = (server) => {
       try {
         if (params) {
           const groupList = await chatService.getGroupList(params);
-          console.log(groupList);
+          for (const key in groupList) {
+            if (Object.hasOwnProperty.call(groupList, key)) {
+              const group = groupList[key];
+              // io.to(`${group.groupId}`).emit("join", group);
+              socket.join(`${group.groupId}`);
+              console.log(socket.id);
+            }
+          }
+          if (cb) {
+            return cb(groupList);
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
+    socket.on("get-group", async (params, cb) => {
+      logger.info("get-group", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "get-group",
+      });
+      try {
+        if (params) {
+          const groupList = await chatService.getGroup(params);
+          if (cb) {
+            return cb(groupList);
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
+    socket.on("remove-member", async (params, cb) => {
+      logger.info("remove-member", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "remove-member",
+      });
+      try {
+        if (params) {
+          const groupList = await chatService.removeMember(params);
           if (cb) {
             return cb(groupList);
           }
