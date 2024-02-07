@@ -643,16 +643,14 @@ const createGroups = async function (params) {
       let notifications = [];
       let groupList = {};
       if (params.profileIds.length > 0) {
-        for (const key in params.profileIds) {
-          if (Object.hasOwnProperty.call(params.profileIds, key)) {
-            const id = params.profileIds[key];
+        for (const id of params.profileIds) {
+          const data = {
+            groupId: params?.groupId,
+            profileId: id,
+          };
+          const memberId = await addMembers(data);
+          if (memberId) {
             console.log("ids==>", id);
-            const data = {
-              groupId: params.groupId,
-              profileId: id,
-            };
-            await addMembers(data);
-            groupList = await getGroup(params?.groupId);
             const notification = await createNotification({
               notificationByProfileId: params?.profileId,
               notificationToProfileId: id,
@@ -662,13 +660,14 @@ const createGroups = async function (params) {
             });
             notifications.push(notification);
           }
-          return { notifications, groupList };
         }
       } else {
         groupList = await getGroup(params);
         console.log("getttt===>");
         return { groupList };
       }
+      groupList = await getGroup(params);
+      return { notifications, groupList };
     }
   } catch (error) {
     return error;
@@ -680,6 +679,7 @@ const addMembers = async function (data) {
     const query = "insert into groupMembers set ?";
     const values = [data];
     const member = await executeQuery(query, values);
+    console.log(member.insertId);
     return member.insertId;
   } catch (error) {
     return error;
