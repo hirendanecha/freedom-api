@@ -24,4 +24,16 @@ Messages.getMessages = async (limit, offset, roomId, groupId) => {
   };
 };
 
+Messages.getMembers = async (groupId, searchText) => {
+  try {
+    const query =
+      "select gm.profileId as Id,p.Username,p.FirstName,p.ProfilePicName from groupMembers as gm left join profile as p on p.ID = gm.profileId where gm.groupId = ? and p.Username Like ? order by p.Username";
+    const values = [groupId, `${searchText}%`];
+    const memberList = await executeQuery(query, values);
+    return memberList;
+  } catch (error) {
+    return error;
+  }
+};
+
 module.exports = Messages;

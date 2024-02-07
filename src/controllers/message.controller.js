@@ -14,3 +14,14 @@ exports.getMessages = async (req, res) => {
     )
   );
 };
+
+exports.getMembers = async (req, res) => {
+  try {
+    const groupId = req.params.id;
+    const { searchText } = req.query;
+    const data = await Message.getMembers(groupId, searchText);
+    return res.send({ data: data });
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
