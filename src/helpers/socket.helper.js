@@ -385,15 +385,22 @@ socket.config = (server) => {
     });
 
     socket.on("get-chat-list", async (params, cb) => {
-      logger.info("get-chat", {
-        ...params,
-        address,
-        id: socket.id,
-        method: "get-chat",
-      });
+      // logger.info("get-chat", {
+      //   ...params,
+      //   address,
+      //   id: socket.id,
+      //   method: "get-chat",
+      // });
       try {
         if (params) {
           const chatList = await chatService.getChatList(params);
+          for (const key in chatList) {
+            if (Object.hasOwnProperty.call(chatList, key)) {
+              const chat = chatList[key];
+              socket.join(`${chat.roomId}`);
+              console.log(socket.id);
+            }
+          }
           if (cb) {
             // socket.emit("chat-list", chatList);
             return cb(chatList);
@@ -467,7 +474,7 @@ socket.config = (server) => {
           const data = await chatService.sendMessage(params);
           console.log("new-message", data);
           if (data.newMessage) {
-            if (params.groupId) {
+            if (params?.groupId) {
               io.to(`${params.groupId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
                 if (data?.notification) {
@@ -479,14 +486,12 @@ socket.config = (server) => {
               }
             } else {
               console.log("in=========>");
-              io.to(`${params.profileId}`).emit("new-message", data.newMessage);
+              io.to(`${params.roomId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
-                if (data?.notification) {
-                  io.to(`${data.notification.notificationToProfileId}`).emit(
-                    "notification",
-                    data?.notification
-                  );
-                }
+                io.to(`${params?.roomId}`).emit(
+                  "notification",
+                  data?.notification
+                );
               }
             }
             // if (data?.notifications) {
@@ -643,10 +648,10 @@ socket.config = (server) => {
               }
             } else {
               console.log("in=========>");
-              io.to(`${params.profileId}`).emit("new-message", data.newMessage);
+              io.to(`${params.roomId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
                 if (data?.notification) {
-                  io.to(`${data.notification.notificationToProfileId}`).emit(
+                  io.to(`${params.roomId}`).emit(
                     "notification",
                     data?.notification
                   );
@@ -678,9 +683,14 @@ socket.config = (server) => {
       });
       try {
         if (params) {
-          const data = await chatService.declineCall(params);
-          io.to(`${data?.notificationToProfileId}`).emit("notification", data);
-          return cb(true);
+          if (params?.roomId) {
+            const data = await chatService.declineCall(params);
+            io.to(`${params?.roomId}`).emit("notification", data);
+            return cb(true);
+          } else {
+            io.to(`${params?.groupId}`).emit("notification", data);
+            return cb(true);
+          }
         }
       } catch (error) {
         return cb(error);
@@ -688,7 +698,7 @@ socket.config = (server) => {
     });
 
     socket.on("pick-up-call", async (params, cb) => {
-      logger.info("decile-call", {
+      logger.info("pick-up-call", {
         ...params,
         address,
         id: socket.id,
@@ -697,8 +707,13 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.pickUpCall(params);
-          io.to(`${data?.notificationToProfileId}`).emit("notification", data);
-          return cb(true);
+          if (params?.roomId) {
+            io.to(`${params?.roomId}`).emit("notification", data);
+            return cb(true);
+          } else {
+            io.to(`${params?.groupId}`).emit("notification", data);
+            return cb(true);
+          }
         }
       } catch (error) {
         return cb(error);
@@ -736,12 +751,12 @@ socket.config = (server) => {
     });
 
     socket.on("get-group-list", async (params, cb) => {
-      logger.info("get-group", {
-        ...params,
-        address,
-        id: socket.id,
-        method: "get-group",
-      });
+      // logger.info("get-group", {
+      //   ...params,
+      //   address,
+      //   id: socket.id,
+      //   method: "get-group",
+      // });
       try {
         if (params) {
           const groupList = await chatService.getGroupList(params);

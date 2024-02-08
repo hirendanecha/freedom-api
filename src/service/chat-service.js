@@ -536,10 +536,10 @@ const deleteRoom = async function (params) {
 const startCall = async function (params) {
   try {
     if (params) {
-      if (params.roomId) {
+      if (params?.roomId) {
         const data = {
           notificationToProfileId: params?.notificationToProfileId,
-          groupId: params?.groupId,
+          roomId: params?.roomId,
           notificationByProfileId: params?.notificationByProfileId,
           actionType: "VC",
           msg: "incoming call...",
@@ -597,6 +597,7 @@ const pickUpCall = async function (params) {
       const data = {
         notificationToProfileId: params?.notificationToProfileId,
         roomId: params?.roomId,
+        groupId: params?.groupId,
         notificationByProfileId: params?.notificationByProfileId,
         actionType: "SC",
         msg: "call start...",
