@@ -1,3 +1,4 @@
+const { query } = require("../../config/db.config");
 const { executeQuery } = require("../helpers/utils");
 const { notificationMailOnInvite } = require("../helpers/utils");
 const socketService = require("./socket-service");
@@ -68,6 +69,10 @@ exports.getGroup = async function (data) {
 
 exports.removeMember = async function (data) {
   return await removeMember(data);
+};
+
+exports.getRoomsIds = async function (data) {
+  return await getRoomsIds(data);
 };
 
 const getChatList = async function (params) {
@@ -743,6 +748,20 @@ const removeMember = async function (params) {
     const member = await executeQuery(query, values);
     const group = await getGroup(params);
     return group;
+  } catch (error) {
+    return error;
+  }
+};
+
+const getRoomsIds = async function (id) {
+  try {
+    const query = `select id as roomId from chatRooms where profileId1 = ${id} or profileId2 = ${id}`;
+    const query1 = `select groupId from groupMembers where profileId = ${id}`;
+    const roomsIds = await executeQuery(query);
+    const groupsIds = await executeQuery(query1);
+
+    const chatData = { roomsIds, groupsIds };
+    return chatData;
   } catch (error) {
     return error;
   }

@@ -30,6 +30,22 @@ socket.config = (server) => {
           return next(err);
         }
         socket.user = decoded.user;
+        // Function to join existing rooms
+        const chatData = await chatService.getRoomsIds(socket.user.id);
+        if (chatData) {
+          for (const roomId of chatData.roomsIds) {
+            const chat = roomId;
+            console.log(`${chat.roomId}`);
+            socket.join(`${chat.roomId}`);
+          }
+          for (const groupId of chatData?.groupsIds) {
+            const chat = groupId;
+            console.log('\n', `${chat.groupId}`);
+            socket.join(`${chat.groupId}`);
+          }
+        }
+        console.log('ProfileId', socket.user?.id);
+        socket.join(`${socket.user?.id}`);
         next();
       });
     } catch (error) {
@@ -117,7 +133,6 @@ socket.config = (server) => {
         method: "New post found",
         params: params,
       });
-      socket.join(`${params.profileId}`);
       const data = await socketService.getPost(params);
       if (data) {
         socket.emit("new-post", data);
@@ -133,17 +148,15 @@ socket.config = (server) => {
         const data = await socketService.createPost(params);
         if (data?.posts) {
           io.emit("new-post-added", data?.posts);
-
+          console.log({'notifications': data?.notifications});
           if (data?.notifications) {
             for (const key in data?.notifications) {
-              if (Object.hasOwnProperty.call(data?.notifications, key)) {
                 const notification = data?.notifications[key];
-
+                console.log({notification});
                 io.to(`${notification.notificationToProfileId}`).emit(
                   "notification",
                   notification
                 );
-              }
             }
           }
 
@@ -395,13 +408,13 @@ socket.config = (server) => {
       try {
         if (params) {
           const chatList = await chatService.getChatList(params);
-          for (const key in chatList) {
-            if (Object.hasOwnProperty.call(chatList, key)) {
-              const chat = chatList[key];
-              socket.join(`${chat.roomId}`);
-              console.log(socket.id);
-            }
-          }
+          // for (const key in chatList) {
+          //   if (Object.hasOwnProperty.call(chatList, key)) {
+          //     const chat = chatList[key];
+          //     socket.join(`${chat.roomId}`);
+          //     console.log(socket.id);
+          //   }
+          // }
           if (cb) {
             // socket.emit("chat-list", chatList);
             return cb(chatList);
@@ -761,14 +774,14 @@ socket.config = (server) => {
       try {
         if (params) {
           const groupList = await chatService.getGroupList(params);
-          for (const key in groupList) {
-            if (Object.hasOwnProperty.call(groupList, key)) {
-              const group = groupList[key];
-              // io.to(`${group.groupId}`).emit("join", group);
-              socket.join(`${group.groupId}`);
-              console.log(socket.id);
-            }
-          }
+          // for (const key in groupList) {
+          //   if (Object.hasOwnProperty.call(groupList, key)) {
+          //     const group = groupList[key];
+          //     // io.to(`${group.groupId}`).emit("join", group);
+          //     socket.join(`${group.groupId}`);
+          //     console.log(socket.id);
+          //   }
+          // }
           if (cb) {
             return cb(groupList);
           }
