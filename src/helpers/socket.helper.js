@@ -117,6 +117,7 @@ socket.config = (server) => {
         method: "New post found",
         params: params,
       });
+      socket.join(`${params.profileId}`);
       const data = await socketService.getPost(params);
       if (data) {
         socket.emit("new-post", data);
