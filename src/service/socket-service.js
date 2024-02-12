@@ -68,6 +68,10 @@ exports.getMeta = function (data) {
   return getMetaD(data);
 };
 
+exports.readNotification = function (data) {
+  return readNotification(data);
+};
+
 const getPost = async function (params) {
   const { page, size, profileId, communityId } = params;
   const { limit, offset } = getPagination(page, size);
@@ -529,23 +533,33 @@ const deletePost = async function (params) {
   return deletePost;
 };
 
+const readNotification = async function (id) {
+  try {
+    const query = `update notifications set isRead = 'Y' where notificationToProfileId = ${id} `;
+    const notification = await executeQuery(query);
+    return true;
+  } catch (error) {
+    return error;
+  }
+};
+
 const ogPromise = (url) => {
   return new Promise((resolve, reject) => {
     og(url, async function (err, meta) {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
         const data = meta;
-        resolve(data)
+        resolve(data);
       }
     });
-  })
-}
+  });
+};
 
 const getMetaD = async function (params) {
   const { url } = params;
   if (url) {
-    return await ogPromise(url)
+    return await ogPromise(url);
   } else {
     return null;
   }

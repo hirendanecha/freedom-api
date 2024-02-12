@@ -1,6 +1,5 @@
 let logger = console;
 const socket = {};
-const { post, param } = require("../routes");
 const socketService = require("../service/socket-service");
 const chatService = require("../service/chat-service");
 const environment = require("../environments/environment");
@@ -35,16 +34,13 @@ socket.config = (server) => {
         if (chatData) {
           for (const roomId of chatData.roomsIds) {
             const chat = roomId;
-            console.log(`${chat.roomId}`);
             socket.join(`${chat.roomId}`);
           }
           for (const groupId of chatData?.groupsIds) {
             const chat = groupId;
-            console.log('\n', `${chat.groupId}`);
             socket.join(`${chat.groupId}`);
           }
         }
-        console.log('ProfileId', socket.user?.id);
         socket.join(`${socket.user?.id}`);
         next();
       });
@@ -148,15 +144,15 @@ socket.config = (server) => {
         const data = await socketService.createPost(params);
         if (data?.posts) {
           io.emit("new-post-added", data?.posts);
-          console.log({'notifications': data?.notifications});
+          console.log({ notifications: data?.notifications });
           if (data?.notifications) {
             for (const key in data?.notifications) {
-                const notification = data?.notifications[key];
-                console.log({notification});
-                io.to(`${notification.notificationToProfileId}`).emit(
-                  "notification",
-                  notification
-                );
+              const notification = data?.notifications[key];
+              console.log({ notification });
+              io.to(`${notification.notificationToProfileId}`).emit(
+                "notification",
+                notification
+              );
             }
           }
 
@@ -363,6 +359,7 @@ socket.config = (server) => {
       });
       try {
         if (params.profileId) {
+          await socketService.readNotification(params.profileId);
           params["isRead"] = "Y";
           io.to(`${params.profileId}`).emit("isReadNotification_ack", params);
         }
@@ -725,7 +722,10 @@ socket.config = (server) => {
             io.to(`${params?.roomId}`).emit("notification", data);
             return cb(true);
           } else {
-            io.to(`${params?.groupId}`).emit("notification", data);
+            io.to(`${params?.notificationToProfileId}`).emit(
+              "notification",
+              data
+            );
             return cb(true);
           }
         }
