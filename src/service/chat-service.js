@@ -1,7 +1,5 @@
-const { query } = require("../../config/db.config");
 const { executeQuery } = require("../helpers/utils");
 const { notificationMailOnInvite } = require("../helpers/utils");
-const socketService = require("./socket-service");
 
 exports.getChatList = async function (params) {
   return await getChatList(params);
