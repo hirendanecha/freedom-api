@@ -1,20 +1,13 @@
 "use strict";
 
 const mysql = require("mysql2");
+const environment = require("../src/environments/environment");
 
 const db = mysql.createConnection({
-  // host: "127.0.0.1",
-  // user: "root",
-  // password: "",
-  // database: 'freedom-buzz'
-  // host: '65.108.254.22',
-  // user: 'root',
-  // password: 'JYq1Nyr2l7Cf',
-  // database: 'freedom-buzz'
-  host: '135.181.104.107',
-  user: 'root',
-  password: 'JYq1Nyr2l7Cf',
-  database: 'freedom-buzz'
+  host: environment.DB_HOST,
+  user: environment.DB_USER,
+  password: environment.DB_PASS,
+  database: environment.DB_NAME,
 });
 
 db.connect(function (err) {
