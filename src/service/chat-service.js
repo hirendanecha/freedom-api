@@ -111,28 +111,28 @@ ORDER BY
 r.updatedDate desc;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
-    const query1 = `SELECT g.id AS groupId,
-    g.profileId AS createdBy,
-    g.profileImage,
-    g.groupName,
-    g.createdDate,
-    g.lastMessageText,
-    g.updatedDate,
-    COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
-    p.Username,
-    p.ProfilePicName,
-    p.ID AS profileId
-FROM chatGroups AS g
-LEFT JOIN groupMembers AS gm ON gm.groupId = g.id
-LEFT JOIN profile AS p ON p.ID = g.profileId
-LEFT JOIN messages AS m ON m.groupId = g.id
-                       AND m.sentBy != ${params.profileId}
-                       AND m.isRead = 'N'
-WHERE gm.profileId = ${params.profileId}
-GROUP BY g.id
-ORDER BY g.updatedDate DESC`;
-    const groupList = await executeQuery(query1);
-    console.log("groupList===>", groupList);
+//     const query1 = `SELECT g.id AS groupId,
+//     g.profileId AS createdBy,
+//     g.profileImage,
+//     g.groupName,
+//     g.createdDate,
+//     g.lastMessageText,
+//     g.updatedDate,
+//     COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
+//     p.Username,
+//     p.ProfilePicName,
+//     p.ID AS profileId
+// FROM chatGroups AS g
+// LEFT JOIN groupMembers AS gm ON gm.groupId = g.id
+// LEFT JOIN profile AS p ON p.ID = g.profileId
+// LEFT JOIN messages AS m ON m.groupId = g.id
+//                        AND m.sentBy != ${params.profileId}
+//                        AND m.isRead = 'N'
+// WHERE gm.profileId = ${params.profileId}
+// GROUP BY g.id
+// ORDER BY g.updatedDate DESC`;
+//     const groupList = await executeQuery(query1);
+//     console.log("groupList===>", groupList);
     return chatList;
   } catch (error) {
     console.log(error);
