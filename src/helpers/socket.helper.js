@@ -828,6 +828,36 @@ socket.config = (server) => {
         cb(error);
       }
     });
+
+    socket.on("start-typing", async (params, cb) => {
+      logger.info("start-typing", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "start-typing",
+      });
+      try {
+        if (params) {
+          const data = {
+            profileId: params.profileId,
+            isTyping: params.isTyping,
+            roomId: params.roomId,
+            groupId: params.groupId,
+          };
+          if (params.roomId) {
+            io.to(`${data?.profileId}`).emit("typing", data);
+          } else {
+            data["Username"] = await chatService.getUserDetails(data.profileId);
+            io.to(`${data?.groupId}`).emit("typing", data);
+          }
+          if (cb) {
+            return cb();
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
   });
 };
 

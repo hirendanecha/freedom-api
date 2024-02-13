@@ -73,6 +73,10 @@ exports.getRoomsIds = async function (data) {
   return await getRoomsIds(data);
 };
 
+exports.getUserDetails = async function (data) {
+  return await getUserDetails(data);
+};
+
 const getChatList = async function (params) {
   try {
     // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
@@ -109,28 +113,28 @@ ORDER BY
 r.updatedDate desc;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
-//     const query1 = `SELECT g.id AS groupId,
-//     g.profileId AS createdBy,
-//     g.profileImage,
-//     g.groupName,
-//     g.createdDate,
-//     g.lastMessageText,
-//     g.updatedDate,
-//     COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
-//     p.Username,
-//     p.ProfilePicName,
-//     p.ID AS profileId
-// FROM chatGroups AS g
-// LEFT JOIN groupMembers AS gm ON gm.groupId = g.id
-// LEFT JOIN profile AS p ON p.ID = g.profileId
-// LEFT JOIN messages AS m ON m.groupId = g.id
-//                        AND m.sentBy != ${params.profileId}
-//                        AND m.isRead = 'N'
-// WHERE gm.profileId = ${params.profileId}
-// GROUP BY g.id
-// ORDER BY g.updatedDate DESC`;
-//     const groupList = await executeQuery(query1);
-//     console.log("groupList===>", groupList);
+    //     const query1 = `SELECT g.id AS groupId,
+    //     g.profileId AS createdBy,
+    //     g.profileImage,
+    //     g.groupName,
+    //     g.createdDate,
+    //     g.lastMessageText,
+    //     g.updatedDate,
+    //     COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
+    //     p.Username,
+    //     p.ProfilePicName,
+    //     p.ID AS profileId
+    // FROM chatGroups AS g
+    // LEFT JOIN groupMembers AS gm ON gm.groupId = g.id
+    // LEFT JOIN profile AS p ON p.ID = g.profileId
+    // LEFT JOIN messages AS m ON m.groupId = g.id
+    //                        AND m.sentBy != ${params.profileId}
+    //                        AND m.isRead = 'N'
+    // WHERE gm.profileId = ${params.profileId}
+    // GROUP BY g.id
+    // ORDER BY g.updatedDate DESC`;
+    //     const groupList = await executeQuery(query1);
+    //     console.log("groupList===>", groupList);
     return chatList;
   } catch (error) {
     console.log(error);
@@ -785,4 +789,10 @@ const getRoomsIds = async function (id) {
   } catch (error) {
     return error;
   }
+};
+
+const getUserDetails = async function (id) {
+  const query = `select Username from profile where ID = ${id}`;
+  const [profile] = await executeQuery(query);
+  return profile?.Username;
 };
