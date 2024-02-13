@@ -545,15 +545,16 @@ socket.config = (server) => {
     });
 
     socket.on("accept-room", async (params, cb) => {
-      logger.info("read-message", {
+      logger.info("accept-room", {
         ...params,
         address,
         id: socket.id,
-        method: "read-message",
+        method: "accept-room",
       });
       try {
         if (params) {
           const data = await chatService.acceptRoom(params);
+          console.log(data);
           if (data) {
             io.to(`${data?.notification?.notificationToProfileId}`).emit(
               "notification",
