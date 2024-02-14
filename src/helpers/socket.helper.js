@@ -626,7 +626,13 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.deleteRoom(params);
-          io.to(`${params?.profileId}`).emit("new-message", data);
+          console.log(data);
+          if (data?.notification) {
+            io.to(`${data.notification?.notificationToProfileId}`).emit(
+              "notification",
+              data?.notification
+            );
+          }
           if (data) {
             return cb(data);
           }

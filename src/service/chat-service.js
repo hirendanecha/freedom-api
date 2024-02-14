@@ -503,17 +503,20 @@ const deleteMessage = async function (params) {
 const deleteRoom = async function (params) {
   try {
     const data = {
-      id: params.id,
+      id: params?.roomId,
     };
     const query = "delete from chatRooms where id = ?";
     const values = [data.id];
     const message = await executeQuery(query, values);
-
-    // const query1 = "select * from messages where roomId = ?";
-    // const values1 = data.roomId;
-    // const messageList = await executeQuery(query1, values1);.0
-    data.isDeleted = true;
-    return data;
+    const notification = await createNotification({
+      notificationByProfileId: params?.profileId,
+      notificationToProfileId: params?.createdBy,
+      actionType: "M",
+      roomId: params?.roomId,
+      msg: "has decline your invitation",
+    });
+    notification["isRoomDeleted"] = true;
+    return { data, notification };
   } catch (error) {
     return error;
   }
