@@ -91,6 +91,7 @@ const getChatList = async function (params) {
                   r.lastMessageText,
                   r.updatedDate,
                   r.createdDate,
+                  r.isDeleted,
                   p.ID AS profileId,
                   p.Username,
                   p.FirstName,
@@ -106,35 +107,13 @@ JOIN
 LEFT JOIN
     messages AS m ON m.roomId = r.id AND m.sentBy != ${params.profileId} AND m.isRead = 'N'
 WHERE
-    r.profileId1 = ? OR r.profileId2 = ?
+    (r.profileId1 = ? OR r.profileId2 = ?) AND r.isDeleted = 'N'
 GROUP BY
     r.id, r.profileId1, r.isAccepted,r.updatedDate, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
 ORDER BY
 r.updatedDate desc;`;
     const values = [params.profileId, params.profileId];
     const chatList = await executeQuery(query, values);
-    //     const query1 = `SELECT g.id AS groupId,
-    //     g.profileId AS createdBy,
-    //     g.profileImage,
-    //     g.groupName,
-    //     g.createdDate,
-    //     g.lastMessageText,
-    //     g.updatedDate,
-    //     COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
-    //     p.Username,
-    //     p.ProfilePicName,
-    //     p.ID AS profileId
-    // FROM chatGroups AS g
-    // LEFT JOIN groupMembers AS gm ON gm.groupId = g.id
-    // LEFT JOIN profile AS p ON p.ID = g.profileId
-    // LEFT JOIN messages AS m ON m.groupId = g.id
-    //                        AND m.sentBy != ${params.profileId}
-    //                        AND m.isRead = 'N'
-    // WHERE gm.profileId = ${params.profileId}
-    // GROUP BY g.id
-    // ORDER BY g.updatedDate DESC`;
-    //     const groupList = await executeQuery(query1);
-    //     console.log("groupList===>", groupList);
     return chatList;
   } catch (error) {
     console.log(error);
@@ -173,8 +152,9 @@ const createChatRoom = async function (params) {
       data.profileId1,
       data.profileId2,
     ];
-    const oldRoom = await executeQuery(query, values);
-    if (!oldRoom.length) {
+    const [oldRoom] = await executeQuery(query, values);
+    console.log(oldRoom);
+    if (oldRoom.isDeleted === "Y") {
       const query = "Insert Into chatRooms set ?";
       const values = [data];
       const room = await executeQuery(query, values);
@@ -505,18 +485,23 @@ const deleteRoom = async function (params) {
     const data = {
       id: params?.roomId,
     };
-    const query = "delete from chatRooms where id = ?";
+    const query = `update chatRooms set isDeleted = 'Y' where id = ?`;
     const values = [data.id];
     const message = await executeQuery(query, values);
-    const notification = await createNotification({
-      notificationByProfileId: params?.profileId,
-      notificationToProfileId: params?.createdBy,
-      actionType: "M",
-      roomId: params?.roomId,
-      msg: "has decline your invitation",
-    });
-    notification["isRoomDeleted"] = true;
-    return { data, notification };
+    let notification = {};
+    if (params.profileId && params.createdBy) {
+      notification = await createNotification({
+        notificationByProfileId: params?.profileId,
+        notificationToProfileId: params?.createdBy,
+        actionType: "M",
+        roomId: params?.roomId,
+        msg: "has decline your invitation",
+      });
+      notification["isRoomDeleted"] = true;
+      return { data, notification };
+    } else {
+      return { data };
+    }
   } catch (error) {
     return error;
   }

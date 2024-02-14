@@ -851,10 +851,10 @@ socket.config = (server) => {
             roomId: params.roomId,
             groupId: params.groupId,
           };
+          data["Username"] = await chatService.getUserDetails(data.profileId);
           if (params.roomId) {
             io.to(`${data?.profileId}`).emit("typing", data);
           } else {
-            data["Username"] = await chatService.getUserDetails(data.profileId);
             io.to(`${data?.groupId}`).emit("typing", data);
           }
           if (cb) {
