@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const env = require("../environments/environment");
 
 module.exports = function (req, res, next) {
   //Get token from header
@@ -13,7 +14,7 @@ module.exports = function (req, res, next) {
     }
     //Verify token
     try {
-      const decoded = jwt.verify(token, "MyS3cr3t");
+      const decoded = jwt.verify(token, env.JWT_SECRET_KEY);
       req.user = decoded.user;
       next();
     } catch (err) {

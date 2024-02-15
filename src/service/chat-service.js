@@ -144,17 +144,15 @@ const createChatRoom = async function (params) {
       profileId1: params?.profileId1,
       profileId2: params?.profileId2,
     };
-    const query =
-      "select * from chatRooms as r where (r.profileId1 = ? and r.profileId2 = ?) or (r.profileId2 = ? and r.profileId1 = ?)";
+    const query = `select * from chatRooms as r where r.isDeleted = 'N' AND (r.profileId1 = ? and r.profileId2 = ?) or (r.profileId2 = ? and r.profileId1 = ?)`;
     const values = [
       data.profileId1,
       data.profileId2,
       data.profileId1,
       data.profileId2,
     ];
-    const [oldRoom] = await executeQuery(query, values);
-    console.log(oldRoom);
-    if (oldRoom.isDeleted === "Y") {
+    const oldRoom = await executeQuery(query, values);
+    if (!oldRoom.length) {
       const query = "Insert Into chatRooms set ?";
       const values = [data];
       const room = await executeQuery(query, values);
@@ -639,7 +637,7 @@ const createGroups = async function (params) {
         const query = "insert into chatGroups set ?";
         const values = [data];
         const group = await executeQuery(query, values);
-        params["groupId"] = group?.insertId;
+        data["groupId"] = group?.insertId;
         const adminData = {
           groupId: group.insertId,
           profileId: data.profileId,
