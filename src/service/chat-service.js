@@ -196,6 +196,7 @@ const sendMessage = async function (params) {
       groupId: params?.groupId,
       sentBy: params.sentBy,
       messageMedia: params.messageMedia,
+      parentMessageId: params.parentMessageId,
     };
     const query = "select * from chatRooms where id = ?";
     const values = [data.roomId];
@@ -493,7 +494,7 @@ const deleteRoom = async function (params) {
         notificationToProfileId: params?.createdBy,
         actionType: "M",
         roomId: params?.roomId,
-        msg: "has decline your invitation",
+        msg: "has declined your invitation",
       });
       notification["isRoomDeleted"] = true;
       return { data, notification };
@@ -595,7 +596,7 @@ const declineCall = async function (params) {
         roomId: params?.roomId,
         notificationByProfileId: params?.notificationByProfileId || null,
         actionType: "DC",
-        msg: "Decline call..",
+        msg: "Declined call..",
       };
       const notification = await createNotification(data);
       return notification;
