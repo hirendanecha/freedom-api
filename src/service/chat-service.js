@@ -210,6 +210,13 @@ const sendMessage = async function (params) {
         "select m.*,p.Username,p.ProfilePicName,p.FirstName from messages as m left join profile as p on p.ID = m.sentBy where m.id = ?";
       const values1 = message.insertId;
       const [newMessage] = await executeQuery(query1, values1);
+      if (newMessage?.parentMessageId) {
+        const query1 =
+          "select m.*,p.Username,p.ProfilePicName,p.FirstName from messages as m left join profile as p on p.ID = m.sentBy where m.id = ?";
+        const values1 = newMessage?.parentMessageId;
+        const [parentMessage] = await executeQuery(query1, values1);
+        newMessage["parentMessage"] = parentMessage;
+      }
       if (newMessage) {
         if (data.roomId) {
           const date = new Date();

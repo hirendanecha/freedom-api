@@ -15,12 +15,14 @@ const profileRouter = require("./profile.routes");
 const dashboardRouter = require("./dashboard.routes");
 const featuredChannels = require("./featured-channels.routes");
 const messageRouter = require("./message.routes");
+const authorize = require("../middleware/authorize");
 
 router.use("/login", authRoutes);
-router.use("/customers", userRoutes);
 router.use("/admin", adminRouter);
-router.use("/utils", utilsRoutes);
+router.use(authorize);
 router.use("/posts", postRoutes);
+router.use("/customers", userRoutes);
+router.use("/utils", utilsRoutes);
 router.use("/community", communityRouter);
 router.use("/community-post", communityPostRouter);
 router.use("/unsubscribe-profile", unsubscribeProfileRouter);
