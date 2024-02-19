@@ -437,9 +437,13 @@ const deleteMessage = async function (params) {
       sentBy: params.sentBy,
     };
     const query = "delete from messages where id = ?";
-    const values = [data.id];
+    const values = [data.id, data.id];
     const message = await executeQuery(query, values);
-    console.log("message", message);
+    const deleteChild = await executeQuery(
+      "delete from messages where parentMessageId in (?)",
+      values
+    );
+    console.log("message", message, deleteChild);
     if (message) {
       let messageList = [];
       if (data?.roomId) {
