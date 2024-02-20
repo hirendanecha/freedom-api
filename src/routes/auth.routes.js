@@ -5,6 +5,6 @@ const authorize = require("../middleware/authorize");
 
 router.post("/", userController.login);
 router.post("/admin", userController.adminLogin);
-router.get("/me", userController.getToken);
+router.get("/me", authorize, userController.getToken);
 
 module.exports = router;
