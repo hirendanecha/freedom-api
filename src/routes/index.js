@@ -19,7 +19,7 @@ const authorize = require("../middleware/authorize");
 
 router.use("/login", authRoutes);
 router.use("/admin", adminRouter);
-router.use(authorize);
+// router.use(authorize);
 router.use("/posts", postRoutes);
 router.use("/customers", userRoutes);
 router.use("/utils", utilsRoutes);
