@@ -15,7 +15,7 @@ Messages.getMessages = async (limit, offset, roomId, groupId) => {
     `SELECT count(m.id) as count FROM messages as m WHERE roomId = ${roomId} or groupId = ${groupId}`
   );
   const searchData = await executeQuery(
-    `select m.*,p.Username,p.ProfilePicName,p.FirstName from messages as m left join profile as p on p.ID = m.sentBy where m.roomId =${roomId} or m.groupId = ${groupId} and m.parentMessageId is NULL GROUP BY id order by createdDate desc limit ? offset ?`,
+    `select m.*,p.Username,p.ProfilePicName,p.FirstName from messages as m left join profile as p on p.ID = m.sentBy where m.roomId =${roomId} or m.groupId = ${groupId} GROUP BY m.id order by m.createdDate desc limit ? offset ?`,
     [limit, offset]
   );
   for (const msg of searchData) {
