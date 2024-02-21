@@ -1,15 +1,16 @@
 const jwt = require("jsonwebtoken");
+const env = require("../environments/environment");
 
 module.exports = function () {
   this.generateJwtToken = (user) => {
     const payload = {
       user: {
-        id: user.Id,
+        id: user.profileId,
         username: user.Username,
         active: user.IsActive,
       },
     };
 
-    return jwt.sign(payload, "MyS3cr3t", { expiresIn: "7d" });
+    return jwt.sign(payload, env.JWT_SECRET_KEY, { expiresIn: "7d" });
   };
 };

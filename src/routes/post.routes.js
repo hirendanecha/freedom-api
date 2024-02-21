@@ -4,12 +4,14 @@ const router = express.Router();
 const postController = require("../controllers/post.controller");
 const utilsController = require("../controllers/utils.controller");
 const uploadFileMiddleware = require("../middleware/upload");
+const authorize = require("../middleware/authorize");
 
 router.post("/", postController.findAll);
-router.post("/get-my-post", postController.getPostByProfileId);
 router.get("/get/:id", postController.getPostByPostId);
-router.get("/get-pdfs/:id", postController.getPdfsFile);
 router.post("/comments/", postController.getPostComments);
+router.post("/get-my-post", postController.getPostByProfileId);
+router.use(authorize);
+router.get("/get-pdfs/:id", postController.getPdfsFile);
 router.post("/get-meta", postController.getMeta);
 router.post("/create-post", postController.createPost);
 router.post(

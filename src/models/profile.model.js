@@ -124,7 +124,7 @@ Profile.update = function (profileId, profileData, result) {
 
 Profile.getUsersByUsername = async function (searchText) {
   if (searchText) {
-    const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin='N' AND u.IsSuspended='N' AND p.Username LIKE ? order by p.Username limit 500`;
+    const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin ='N' AND u.IsSuspended ='N' AND u.IsActive = 'Y' AND p.Username LIKE ? order by p.Username limit 500`;
     const values = [`${searchText}%`];
     const searchData = await executeQuery(query, values);
     return searchData;
@@ -135,8 +135,8 @@ Profile.getUsersByUsername = async function (searchText) {
 
 Profile.getNotificationById = async function (id) {
   if (id) {
-    const query = `select n.*,p.Username,p.FirstName,p.ProfilePicName from notifications as n left join profile as p on p.ID = n.notificationByProfileId where n.notificationToProfileId =? order by createDate desc`;
-    const values = [id];
+    const query = `select n.*,p.Username,p.FirstName,p.ProfilePicName from notifications as n left join profile as p on p.ID = n.notificationByProfileId left join groupMembers as g on g.groupId = n.groupId and g.profileId != n.notificationByProfileId where g.profileId = ? OR n.notificationToProfileId =? order by n.createDate desc`;
+    const values = [id, id];
     const notificationData = await executeQuery(query, values);
     return notificationData;
   } else {

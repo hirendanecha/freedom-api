@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const communityController = require("../controllers/community.controller");
 const utilsController = require("../controllers/utils.controller");
+const authorize = require("../middleware/authorize");
 
+router.use(authorize);
 router.get("/", communityController.getCommunity);
 router.get(
   "/get-communities-pages/:id",
