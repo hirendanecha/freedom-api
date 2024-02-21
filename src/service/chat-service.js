@@ -649,7 +649,7 @@ const createGroups = async function (params) {
         const query = "insert into chatGroups set ?";
         const values = [data];
         const group = await executeQuery(query, values);
-        data["groupId"] = group?.insertId;
+        params["groupId"] = group?.insertId;
         const adminData = {
           groupId: group.insertId,
           profileId: data.profileId,
@@ -667,6 +667,8 @@ const createGroups = async function (params) {
         const values = [data, params?.groupId];
         const updateGroup = await executeQuery(query, values);
       }
+      console.log(params.profileIds);
+
       let notifications = [];
       let groupList = {};
       if (params.profileIds.length > 0) {
