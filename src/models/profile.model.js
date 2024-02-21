@@ -135,7 +135,7 @@ Profile.getUsersByUsername = async function (searchText) {
 
 Profile.getNotificationById = async function (id) {
   if (id) {
-    const query = `select n.*,p.Username,p.FirstName,p.ProfilePicName from notifications as n left join profile as p on p.ID = n.notificationByProfileId where n.notificationToProfileId =? order by createDate desc`;
+    const query = `select n.*,p.Username,p.FirstName,p.ProfilePicName from notifications as n left join profile as p on p.ID = n.notificationByProfileId left join groupMembers as g on g.id = n.groupId and g.profileId != n.notificationByProfileId where n.notificationToProfileId =? order by createDate desc`;
     const values = [id];
     const notificationData = await executeQuery(query, values);
     return notificationData;
