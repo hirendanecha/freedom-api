@@ -405,6 +405,14 @@ const editMessage = async function (params) {
     const query = "update messages set ? where id = ?";
     const values = [data, data.id];
     const message = await executeQuery(query, values);
+    let parentMessage = {};
+    if (data?.parentMessageId) {
+      const query1 =
+        "select m.*,p.Username,p.ProfilePicName,p.FirstName from messages as m left join profile as p on p.ID = m.sentBy where m.id = ?";
+      const values1 = data?.parentMessageId;
+      const [message] = await executeQuery(query1, values1);
+      parentMessage = message;
+    }
     if (data.roomId) {
       const date = new Date();
       const query =
@@ -422,6 +430,7 @@ const editMessage = async function (params) {
     const query1 = "select * from messages where id = ?";
     const values1 = [data?.id];
     const [editMessage] = await executeQuery(query1, values1);
+    editMessage["parentMessage"] = parentMessage;
     return editMessage;
   } catch (error) {
     console.log(error);
