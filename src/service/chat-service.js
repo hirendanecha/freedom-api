@@ -400,6 +400,7 @@ const editMessage = async function (params) {
       groupId: params?.groupId,
       sentBy: params.sentBy,
       messageMedia: params.messageMedia,
+      parentMessageId: params.parentMessageId,
     };
     const query = "update messages set ? where id = ?";
     const values = [data, data.id];
