@@ -340,9 +340,13 @@ exports.delete = function (req, res) {
   const userId = req.params.id;
   const profileId = req.query.profileId;
   console.log(userId, profileId);
-  const isDeleted = User.delete(userId, profileId);
-  if (isDeleted) {
-    res.json({ error: false, message: "User deleted successfully" });
+  if (req.query.profileId === req.user.id) {
+    const isDeleted = User.delete(userId, profileId);
+    if (isDeleted) {
+      res.json({ error: false, message: "User deleted successfully" });
+    }
+  } else {
+    return res.status(401).json({ message: "Unauthorized token" });
   }
 };
 
@@ -462,9 +466,10 @@ exports.resendVerification = function (req, res) {
     });
   });
 };
-
 exports.logout = function (req, res) {
-  console.log("cookies");
+  console.log("innn==>");
+  const token = req.headers.authorization.split(" ")[1];
+  authorize.setTokenInList(token);
   res.clearCookie("auth-user", {
     sameSite: "none",
     secure: true,
@@ -476,5 +481,5 @@ exports.logout = function (req, res) {
   //   sameSite: "none",
   //   domain: environments.domain,
   // });
-  res.end();
+  return res.status(200).json({ message: "logout successfully" });
 };

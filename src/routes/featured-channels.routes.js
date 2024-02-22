@@ -3,7 +3,7 @@ const router = express.Router();
 const featuredChannels = require("../controllers/featuredChannels.controller");
 const authorize = require("../middleware/authorize");
 
-router.use(authorize);
+router.use(authorize.authorization);
 router.get("/", featuredChannels.getChannels);
 router.get("/get/:id", featuredChannels.findChannelById);
 router.get("/search-user", featuredChannels.getUsersByUsername);

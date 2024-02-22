@@ -3,7 +3,7 @@ const router = express.Router();
 const profileController = require("./../controllers/profile.controller");
 const authorize = require("../middleware/authorize");
 
-router.use(authorize);
+router.use(authorize.authorization);
 router.get("/groupsAndPosts", profileController.groupsAndPosts);
 router.get("/getGroups", profileController.getGroups);
 router.get(

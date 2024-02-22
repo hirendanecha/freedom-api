@@ -12,7 +12,7 @@ router.post(
 
 router.get("/files/:folder/:id", utilsController.getFiles);
 router.get("/:folder/:id/:filename", utilsController.readFile);
-// router.use(authorize);
+// router.use(authorize.authorization);
 router.post("/upload", utilsController.fileupload);
 // router.post("/upload2", utilsController.fileupload2);
 router.get("/download/partner/:name", utilsController.downloadPartner);
