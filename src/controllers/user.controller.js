@@ -4,6 +4,7 @@ const User = require("../models/user.model");
 const utils = require("../helpers/utils");
 const environments = require("../environments/environment");
 const jwt = require("jsonwebtoken");
+const authorize = require("../middleware/authorize");
 
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 const { Encrypt } = require("../helpers/cryptography");
