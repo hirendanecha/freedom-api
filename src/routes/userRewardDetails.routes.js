@@ -6,7 +6,7 @@ const authorize = require("../middleware/authorize");
 
 router.get(
   "/getCountByProfileId/:profileId",
-  authorize,
+  authorize.authorization,
   userRewardDetailsController.getCountByProfileId
 );
 

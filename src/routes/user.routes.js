@@ -25,7 +25,7 @@ router.get("/search-user", profileController.getUsersByUsername);
 router.get("/:id", userController.findById);
 router.get("/profile/:id", profileController.FindProfieById);
 router.put("/:id", userController.update);
-router.put("/profile/:id", authorize, profileController.updateProfile);
+router.put("/profile/:id", profileController.updateProfile);
 router.get("/notification/:id", profileController.getNotification);
 router.get("/get-notification/:id", profileController.getNotificationById);
 router.post("/user/verification/resend", userController.resendVerification);
