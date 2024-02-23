@@ -77,6 +77,10 @@ exports.getUserDetails = async function (data) {
   return await getUserDetails(data);
 };
 
+exports.switchChat = async function (data) {
+  return await switchChat(data);
+};
+
 const getChatList = async function (params) {
   try {
     // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
@@ -804,4 +808,11 @@ const getUserDetails = async function (id) {
   const query = `select Username from profile where ID = ${id}`;
   const [profile] = await executeQuery(query);
   return profile?.Username;
+};
+
+const switchChat = async function (params) {
+  const date = new Date();
+  const query = `update groupMembers set switchDate = ${date} where groupId = ${params.groupId} and profileId = ${params.profileId}`;
+  const data = await executeQuery(query);
+  return data;
 };
