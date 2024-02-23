@@ -865,6 +865,29 @@ socket.config = (server) => {
         cb(error);
       }
     });
+
+    socket.on("switch-group", async (params, cb) => {
+      logger.info("switch-group", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "switch-group",
+      });
+      try {
+        if (params) {
+          const data = {
+            profileId: params.profileId,
+            groupId: params.groupId,
+          };
+          data = await chatService.switchChat(data);
+          if (cb) {
+            return cb(data);
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
   });
 };
 

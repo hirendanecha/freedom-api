@@ -4,6 +4,7 @@ const communityController = require("../controllers/community.controller");
 const utilsController = require("../controllers/utils.controller");
 const authorize = require("../middleware/authorize");
 
+router.get("/bySlug/:slug", communityController.findCommunityBySlug);
 router.use(authorize.authorization);
 router.get("/", communityController.getCommunity);
 router.get(
@@ -14,7 +15,6 @@ router.post("/all-community", communityController.findAllCommunity);
 // router.get("/un-approve-community", communityController.findUnApproveCommunity);
 router.get("/search", communityController.search);
 router.get("/:id", communityController.findCommunityById);
-router.get("/bySlug/:slug", communityController.findCommunityBySlug);
 router.get("/user/:id", communityController.getCommunityByUserId);
 router.get(
   "/joined-community/:id",
