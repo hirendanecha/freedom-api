@@ -97,7 +97,7 @@ Profile.FindById = async function (profileId) {
     County
   FROM profile WHERE ID=?`;
   const values = profileId;
-  const profile = await executeQuery(query, values);
+  let profile = await executeQuery(query, values);
   const query1 =
     "select c.channelId from channelAdmins as c left join profile as p on p.ID = c.profileId where c.profileId = p.ID and p.UserID = ?;";
   const value1 = [profile[0]?.UserID];
