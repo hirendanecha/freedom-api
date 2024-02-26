@@ -556,7 +556,7 @@ socket.config = (server) => {
           const data = await chatService.readGroupMessage(params);
           // io.to(params.profileId).emit("update-message", data.ids);
           if (data) {
-            return cb(data.ids);
+            return cb(data);
           }
         }
       } catch (error) {
