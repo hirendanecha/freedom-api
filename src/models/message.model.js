@@ -1,6 +1,7 @@
 "use strict";
 require("../common/common")();
 const { executeQuery } = require("../helpers/utils");
+const moment = require("moment");
 var Messages = function (data) {
   this.messageText = data.messageText;
   this.roomId = data.roomId;
@@ -20,10 +21,17 @@ Messages.getMessages = async (limit, offset, roomId, groupId) => {
   );
   for (const msg of searchData) {
     msg["parentMessage"] = await getMessageById(msg?.parentMessageId);
+    // if (msg.groupId) {
+    // }
   }
+  const index = searchCount?.[0]?.count;
+  console.log(searchData[0]);
+  const readBy = await getReadUser(searchData[0]);
+  console.log(readBy);
   return {
     count: searchCount?.[0]?.count || 0,
     messageList: searchData,
+    readUsers: readBy,
   };
 };
 
@@ -46,6 +54,23 @@ const getMessageById = async function (id) {
     const values = [id];
     const [message] = await executeQuery(query, values);
     return message;
+  } catch (error) {
+    return null;
+  }
+};
+
+const getReadUser = async function (msg) {
+  try {
+    const date = moment(msg?.createdDate)
+      .utc()
+      .local()
+      .format("YYYY-MM-DD HH:mm:ss");
+    const query = `select p.Username,p.ProfilePicName,p.FirstName from profile as p left join groupMembers as gm on p.ID = gm.profileId where gm.groupId = ${msg.groupId} and gm.switchDate < '${date}'`;
+    console.log(query);
+    // const values = [msg.createdDate];
+    const readUsers = await executeQuery(query);
+    console.log("readusers", readUsers);
+    return readUsers;
   } catch (error) {
     return null;
   }
