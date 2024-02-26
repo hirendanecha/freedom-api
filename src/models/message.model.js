@@ -65,7 +65,7 @@ const getReadUser = async function (msg) {
       .utc()
       .local()
       .format("YYYY-MM-DD HH:mm:ss");
-    const query = `select p.Username,p.ProfilePicName,p.FirstName from profile as p left join groupMembers as gm on p.ID = gm.profileId where gm.groupId = ${msg.groupId} and gm.switchDate > '${date}'`;
+    const query = `select p.ID,p.Username,p.ProfilePicName,p.FirstName from profile as p left join groupMembers as gm on p.ID = gm.profileId where gm.groupId = ${msg.groupId} and gm.switchDate > '${date}'`;
     console.log(query);
     // const values = [msg.createdDate];
     const readUsers = await executeQuery(query);
