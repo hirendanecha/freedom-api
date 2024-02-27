@@ -898,9 +898,9 @@ socket.config = (server) => {
       });
       try {
         if (params) {
-          data = await chatService.switchChat(params);
+          const data = await chatService.switchChat(params);
           if (cb) {
-            return cb(data);
+            return cb(true);
           }
         }
       } catch (error) {
