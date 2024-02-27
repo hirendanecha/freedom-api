@@ -724,11 +724,12 @@ socket.config = (server) => {
       });
       try {
         if (params) {
+          const data = await chatService.declineCall(params);
           if (params?.roomId) {
-            const data = await chatService.declineCall(params);
             io.to(`${params?.roomId}`).emit("notification", data);
             return cb(true);
           } else if (params.groupId) {
+            console.log("decline-group-calll===>>>>>>>>>>>>>>>>>>>>>", data);
             io.to(`${params?.groupId}`).emit("notification", data);
             return cb(true);
           }
