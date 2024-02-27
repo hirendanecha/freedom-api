@@ -554,7 +554,10 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.readGroupMessage(params);
-          io.to(params.groupId).emit("read-message-user", data);
+          if (params.groupId) {
+            console.log("read-message-user", data);
+            io.to(params.groupId).emit("read-message-user", data);
+          }
           if (data) {
             return cb(data);
           }
