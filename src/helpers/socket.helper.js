@@ -728,7 +728,7 @@ socket.config = (server) => {
             const data = await chatService.declineCall(params);
             io.to(`${params?.roomId}`).emit("notification", data);
             return cb(true);
-          } else {
+          } else if (params.groupId) {
             io.to(`${params?.groupId}`).emit("notification", data);
             return cb(true);
           }
