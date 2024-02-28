@@ -26,7 +26,7 @@ Messages.getMessages = async (limit, offset, roomId, groupId) => {
   }
   const index = searchCount?.[0]?.count;
   console.log(searchData[0]);
-  const readBy = await getReadUser(searchData[0]);
+  const readBy = await getReadUser(searchData[searchData.length - 1]);
   console.log(readBy);
   return {
     count: searchCount?.[0]?.count || 0,
@@ -66,10 +66,7 @@ const getReadUser = async function (msg) {
       .local()
       .format("YYYY-MM-DD HH:mm:ss");
     const query = `select p.ID,p.Username,p.ProfilePicName,p.FirstName from profile as p left join groupMembers as gm on p.ID = gm.profileId where gm.groupId = ${msg.groupId} and gm.switchDate > '${date}'`;
-    console.log(query);
-    // const values = [msg.createdDate];
     const readUsers = await executeQuery(query);
-    console.log("readusers", readUsers);
     return readUsers;
   } catch (error) {
     return null;

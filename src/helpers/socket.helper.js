@@ -534,9 +534,12 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.readMessage(params);
-          // io.to(params.profileId).emit("update-message", data.ids);
+          if (params?.profileId) {
+            console.log(data);
+            io.to(params?.profileId).emit("seen-room-message", data);
+          }
           if (data) {
-            return cb(data.ids);
+            return cb(data);
           }
         }
       } catch (error) {
@@ -554,9 +557,9 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.readGroupMessage(params);
-          if (params.groupId) {
+          if (params?.groupId) {
             console.log("read-message-user", data);
-            io.to(params.groupId).emit("read-message-user", data);
+            io.to(`${params?.groupId}`).emit("read-message-user", data);
           }
           if (data) {
             return cb(data);

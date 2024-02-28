@@ -1,5 +1,6 @@
 const { executeQuery } = require("../helpers/utils");
 const { notificationMailOnInvite } = require("../helpers/utils");
+const moment = require("moment");
 
 exports.getChatList = async function (params) {
   return await getChatList(params);
@@ -842,7 +843,6 @@ const getUserDetails = async function (id) {
 const switchChat = async function (params) {
   const query = `update groupMembers set switchDate = '${params.date}' where groupId = ${params.groupId} and profileId = ${params.profileId}`;
   const data = await executeQuery(query);
-  console.log(data);
   return data;
 };
 
