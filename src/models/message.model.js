@@ -26,7 +26,7 @@ Messages.getMessages = async (limit, offset, roomId, groupId) => {
   }
   const index = searchCount?.[0]?.count;
   console.log(searchData[0]);
-  const readBy = await getReadUser(searchData[searchData.length - 1]);
+  const readBy = await getReadUser(searchData[0]);
   console.log(readBy);
   return {
     count: searchCount?.[0]?.count || 0,
