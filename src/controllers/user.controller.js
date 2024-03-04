@@ -484,3 +484,19 @@ exports.logout = function (req, res) {
   // });
   return res.status(200).json({ message: "logout successfully" });
 };
+
+exports.verifyToken = async function (req, res) {
+  try {
+    const token = req.params.token;
+    const decoded = jwt.verify(token, environments.JWT_SECRET_KEY);
+    if (decoded.user) {
+      res.status(200).send({ message: "Authorized User", verifiedToken: true });
+    } else {
+      res
+        .status(401)
+        .json({ message: "Unauthorized Token", verifiedToken: false });
+    }
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token", verifiedToken: false });
+  }
+};
