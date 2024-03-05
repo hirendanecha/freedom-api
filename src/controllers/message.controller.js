@@ -1,6 +1,11 @@
 const Message = require("../models/message.model");
 const utils = require("../helpers/utils");
-const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
+const {
+  getPagination,
+  getCount,
+  getPaginationData,
+  executeQuery,
+} = require("../helpers/fn");
 
 exports.getMessages = async (req, res) => {
   const { page, size, roomId, groupId } = req.body;
@@ -23,5 +28,18 @@ exports.getMembers = async (req, res) => {
     return res.send({ data: data });
   } catch (error) {
     return res.status(500).send(error);
+  }
+};
+
+exports.getGroup = async function (req, res) {
+  try {
+    if (req.params.id) {
+      const groups = await Message.getGroup(req.params.id);
+      res.send({ error: false, data: groups });
+    } else {
+      res.status(404).send({ error: true, message: "data not found" });
+    }
+  } catch (error) {
+    return error;
   }
 };
