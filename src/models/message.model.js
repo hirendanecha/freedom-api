@@ -91,4 +91,19 @@ Messages.getGroup = async function (id) {
   }
 };
 
+Messages.getRoom = async function (id) {
+  try {
+    const query =
+      "select r.id as roomId,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = r.profileId2 where r.id = ?";
+    const values = [id];
+    const room = await executeQuery(query, values);
+    console.log(room);
+    if (room) {
+      return room;
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
 module.exports = Messages;

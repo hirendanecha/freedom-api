@@ -37,7 +37,20 @@ exports.getGroup = async function (req, res) {
       const groups = await Message.getGroup(req.params.id);
       res.send({ error: false, data: groups });
     } else {
-      res.status(404).send({ error: true, message: "data not found" });
+      res.status(404).send({ error: true, message: "group not found" });
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
+exports.getRoom = async function (req, res) {
+  try {
+    if (req.params.id) {
+      const room = await Message.getRoom(req.params.id);
+      res.send({ error: false, data: room });
+    } else {
+      res.status(404).send({ error: true, message: "room not found" });
     }
   } catch (error) {
     return error;
