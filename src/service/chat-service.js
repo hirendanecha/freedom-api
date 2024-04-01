@@ -728,7 +728,11 @@ const createGroups = async function (params) {
               notificationToProfileId: id,
               actionType: "M",
               groupId: params?.groupId,
-              msg: `added you in chat group`,
+              msg: `${
+                params?.isUpdate
+                  ? "changed group details"
+                  : "added you in chat group"
+              }`,
             });
             notifications.push(notification);
           }
