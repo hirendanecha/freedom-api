@@ -736,6 +736,7 @@ const createGroups = async function (params) {
                 : "added you in chat group"
             }`,
           });
+
           notifications.push(notification);
           // }
         }
@@ -745,7 +746,7 @@ const createGroups = async function (params) {
         return { groupList };
       }
       groupList = await getGroup(params);
-      return { notifications, groupList };
+      return { notifications, groupList, groupId: params?.groupId };
     }
   } catch (error) {
     return error;

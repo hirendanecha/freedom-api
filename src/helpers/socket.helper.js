@@ -779,6 +779,7 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.createGroups(params);
+          socket.join(`${data.groupId}`);
           console.log("group", data.notifications);
           if (data?.notifications) {
             for (const key in data?.notifications) {
