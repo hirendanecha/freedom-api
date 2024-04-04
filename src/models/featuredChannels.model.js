@@ -92,14 +92,14 @@ featuredChannels.findChannelById = async function (id) {
 
 featuredChannels.getUsersByUsername = async function (searchText) {
   if (searchText) {
-    const query1 = "select profileId from channelAdmins";
-    const ids = await executeQuery(query1);
-    const profileIds = [];
-    ids.map((e) => profileIds.push(e.profileId));
-    const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin='N' AND u.IsSuspended='N' AND p.Username LIKE ? and p.ID not in (?) order by p.Username limit 500`;
-    const values = [`${searchText}%`, profileIds];
+    // const query1 = "select profileId from channelAdmins";
+    // const ids = await executeQuery(query1);
+    // const profileIds = [];
+    // ids.map((e) => profileIds.push(e.profileId));
+    const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin='N' AND u.IsSuspended='N' AND p.Username LIKE ? order by p.Username limit 500`;
+    const values = [`${searchText}%`];
     const searchData = await executeQuery(query, values);
-    console.log(searchData, profileIds);
+    console.log(searchData);
 
     return searchData;
   } else {
@@ -109,7 +109,7 @@ featuredChannels.getUsersByUsername = async function (searchText) {
 
 featuredChannels.getChannelByUserId = async function (id) {
   const query =
-    "select f.* from featured_channels as f left join profile as p on p.ID = f.profileid where f.profileid in(p.Id) and p.UserID = ? and feature = 'Y';";
+    "select f.* from featured_channels as f left join profile as p on p.ID = f.profileid where f.profileid in(p.ID) and p.UserID = ? and feature = 'Y';";
   const value = [id];
   const channels = await executeQuery(query, value);
   console.log(channels);
@@ -119,23 +119,28 @@ featuredChannels.getChannelByUserId = async function (id) {
 };
 
 featuredChannels.CreateSubAdmin = async function (data, result) {
-  console.log(data);
-
-  const query = `select u.Email,u.Username from users as u left join profile as p on u.Id = p.UserID where p.ID = ${data.profileId} `;
-  const user = await executeQuery(query);
-  console.log("user", user);
-  const userData = {
-    Username: user[0].Username,
-    Email: user[0].Email,
-  };
-  await channelNotificationEmail(userData);
-  db.query("insert into channelAdmins set ?", data, function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res.insertId);
-    }
-  });
+  const query1 = `select * from channelAdmins where profileId = ${data.profileId} and channelId = ${data.channelId}`;
+  const sameChannel = await executeQuery(query1);
+  if (!sameChannel.length > 0) {
+    console.log(data);
+    const query = `select u.Email,u.Username from users as u left join profile as p on u.Id = p.UserID where p.ID = ${data.profileId} `;
+    const user = await executeQuery(query);
+    console.log("user", user);
+    const userData = {
+      Username: user[0].Username,
+      Email: user[0].Email,
+    };
+    await channelNotificationEmail(userData);
+    db.query("insert into channelAdmins set ?", data, function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res.insertId);
+      }
+    });
+  } else {
+    result("Already assigned", null);
+  }
 };
 featuredChannels.getPostDetails = async function (id) {
   const query =
@@ -157,6 +162,15 @@ featuredChannels.approveChannels = async function (id, feature) {
   }
 };
 
+featuredChannels.getChannelsByProfileId = async function (id) {
+  const query = `select f.* from featured_channels as f LEFT JOIN channelAdmins AS ca ON ca.channelId = f.id left join profile as p on p.ID = ca.profileId where ca.profileId in(p.ID) and p.UserID = ?;`;
+  const values = [id];
+  const channels = await executeQuery(query, values);
+  if (channels) {
+    return channels;
+  }
+};
+
 featuredChannels.createChannel = async function (reqBody) {
   const query1 = "select * from featured_channels where unique_link = ?";
   const value = [reqBody.unique_link];
@@ -171,6 +185,19 @@ featuredChannels.createChannel = async function (reqBody) {
     }
   } else {
     return [];
+  }
+};
+featuredChannels.editChannel = async function (data, id) {
+  try {
+    const query = `UPDATE featured_channels SET ? WHERE id = ?`;
+    const values = [data, id];
+    const channel = await executeQuery(query, values);
+    if (channel) {
+      return channel;
+    }
+  } catch (error) {
+    console.error("Error updating channel:", error);
+    return error;
   }
 };
 

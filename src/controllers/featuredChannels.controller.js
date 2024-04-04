@@ -84,6 +84,7 @@ exports.CreateSubAdmin = function (req, res) {
   const data = { ...req.body };
   featuredChannels.CreateSubAdmin(data, function (err, result) {
     if (err) {
+      console.log(err);
       return utils.send500(res, err);
     } else {
       return res.json({
@@ -123,6 +124,24 @@ exports.channelsApprove = async function (req, res) {
   }
 };
 
+exports.getChannelsByProfileId = async function (req, res) {
+  const { id } = req.params;
+  console.log(id);
+  const channels = await featuredChannels.getChannelsByProfileId(id);
+  console.log(channels);
+  if (channels) {
+    res.send({
+      error: false,
+      data: channels,
+    });
+  } else {
+    res.status(404).send({
+      error: true,
+      message: "channel not found",
+    });
+  }
+};
+
 exports.createChannel = async function (req, res) {
   const data = new featuredChannels({ ...req.body });
   data.feature = data.feature === true ? "Y" : "N";
@@ -139,6 +158,27 @@ exports.createChannel = async function (req, res) {
     }
   } else {
     utils.send404(res, (err = { message: "data not found" }));
+  }
+};
+
+exports.editChannel = async function (req, res) {
+  try {
+    const data = new featuredChannels({ ...req.body });
+    const { id } = req.params;
+    if (data && id) {
+      const channel = await featuredChannels.editChannel(data, id);
+      if (channel) {
+        res
+          .status(200)
+          .send({ error: false, message: "edit channel successfully!" });
+      } else {
+        res
+          .status(500)
+          .send({ error: true, message: "some thing went wrong!" });
+      }
+    }
+  } catch (error) {
+    res.send(error);
   }
 };
 
