@@ -2,6 +2,7 @@ const Community = require("../models/community.model");
 const User = require("../models/user.model");
 const utils = require("../helpers/utils");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
+const Profile = require("../models/profile.model");
 
 // Admin Api //
 exports.findAllCommunity = async function (req, res) {
@@ -47,10 +48,17 @@ exports.createCommunity = async function (req, res) {
   } else {
     const communityData = new Community(req.body);
     console.log(communityData);
-    Community.create(communityData, function (err, community) {
+    Community.create(communityData, async function (err, community) {
       if (err) {
         return utils.send500(res, err);
       } else {
+        const adminData = await User.findAdmin();
+        const [userData] = await Profile.FindById(communityData.profileId);
+        const adminEmail = adminData?.Email;
+        const userName = userData?.Username;
+        if (adminEmail) {
+          await utils.channelCreationMail(adminEmail, userName);
+        }
         return res.json({
           error: false,
           message: "Your community will be approve by admin",

@@ -471,4 +471,11 @@ User.setPassword = async function (user_id, password) {
   return user;
 };
 
+User.findAdmin = async function () {
+  const query = `SELECT Email FROM users WHERE AccountType = 'admin'`;
+  const [user] = await executeQuery(query);
+  console.log(user);
+  return user;
+};
+
 module.exports = User;

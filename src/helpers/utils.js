@@ -164,6 +164,20 @@ exports.communityApproveEmail = async (profileId, isApprove) => {
   }
 };
 
+exports.channelCreationMail = async (adminMail, userName) => {
+  let redirectUrl = "https://admin.freedom.buzz/community";
+  let msg = `${userName} has create community on Freedom.buzz.`;
+  const mailObj = {
+    email: adminMail,
+    subject: "New community registered",
+    root: "../email-templates/notification.ejs",
+    templateData: { name: "Admin", msg: msg, url: redirectUrl },
+  };
+
+  await email.sendMail(mailObj);
+  return;
+};
+
 exports.executeQuery = async (query, values = []) => {
   return new Promise((resolve, reject) => {
     db.query(query, values, function (err, result) {
