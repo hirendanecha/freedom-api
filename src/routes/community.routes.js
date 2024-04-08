@@ -5,6 +5,7 @@ const utilsController = require("../controllers/utils.controller");
 const authorize = require("../middleware/authorize");
 
 router.get("/bySlug/:slug", communityController.findCommunityBySlug);
+router.get("/get-link/:id", communityController.getLink);
 router.use(authorize.authorization);
 router.get("/", communityController.getCommunity);
 router.get(
@@ -20,7 +21,6 @@ router.get(
   "/joined-community/:id",
   communityController.getJoinedCommunityByProfileId
 );
-router.get("/get-link/:id", communityController.getLink);
 router.get("/status/:id", communityController.approveCommunity);
 router.get("/change-user-type/:id", communityController.changeAccountType);
 router.get("/files/:folder/:id", utilsController.getFiles);
