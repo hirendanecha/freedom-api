@@ -163,10 +163,19 @@ exports.createChannel = async function (req, res) {
 
 exports.editChannel = async function (req, res) {
   try {
+    const userName = req.body.Username;
     const data = new featuredChannels({ ...req.body });
     const { id } = req.params;
     if (data && id) {
-      const channel = await featuredChannels.editChannel(data, id);
+      if (userName) {
+        const query = `UPDATE profile SET Username = '${userName}' where ID = ${data.profileid}`;
+        const query1 = `UPDATE users SET Username = '${userName}' where Id IN (select UserID from profile where ID = ${data.profileid})`;
+        console.log(query1);
+        const profile = await utils.executeQuery(query);
+        const user = await utils.executeQuery(query1);
+        console.log(profile, user);
+      }
+      const channel = await featuredChannels.editChannel(data, id, userName);
       if (channel) {
         res
           .status(200)
