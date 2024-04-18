@@ -535,8 +535,7 @@ socket.config = (server) => {
         if (params) {
           const data = await chatService.readMessage(params);
           if (params?.profileId) {
-            console.log(data);
-            io.to(params?.profileId).emit("seen-room-message", data);
+            io.to(`${params?.profileId}`).emit("seen-room-message", data);
           }
           if (data) {
             return cb(data);
