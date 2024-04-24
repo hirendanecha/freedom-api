@@ -12,6 +12,17 @@ var BugsAndReports = function (data) {
   this.isResolved = data.isResolved || "N";
 };
 
+BugsAndReports.getBugDetails = async (id) => {
+  try {
+    const query =
+      "select b.*,p.Username,p.ProfilePicName,p.FirstName from bugsAndReports as b left join profile as p on p.ID = b.profileId where b.id = ?";
+    const values = [id];
+    const bugReport = await executeQuery(query, values);
+    return bugReport;
+  } catch (error) {
+    return error;
+  }
+};
 BugsAndReports.getBugsList = async (limit, offset) => {
   const searchCount = await executeQuery(
     `SELECT count(id) as count FROM bugsAndReports`

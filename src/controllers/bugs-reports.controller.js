@@ -7,6 +7,15 @@ const {
   executeQuery,
 } = require("../helpers/fn");
 
+exports.getBugDetails = async (req, res) => {
+  const { id } = req.params;
+  const data = await BugsAndReports.getBugDetails(id);
+  if (data) {
+    return res.send(data);
+  } else {
+    return res.send({ error: true, message: "No data found" });
+  }
+};
 exports.getBugsList = async (req, res) => {
   const { page, size } = req.body;
   const { limit, offset } = getPagination(page, size);
