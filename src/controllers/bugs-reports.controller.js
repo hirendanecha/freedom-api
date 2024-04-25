@@ -41,8 +41,8 @@ exports.addBugReports = async (req, res) => {
 };
 exports.updateBugsStatus = async (req, res) => {
   try {
-    const { id, profileId } = req.body;
-    const bugId = await BugsAndReports.updateBugsStatus(id, profileId);
+    const { id, profileId, isResolved } = req.body;
+    const bugId = await BugsAndReports.updateBugsStatus(id, profileId,isResolved);
     if (bugId) {
       return res.send({
         id: bugId,

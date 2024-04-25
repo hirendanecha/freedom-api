@@ -52,8 +52,8 @@ BugsAndReports.addBugsReports = async (data) => {
 
 BugsAndReports.updateBugsStatus = async (id, profileId) => {
   try {
-    const query = "update bugsAndReports set isResolved = 'Y' where id = ?";
-    const values = id;
+    const query = "update bugsAndReports set isResolved = ? where id = ?";
+    const values = [isResolved, id];
     const bugs = await executeQuery(query, values);
     if (bugs) {
       if (profileId) {
