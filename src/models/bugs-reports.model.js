@@ -50,7 +50,7 @@ BugsAndReports.addBugsReports = async (data) => {
   }
 };
 
-BugsAndReports.updateBugsStatus = async (id, profileId) => {
+BugsAndReports.updateBugsStatus = async (id, profileId, isResolved) => {
   try {
     const query = "update bugsAndReports set isResolved = ? where id = ?";
     const values = [isResolved, id];
