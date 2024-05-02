@@ -222,7 +222,7 @@ featuredChannels.getChannelVideos = async function (channelId, limit, offset) {
 featuredChannels.getVideos = async function (channelId, limit, offset) {
   const whereCondition = channelId
     ? `p.posttype = 'V' and p.streamname is not null and p.channelId != ${channelId}`
-    : "p.posttype = 'V' and p.streamname is not null";
+    : "p.posttype = 'V' and p.streamname is not null and p.channelId is not null";
   const searchCount = await executeQuery(
     `SELECT count(id) as count FROM posts as p WHERE ${whereCondition}`
   );
