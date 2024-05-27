@@ -83,7 +83,7 @@ exports.supportContact = async (req, res) => {
     console.log(data);
     let msg = `${data.description}`;
     const mailObj = {
-      email: "sra.opash@gmail.com",
+      email: adminMail,
       subject: "New Contact has been registered",
       root: "../email-templates/support-contact.ejs",
       templateData: {
