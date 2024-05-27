@@ -19,6 +19,7 @@ const environment = {
   DB_PASS: process.env.PASSWORD,
   DB_NAME: process.env.DATABASE,
   DB_USER: process.env.USER,
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL
 };
 
 module.exports = environment;

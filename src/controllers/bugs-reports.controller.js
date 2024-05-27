@@ -6,6 +6,8 @@ const {
   getPaginationData,
   executeQuery,
 } = require("../helpers/fn");
+const environment = require("../environments/environment");
+const ejsEmail = require("../helpers/email");
 
 exports.getBugDetails = async (req, res) => {
   const { id } = req.params;
@@ -42,7 +44,11 @@ exports.addBugReports = async (req, res) => {
 exports.updateBugsStatus = async (req, res) => {
   try {
     const { id, profileId, isResolved } = req.body;
-    const bugId = await BugsAndReports.updateBugsStatus(id, profileId,isResolved);
+    const bugId = await BugsAndReports.updateBugsStatus(
+      id,
+      profileId,
+      isResolved
+    );
     if (bugId) {
       return res.send({
         id: bugId,
@@ -63,6 +69,33 @@ exports.deleteBugs = async (req, res) => {
         message: "report deleted successfully",
       });
     }
+  } catch (error) {
+    return res.send({ error: true, message: error });
+  }
+};
+exports.supportContact = async (req, res) => {
+  try {
+    const data = req.body;
+    const adminMail = environment.ADMIN_EMAIL;
+    const name = data?.name;
+    const email = data?.email;
+    const media = data?.media || null;
+    console.log(data);
+    let msg = `${data.description}`;
+    const mailObj = {
+      email: "sra.opash@gmail.com",
+      subject: "New Contact has been registered",
+      root: "../email-templates/support-contact.ejs",
+      templateData: {
+        name: name,
+        email: email,
+        media: media,
+        msg: msg,
+      },
+      // url: redirectUrl,
+    };
+    await ejsEmail.sendMail(mailObj);
+    return res.send({ error: false, message: "Email sent successfully" });
   } catch (error) {
     return res.send({ error: true, message: error });
   }
