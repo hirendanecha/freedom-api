@@ -89,6 +89,12 @@ exports.readGroupMessage = async function (data) {
 exports.resendRoom = async function (data) {
   return await resendRoom(data);
 };
+exports.userStatus = async function (id) {
+  return await userStatus(id);
+};
+exports.changeUserStatus = async function (data) {
+  return await changeUserStatus(data);
+};
 
 const getChatList = async function (params) {
   try {
@@ -907,6 +913,30 @@ const resendRoom = async function (params) {
     } else {
       return { data };
     }
+  } catch (error) {
+    return error;
+  }
+};
+
+const userStatus = async function (id) {
+  try {
+    const query = `select userStatus from profile where ID = ${id}`;
+    const [status] = await executeQuery(query);
+    return status.userStatus;
+  } catch (error) {
+    return error;
+  }
+};
+
+const changeUserStatus = async function (params) {
+  try {
+    const query = `update profile set userStatus = '${params.status}' where ID = ${params.id}`;
+    await executeQuery(query);
+    const data = {
+      status: params.status,
+      id: params.id,
+    };
+    return data;
   } catch (error) {
     return error;
   }
