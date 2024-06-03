@@ -48,6 +48,7 @@ User.login = function (email, Id, result) {
             p.DefaultUniqueLink,
             p.UniqueLink,
             p.AccountType,
+            p.userStatus,
             cm.communityId
      FROM users as u left join profile as p on p.UserID = u.Id AND p.AccountType in ('I','M') left join communityMembers as cm on cm.profileId = p.ID WHERE u.Email = ? OR u.Username = ? AND u.Id = ?`,
     [email, email, Id],

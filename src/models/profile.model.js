@@ -94,7 +94,8 @@ Profile.FindById = async function (profileId) {
     CreatedOn,
     AccountType,
     MediaApproved,
-    County
+    County,
+    userStatus
   FROM profile WHERE ID=?`;
   const values = profileId;
   let profile = await executeQuery(query, values);
