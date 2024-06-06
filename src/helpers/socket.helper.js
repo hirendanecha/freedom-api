@@ -962,6 +962,7 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.changeUserStatus(params);
+          io.to(`${socket.user?.id}`).emit("notification", data?.notification);
           if (cb) {
             return cb(data);
           }
