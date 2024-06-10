@@ -499,3 +499,16 @@ exports.verifyToken = async function (req, res) {
     res.status(401).json({ message: "Invalid token", verifiedToken: false });
   }
 };
+
+exports.getStats = async function (req, res) {
+  console.log("innn");
+  const countryCode = req?.query?.countryCode;
+  if (countryCode) {
+    const states = await User.getStats(countryCode);
+    if (states) {
+      res.json(states);
+    } else {
+      res.status(404).send({ message: "not found" });
+    }
+  }
+};

@@ -12,6 +12,7 @@ router.get("/zip/:zip", userController.getZipData);
 router.get("/profile/:id", profileController.FindProfieById);
 router.get("/verify-token/:token", userController.verifyToken);
 router.post("/forgot-password", userController.forgotPassword);
+router.get("/states", userController.getStats);
 router.use(authorize.authorization);
 router.post("/", userController.findAll);
 router.get("/get", userController.getAll);
