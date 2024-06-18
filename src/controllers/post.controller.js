@@ -67,7 +67,7 @@ exports.createPost = async function (req, res) {
 
 exports.uploadVideo = async function (req, res) {
   console.log("req file ==>", req.file);
-
+  const { roomId, groupId } = req.query;
   const url = await s3.uploadFileToWasabi(
     req.file,
     req.file?.originalname.replace(" ", "-")
@@ -77,6 +77,8 @@ exports.uploadVideo = async function (req, res) {
     return res.json({
       error: false,
       url: url,
+      roomId: +roomId || null,
+      groupId: +groupId || null,
     });
   } else {
     return utils.send500(res, err);
