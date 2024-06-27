@@ -103,40 +103,43 @@ exports.getMessages = async function (data) {
 
 const getChatList = async function (params) {
   try {
-    // const query = `select r.id as roomId,count(m.id) as unReadMessage ,r.profileId1 as createdBy, r.isAccepted,p.ID as profileId,p.Username,p.FirstName,p.lastName,p.ProfilePicName from chatRooms as r join profile as p on p.ID = CASE
-    //               WHEN r.profileId1 = ${params.profileId} THEN r.profileId2
-    //               WHEN r.profileId2 = ${params.profileId} THEN r.profileId1
-    //               END left join messages as m on m.roomId = roomId and m.sentBy != ${params.profileId} and m.isRead = 'N' where r.profileId1 = ? or r.profileId2 = ? order by roomId`;
+    console.log("chatList==>", params);
     const query = `SELECT
-                  r.id AS roomId,
-                  COUNT(CASE WHEN m.id IS NOT NULL THEN 1 END) AS unReadMessage,
-                  r.profileId1 AS createdBy,
-                  r.isAccepted,
-                  r.lastMessageText,
-                  r.updatedDate,
-                  r.createdDate,
-                  r.isDeleted,
-                  p.ID AS profileId,
-                  p.Username,
-                  p.FirstName,
-                  p.LastName,
-                  p.ProfilePicName
-FROM
-    chatRooms AS r
-JOIN
-    profile AS p ON p.ID = CASE
-        WHEN r.profileId1 = ${params.profileId} THEN r.profileId2
-        WHEN r.profileId2 = ${params.profileId} THEN r.profileId1
-    END
-LEFT JOIN
-    messages AS m ON m.roomId = r.id AND m.sentBy != ${params.profileId} AND m.isRead = 'N'
-WHERE
-    (r.profileId1 = ? OR r.profileId2 = ?) AND r.isDeleted = 'N'
-GROUP BY
-    r.id, r.profileId1, r.isAccepted,r.updatedDate, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
-ORDER BY
-r.updatedDate desc;`;
-    const values = [params.profileId, params.profileId];
+                      r.id AS roomId,
+                      COUNT(m.id) AS unReadMessage,
+                      r.profileId1 AS createdBy,
+                      r.isAccepted,
+                      r.lastMessageText,
+                      r.updatedDate,
+                      r.createdDate,
+                      r.isDeleted,
+                      p.ID AS profileId,
+                      p.Username,
+                      p.FirstName,
+                      p.LastName,
+                      p.ProfilePicName
+                   FROM
+                      chatRooms AS r
+                   JOIN
+                      profile AS p ON p.ID = CASE
+                          WHEN r.profileId1 = ? THEN r.profileId2
+                          WHEN r.profileId2 = ? THEN r.profileId1
+                      END
+                   LEFT JOIN
+                      messages AS m ON m.roomId = r.id AND m.sentBy != ? AND m.isRead = 'N'
+                   WHERE
+                      (r.profileId1 = ? OR r.profileId2 = ?) AND r.isDeleted = 'N'
+                   GROUP BY
+                      r.id, r.profileId1, r.isAccepted, r.updatedDate, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
+                   ORDER BY
+                      r.updatedDate DESC;`;
+    const values = [
+      params.profileId,
+      params.profileId,
+      params.profileId,
+      params.profileId,
+      params.profileId,
+    ];
     const chatList = await executeQuery(query, values);
     return chatList;
   } catch (error) {

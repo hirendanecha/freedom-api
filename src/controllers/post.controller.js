@@ -5,6 +5,7 @@ const og = require("open-graph");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 // const socket = require("../helpers/socket.helper");
 const io = require("socket.io-client");
+const util = require("util");
 
 exports.findAll = async function (req, res) {
   const postData = await Post.findAll(req.body);
@@ -100,19 +101,32 @@ exports.uploadVideo = async function (req, res) {
   // }
 };
 
-exports.getMeta = function (req, res) {
-  const url = req.body.url;
-  console.log(url);
-  if (url) {
-    og(url, function (err, meta) {
+const ogPromise = (url) =>
+  new Promise((resolve, reject) => {
+    og(url, (err, meta) => {
       if (err) {
-        return utils.send500(res, err);
+        reject(err);
       } else {
-        return res.json({
-          meta,
-        });
+        resolve(meta);
       }
     });
+  });
+
+exports.getMeta = async function (req, res) {
+  const url = req.body.url;
+  console.log(url);
+  try {
+    if (url) {
+      const meta = await ogPromise(url);
+      console.log("meta===>", meta);
+      if (meta) {
+        return res.json({ meta });
+      }
+      return res.json({});
+    }
+  } catch (error) {
+    console.error(error);
+    return utils.send500(res, error);
   }
 };
 
