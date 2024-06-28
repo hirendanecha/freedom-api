@@ -668,7 +668,7 @@ const declineCall = async function (params) {
         roomId: params?.roomId,
         notificationByProfileId: params?.notificationByProfileId || null,
         actionType: "DC",
-        msg: "Declined call..",
+        msg: params.message || "call decline...",
       };
       const notification = await createNotification(data);
       return notification;
