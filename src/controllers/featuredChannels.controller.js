@@ -61,13 +61,26 @@ exports.getUsersByUsername = async function (req, res) {
 
 exports.getChannelById = async function (req, res) {
   const name = req.params.name;
+  const profileId = req.query.profileId;
   console.log(name);
   const data = await featuredChannels.getChannelById(name);
   if (data) {
+    if (profileId) {
+      const isSubscribed = await findSubscribers(profileId, data.id);
+      console.log(isSubscribed);
+      data.isSubscribed = isSubscribed;
+    }
     res.send({ data });
   } else {
     utils.send404(res, (err = { message: "data not found" }));
   }
+};
+
+const findSubscribers = async (profileId, channelId) => {
+  const query = `select count(Id) as subscribers from subscribe_channel where ProfileId = ${profileId} and SubscribeChannelId = ${channelId}`;
+  const [subscribers] = await utils.executeQuery(query);
+  const isSubscribed = subscribers.subscribers > 0 ? true : false;
+  return isSubscribed;
 };
 exports.getChannelByUserId = async function (req, res) {
   const id = req.params.id;
@@ -97,9 +110,18 @@ exports.CreateSubAdmin = function (req, res) {
 
 exports.getPostDetails = async function (req, res) {
   const { id } = req.params;
+  const { profileId } = req.query;
+
   console.log(id);
-  const data = await featuredChannels.getPostDetails(id);
+  console.log(profileId);
+  const data = await featuredChannels.getPostDetails(id, profileId);
   if (data) {
+    console.log("isSubscribed", data);
+    if (profileId) {
+      const isSubscribed = await findSubscribers(profileId, data[0].channelId);
+      console.log(isSubscribed);
+      data[0]["isSubscribed"] = isSubscribed;
+    }
     res.send(data);
   } else {
     utils.send404(res, (err = { message: "data not found" }));
@@ -205,9 +227,9 @@ exports.getChannelVideos = async function (req, res) {
 };
 
 exports.getVideos = async function (req, res) {
-  const { id, page, size } = req?.body;
+  const { id, page, size, profileId } = req?.body;
   const { limit, offset } = getPagination(page, size);
-  const posts = await featuredChannels.getVideos(id, limit, offset);
+  const posts = await featuredChannels.getVideos(id, limit, offset, profileId);
   if (posts.data) {
     res.send(
       getPaginationData({ count: posts.count, docs: posts.data }, page, limit)

@@ -333,13 +333,18 @@ const createNotification = async function (params) {
     notificationByProfileId,
     actionType,
     commentId,
+    channelId,
   } = params;
   const query =
     "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
   const values = [notificationByProfileId];
   const userData = await executeQuery(query, values);
   let desc = "";
-  if (commentId && actionType === "L") {
+  if (channelId) {
+    desc = `${
+      userData[0]?.Username || userData[0]?.FirstName
+    } has subscribed your channel`;
+  } else if (commentId && actionType === "L") {
     desc = `${
       userData[0]?.Username || userData[0]?.FirstName
     } liked your Comment.`;

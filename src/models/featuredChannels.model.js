@@ -57,10 +57,8 @@ featuredChannels.searchAllData = async (search) => {
   const query = `select * from featured_channels where firstname like '%${search}%' or unique_link like '%${search}%'`;
   const channels = await executeQuery(query);
   const query1 = `select p.* ,pr.Username,pr.ProfilePicName,pr.FirstName,pr.LastName,fc.firstname as channelName from posts as p left join profile as pr on p.profileid = pr.ID left join featured_channels as fc on fc.id = p.channelId WHERE p.posttype = 'V' and p.isdeleted = "N" and (p.videoduration is not NULL or p.videoduration != 0 or p.videoduration != "0" ) and (p.postdescription like '%${search}%' or p.keywords like '%${search}%' or p.title like '%${search}%') order by p.id desc`;
-  console.log("query1: ", query1);
   const value1 = [search, search];
   const posts = await executeQuery(query1);
-  //console.log(channels, posts);
   return { channels, posts };
 };
 
@@ -69,7 +67,6 @@ featuredChannels.getChannelById = async function (name) {
     "select * from featured_channels where profileid = ? or unique_link = ?";
   const value = [name, name];
   const channels = await executeQuery(query, value);
-  console.log(channels);
   if (channels) {
     return channels;
   }
@@ -99,7 +96,6 @@ featuredChannels.getUsersByUsername = async function (searchText) {
     const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin='N' AND u.IsSuspended='N' AND p.Username LIKE ? order by p.Username limit 500`;
     const values = [`${searchText}%`];
     const searchData = await executeQuery(query, values);
-    console.log(searchData);
 
     return searchData;
   } else {
@@ -112,7 +108,6 @@ featuredChannels.getChannelByUserId = async function (id) {
     "select f.* from featured_channels as f left join profile as p on p.ID = f.profileid where f.profileid in(p.ID) and p.UserID = ? and feature = 'Y';";
   const value = [id];
   const channels = await executeQuery(query, value);
-  console.log(channels);
   if (channels) {
     return channels;
   }
@@ -122,10 +117,8 @@ featuredChannels.CreateSubAdmin = async function (data, result) {
   const query1 = `select * from channelAdmins where profileId = ${data.profileId} and channelId = ${data.channelId}`;
   const sameChannel = await executeQuery(query1);
   if (!sameChannel.length > 0) {
-    console.log(data);
     const query = `select u.Email,u.Username from users as u left join profile as p on u.Id = p.UserID where p.ID = ${data.profileId} `;
     const user = await executeQuery(query);
-    console.log("user", user);
     const userData = {
       Username: user[0].Username,
       Email: user[0].Email,
@@ -142,12 +135,11 @@ featuredChannels.CreateSubAdmin = async function (data, result) {
     result("Already assigned", null);
   }
 };
-featuredChannels.getPostDetails = async function (id) {
+featuredChannels.getPostDetails = async function (id, profileId) {
   const query =
-    "select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created,fc.id as channelId from posts as p left join featured_channels as fc on fc.id = p.channelId where p.id = ?";
-  const values = [id];
+    "select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created,fc.id as channelId, pl.ActionType as react from posts as p left join postlikedislike as pl on pl.ProfileID = ? left join featured_channels as fc on fc.id = p.channelId where p.id = ?";
+  const values = [profileId, id];
   const channels = await executeQuery(query, values);
-  console.log(channels);
   if (channels) {
     return channels;
   }
@@ -175,7 +167,6 @@ featuredChannels.createChannel = async function (reqBody) {
   const query1 = "select * from featured_channels where unique_link = ?";
   const value = [reqBody.unique_link];
   const oldchannels = await executeQuery(query1, value);
-  console.log("oldchannels", oldchannels);
   if (!oldchannels.length) {
     const query = "insert into featured_channels set ?";
     const values = [reqBody];
@@ -226,7 +217,10 @@ featuredChannels.getVideos = async function (channelId, limit, offset) {
   const searchCount = await executeQuery(
     `SELECT count(id) as count FROM posts as p WHERE ${whereCondition}`
   );
-  const query = `select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created from posts as p left join featured_channels as fc on fc.id = p.channelId where ${whereCondition} order by postcreationdate desc limit ? offset ? `;
+  const orderBy = `order by p.channelId in (SELECT SubscribeChannelId from subscribe_channel where ProfileId= ${profileId}) and p.postdescription desc`;
+  const query = `select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created from posts as p left join featured_channels as fc on fc.id = p.channelId where ${whereCondition} ${
+    profileId ? orderBy : "order by p.postdescription desc"
+  } limit ? offset ? limit ? offset ? `;
   const values = [limit, offset];
   const posts = await executeQuery(query, values);
   if (posts) {
@@ -255,7 +249,6 @@ featuredChannels.updateChannleFeature = function (feature, id, result) {
         console.log(err);
         result(err, null);
       } else {
-        console.log(res);
         result(null, res);
       }
     }
