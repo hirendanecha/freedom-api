@@ -210,22 +210,14 @@ featuredChannels.getChannelVideos = async function (channelId, limit, offset) {
   }
 };
 
-featuredChannels.getVideos = async function (
-  channelId,
-  limit,
-  offset,
-  profileId
-) {
+featuredChannels.getVideos = async function (channelId, limit, offset) {
   const whereCondition = channelId
     ? `p.posttype = 'V' and p.streamname is not null and p.channelId != ${channelId}`
     : "p.posttype = 'V' and p.streamname is not null and p.channelId is not null";
   const searchCount = await executeQuery(
     `SELECT count(id) as count FROM posts as p WHERE ${whereCondition}`
   );
-  const orderBy = `order by p.channelId in (SELECT SubscribeChannelId from subscribe_channel where ProfileId = ${profileId}) and p.postdescription desc`;
-  const query = `select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created from posts as p left join featured_channels as fc on fc.id = p.channelId where ${whereCondition} ${
-    profileId ? orderBy : "order by p.postdescription desc"
-  } limit ? offset ? `;
+  const query = `select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created from posts as p left join featured_channels as fc on fc.id = p.channelId where ${whereCondition} order by postcreationdate desc limit ? offset ? `;
   const values = [limit, offset];
   const posts = await executeQuery(query, values);
   if (posts) {

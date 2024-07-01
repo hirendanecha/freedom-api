@@ -227,9 +227,9 @@ exports.getChannelVideos = async function (req, res) {
 };
 
 exports.getVideos = async function (req, res) {
-  const { id, page, size, profileId } = req?.body;
+  const { id, page, size } = req?.body;
   const { limit, offset } = getPagination(page, size);
-  const posts = await featuredChannels.getVideos(id, limit, offset, profileId);
+  const posts = await featuredChannels.getVideos(id, limit, offset);
   if (posts.data) {
     res.send(
       getPaginationData({ count: posts.count, docs: posts.data }, page, limit)
