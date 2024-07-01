@@ -115,12 +115,11 @@ exports.getPostDetails = async function (req, res) {
   console.log(id);
   console.log(profileId);
   const data = await featuredChannels.getPostDetails(id, profileId);
+  console.log("isSubscribed===>", data);
   if (data) {
-    console.log("isSubscribed", data);
     if (profileId) {
-      const isSubscribed = await findSubscribers(profileId, data[0].channelId);
-      console.log(isSubscribed);
-      data[0]["isSubscribed"] = isSubscribed;
+      const isSubscribed = await findSubscribers(profileId, data[0]?.channelId);
+      data[0]["isSubscribed"] = isSubscribed || false;
     }
     res.send(data);
   } else {

@@ -136,8 +136,12 @@ featuredChannels.CreateSubAdmin = async function (data, result) {
   }
 };
 featuredChannels.getPostDetails = async function (id, profileId) {
-  const query =
-    "select p.*,fc.firstname,fc.unique_link,fc.profile_pic_name,fc.created,fc.id as channelId, pl.ActionType as react from posts as p left join postlikedislike as pl on pl.ProfileID = ? left join featured_channels as fc on fc.id = p.channelId where p.id = ?";
+  const query = `SELECT p.*, fc.firstname, fc.unique_link, fc.profile_pic_name, fc.created, fc.id AS channelId, MAX(pl.ActionType) AS react
+FROM posts AS p 
+LEFT JOIN postlikedislike AS pl ON pl.ProfileID = ? 
+LEFT JOIN featured_channels AS fc ON fc.id = p.channelId 
+WHERE p.id = ?
+GROUP BY p.id, fc.firstname, fc.unique_link, fc.profile_pic_name, fc.created, fc.id;`;
   const values = [profileId, id];
   const channels = await executeQuery(query, values);
   if (channels) {
