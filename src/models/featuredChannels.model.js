@@ -138,7 +138,7 @@ featuredChannels.CreateSubAdmin = async function (data, result) {
 featuredChannels.getPostDetails = async function (id, profileId) {
   const query = `SELECT p.*, fc.firstname, fc.unique_link, fc.profile_pic_name, fc.created, fc.id AS channelId, MAX(pl.ActionType) AS react
 FROM posts AS p 
-LEFT JOIN postlikedislike AS pl ON pl.ProfileID = ?
+LEFT JOIN postlikedislike AS pl ON pl.ProfileID = ? and
 pl.PostID = ?
 LEFT JOIN featured_channels AS fc ON fc.id = p.channelId 
 WHERE p.id = ?
