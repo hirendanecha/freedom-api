@@ -738,7 +738,7 @@ const createGroups = async function (params) {
             groupId: params?.groupId,
             profileId: id,
           };
-          if (!params.isUpdate) {
+          if (params.isUpdate) {
             const memberId = await addMembers(data);
           }
           // if (memberId) {
@@ -750,8 +750,8 @@ const createGroups = async function (params) {
             groupId: params?.groupId,
             msg: `${
               params?.isUpdate
-                ? "changed group details"
-                : "added you in chat group"
+                ? "added you in chat group"
+                : "changed group details"
             }`,
           });
 
