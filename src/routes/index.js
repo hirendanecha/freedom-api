@@ -17,6 +17,7 @@ const featuredChannels = require("./featured-channels.routes");
 const messageRouter = require("./message.routes");
 const bugsAndReports = require("./bugs-reports.routes");
 const subscribeChannelRouter = require("./subscribeChannel.routes");
+const advertizementRouter = require("./advertizment.routes");
 
 router.use("/login", authRoutes);
 router.use("/admin", adminRouter);
@@ -35,5 +36,6 @@ router.use("/channels", featuredChannels);
 router.use("/messages", messageRouter);
 router.use("/bugs-reports", bugsAndReports);
 router.use("/subscribe", subscribeChannelRouter);
+router.use("/advertizement", advertizementRouter);
 
 module.exports = router;
