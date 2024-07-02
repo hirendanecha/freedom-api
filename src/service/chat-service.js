@@ -103,7 +103,6 @@ exports.getMessages = async function (data) {
 
 const getChatList = async function (params) {
   try {
-    console.log("chatList==>", params);
     const query = `SELECT
                       r.id AS roomId,
                       COUNT(m.id) AS unReadMessage,
@@ -760,7 +759,6 @@ const createGroups = async function (params) {
         }
       } else {
         groupList = await getGroup(params);
-        console.log("getttt===>");
         return { groupList };
       }
       groupList = await getGroup(params);
