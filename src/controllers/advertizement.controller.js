@@ -28,3 +28,23 @@ exports.getAdvertizementList = function (req, res) {
     res.status(500).send(error);
   }
 };
+
+exports.deleteAdvertizement = function (req, res) {
+  try {
+    const { id } = req.params;
+    Advertizement.deleteAdvertizement(id)
+      .then((data) => {
+        res
+          .status(200)
+          .send({
+            error: false,
+            message: "Advertizement deleted successfully!",
+          });
+      })
+      .catch((error) => {
+        res.status(401).send(error);
+      });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};

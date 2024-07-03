@@ -41,4 +41,15 @@ Advertizement.getAdvertizementList = async () => {
   }
 };
 
+Advertizement.deleteAdvertizement = async (id) => {
+  try {
+    const list = await executeQuery(
+      `delete from advertizement where id = ${id}`
+    );
+    return ;
+  } catch (error) {
+    return error;
+  }
+};
+
 module.exports = Advertizement;
