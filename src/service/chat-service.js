@@ -648,10 +648,9 @@ const startCall = async function (params) {
         const notification = await createNotification(data);
         notification["link"] = params?.link;
         const query = `select p.Username,p.FirstName,p.LastName,p.ProfilePicName from profile as p where p.ID = ${params?.notificationByProfileId}`;
-        notification["Username"] = profile?.Username;
         const [profile] = await executeQuery(query);
-        const group = await getGroup({ groupId: params?.groupId });
-        console.log("groupDetails==>", group);
+        notification["Username"] = profile?.Username;
+        const group = await getGroup({ groupId: data.groupId });
         notification["ProfilePicName"] = group?.profileImage;
         notification["groupName"] = group?.groupName;
         return { notification };
