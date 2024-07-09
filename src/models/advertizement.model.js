@@ -5,6 +5,7 @@ const moment = require("moment");
 var Advertizement = function (params) {
   this.id = params?.id || null;
   this.imageUrl = params?.imageUrl;
+  this.link = params?.link;
   this.updatedDate = params.updatedDate || null;
 };
 
@@ -46,7 +47,7 @@ Advertizement.deleteAdvertizement = async (id) => {
     const list = await executeQuery(
       `delete from advertizement where id = ${id}`
     );
-    return ;
+    return;
   } catch (error) {
     return error;
   }
