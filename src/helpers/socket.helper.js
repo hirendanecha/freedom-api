@@ -692,23 +692,19 @@ socket.config = (server) => {
               console.log("in=========>");
               io.to(`${params.groupId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
-                if (data?.notification) {
-                  io.to(`${params.groupId}`).emit(
-                    "notification",
-                    data?.notification
-                  );
-                }
+                io.to(`${params.groupId}`).emit(
+                  "notification",
+                  data?.notification
+                );
               }
             } else {
               console.log("in=========>");
               io.to(`${params.roomId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
-                if (data?.notification) {
-                  io.to(`${params.roomId}`).emit(
-                    "notification",
-                    data?.notification
-                  );
-                }
+                io.to(`${params.roomId}`).emit(
+                  "notification",
+                  data?.notification
+                );
               }
             }
             // for (const key in data?.notifications) {
@@ -788,11 +784,11 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.createGroups(params);
-          if (params.profileIds.length > 0) {
-            for (const id of params.profileIds) {
-              socket.join(`${id}`);
-            }
-          }
+          // if (params.profileIds.length > 0) {
+          //   for (const id of params.profileIds) {
+          //     socket.join(`${id}`);
+          //   }
+          // }
           socket.join(`${data.groupId}`);
           if (data?.notifications) {
             for (const notification of data?.notifications) {
