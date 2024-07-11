@@ -734,7 +734,7 @@ const createGroups = async function (params) {
             groupId: params?.groupId,
             profileId: id,
           };
-          if (params.isUpdate) {
+          if (params.isNewGroup || params.isUpdate) {
             const memberId = await addMembers(data);
           }
           // if (memberId) {
