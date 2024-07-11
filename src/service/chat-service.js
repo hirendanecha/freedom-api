@@ -728,7 +728,7 @@ const createGroups = async function (params) {
 
       let notifications = [];
       let groupList = {};
-      if (params.profileIds.length > 0) {
+      if (params.profileIds.length >= 0) {
         for (const id of params.profileIds) {
           const data = {
             groupId: params?.groupId,
