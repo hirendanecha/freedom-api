@@ -114,7 +114,7 @@ Post.getAllPosts = async function (params) {
     whereCondition += `AND p.postcreationdate <= '${endDate}'`;
   }
   const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
-  const values = [profileId, limit, offset];
+  const values = [limit, offset];
   const postData = await executeQuery(query, values);
   // return postData;
   return getPaginationData(
