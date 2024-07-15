@@ -20,6 +20,14 @@ exports.getPostByProfileId = async function (req, res) {
   }
 };
 
+exports.getAllPosts = async function (req, res) {
+  console.log(req.body);
+  const postList = await Post.getAllPosts(req.body);
+  if (postList) {
+    res.send({ data: postList });
+  }
+};
+
 exports.getPostByPostId = function (req, res) {
   console.log(req.params.id);
   Post.getPostByPostId(req.params.id, function (err, post) {

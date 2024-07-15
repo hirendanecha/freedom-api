@@ -100,6 +100,33 @@ Post.getPostByProfileId = async function (params) {
     limit
   );
 };
+
+Post.getAllPosts = async function (params) {
+  const { page, size, startDate, endDate } = params;
+  const { limit, offset } = getPagination(page, size);
+  let whereCondition = "";
+  if (startDate && endDate) {
+    whereCondition += `AND p.postcreationdate >= '${startDate}' AND p.postcreationdate <= '${endDate}'`;
+    console.log(whereCondition);
+  } else if (startDate) {
+    whereCondition += `AND p.postcreationdate >= '${startDate}'`;
+  } else if (endDate) {
+    whereCondition += `AND p.postcreationdate <= '${endDate}'`;
+  }
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
+  const values = [profileId, limit, offset];
+  const postData = await executeQuery(query, values);
+  // return postData;
+  return getPaginationData(
+    {
+      count: postData.length,
+      docs: postData,
+    },
+    page,
+    limit
+  );
+};
+
 Post.getPostByPostId = function (profileId, result) {
   db.query(
     // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
@@ -180,20 +207,12 @@ Post.create = async function (postData) {
 };
 
 Post.delete = async function (id) {
-  // db.query("DELETE FROM posts WHERE id = ?", [id], function (err, res) {
-  //   if (err) {
-  //     console.log("error", err);
-  //     result(err, null);
-  //   } else {
-  //     console.log("Post deleted sucessfully", res);
-  //     result(null, res);
-  //   }
-  // });
-  const query = "DELETE FROM posts WHERE id = ?";
-  const query1 = "DELETE FROM comments WHERE postId = ?";
+  // const query = "DELETE FROM posts WHERE id = ?";
+  const query = "update posts set isdeleted = 'Y' WHERE id = ?";
+  // const query1 = "DELETE FROM comments WHERE postId = ?";
   const value = [id];
   const deletePost = await executeQuery(query, value);
-  const deleteComments = await executeQuery(query1, value);
+  // const deleteComments = await executeQuery(query1, value);
   return deletePost;
 };
 
@@ -251,7 +270,7 @@ Post.getPostComments = async function (profileId, postId) {
     const values = [profileId];
     const replyCommnetsList = await executeQuery(query, values);
     const countQuery = `select count(id) as count from comments where postId = '${postId}' `;
-    const [{count}] = await executeQuery(countQuery);
+    const [{ count }] = await executeQuery(countQuery);
     console.log(count, "comments count");
 
     return {

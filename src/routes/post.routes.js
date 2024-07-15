@@ -9,6 +9,7 @@ const authorize = require("../middleware/authorize");
 router.post("/", postController.findAll);
 router.get("/get/:id", postController.getPostByPostId);
 router.post("/comments/", postController.getPostComments);
+router.post("/get-all-posts", postController.getAllPosts);
 router.post("/get-my-post", postController.getPostByProfileId);
 router.post("/get-meta", postController.getMeta);
 router.use(authorize.authorization);
