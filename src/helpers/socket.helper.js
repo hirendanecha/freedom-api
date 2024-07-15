@@ -987,6 +987,25 @@ socket.config = (server) => {
         cb(error);
       }
     });
+
+    socket.on("check-room", async (params, cb) => {
+      logger.info("check-room", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "check-room",
+      });
+      try {
+        if (params) {
+          const data = await chatService.getRoomByProfileId(params);
+          if (cb) {
+            return cb(data);
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
   });
 };
 

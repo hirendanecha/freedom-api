@@ -100,6 +100,9 @@ exports.changeUserStatus = async function (data) {
 exports.getMessages = async function (data) {
   return await getMessages(data);
 };
+exports.getRoomByProfileId = async function (data) {
+  return await getRoomByProfileId(data);
+};
 
 const getChatList = async function (params) {
   try {
@@ -994,5 +997,16 @@ const getReadUser = async function (msg) {
     return readUsers;
   } catch (error) {
     return null;
+  }
+};
+
+const getRoomByProfileId = async function (data) {
+  try {
+    const query = `select r.*,p.Username,p.ProfilePicName,p.ID as profileId from chatRooms as r JOIN
+    profile AS p ON p.ID = r.profileId1 where r.profileId1 = ${data.profileId1} and r.profileId2 = ${data.profileId2} OR r.profileId1 = ${data.profileId2} and r.profileId2 = ${data.profileId1} and r.isDeleted = 'N'`;
+    const rooms = await executeQuery(query);
+    return rooms;
+  } catch (error) {
+    return error;
   }
 };
