@@ -1003,7 +1003,7 @@ const getReadUser = async function (msg) {
 const getRoomByProfileId = async function (data) {
   try {
     const query = `select r.*,p.Username,p.ProfilePicName,p.ID as profileId from chatRooms as r JOIN
-    profile AS p ON p.ID = r.profileId1 where r.profileId1 = ${data.profileId1} and r.profileId2 = ${data.profileId2} OR r.profileId1 = ${data.profileId2} and r.profileId2 = ${data.profileId1} and r.isDeleted = 'N'`;
+    profile AS p ON p.ID = ${data.profileId2} where r.profileId1 = ${data.profileId1} and r.profileId2 = ${data.profileId2} OR r.profileId1 = ${data.profileId2} and r.profileId2 = ${data.profileId1} and r.isDeleted = 'N'`;
     const rooms = await executeQuery(query);
     return rooms;
   } catch (error) {
