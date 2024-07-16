@@ -137,7 +137,67 @@ User.findAndSearchAll = async (limit, offset, search, startDate, endDate) => {
     `SELECT count(Id) as count FROM users as u WHERE ${whereCondition}`
   );
   const searchData = await executeQuery(
-    `SELECT u.Id, u.Email, u.Username, u.IsActive, u.DateCreation, u.IsAdmin, u.FirstName, u.LastName, u.Address, u.Country, u.City, u.State, u.Zip, u.AccountType, u.IsSuspended,p.MobileNo,p.ProfilePicName,p.ID as profileId,p.MediaApproved FROM users as u left join profile as p on p.UserID = u.Id and p.AccountType IN ('I','M') WHERE ${whereCondition} order by DateCreation desc limit ? offset ?`,
+    `SELECT 
+    u.Id, 
+    u.Email, 
+    u.Username, 
+    u.IsActive, 
+    u.DateCreation, 
+    u.IsAdmin, 
+    u.FirstName, 
+    u.LastName, 
+    u.Address, 
+    u.Country, 
+    u.City, 
+    u.State, 
+    u.Zip, 
+    u.AccountType, 
+    u.IsSuspended,
+    p.MobileNo,
+    p.ProfilePicName,
+    p.ID as profileId,
+    p.MediaApproved,
+    COUNT(us.Id) as unsubscribeCount 
+FROM 
+    users as u 
+LEFT JOIN 
+    profile as p 
+ON 
+    p.UserID = u.Id 
+    AND p.AccountType IN ('I','M') 
+LEFT JOIN 
+    unsubscribe_profiles as us 
+ON 
+    us.UnsubscribeProfileId = p.ID 
+WHERE 
+    ${whereCondition}
+GROUP BY 
+    u.Id, 
+    u.Email, 
+    u.Username, 
+    u.IsActive, 
+    u.DateCreation, 
+    u.IsAdmin, 
+    u.FirstName, 
+    u.LastName, 
+    u.Address, 
+    u.Country, 
+    u.City, 
+    u.State, 
+    u.Zip, 
+    u.AccountType, 
+    u.IsSuspended,
+    p.MobileNo,
+    p.ProfilePicName,
+    p.ID,
+    p.MediaApproved
+ORDER BY 
+    u.DateCreation DESC 
+LIMIT 
+    ? 
+OFFSET 
+    ?;
+`,
     [limit, offset]
   );
 
