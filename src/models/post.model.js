@@ -132,7 +132,7 @@ Post.getAllPosts = async function (params) {
 Post.getPostByPostId = function (profileId, result) {
   db.query(
     // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.isdeleted ='N' and p.id =? ;",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.id =? ;",
     profileId,
     function (err, res) {
       if (err) {
@@ -208,13 +208,17 @@ Post.create = async function (postData) {
   return post;
 };
 
-Post.delete = async function (id) {
-  // const query = "DELETE FROM posts WHERE id = ?";
-  const query = "update posts set isdeleted = 'Y' WHERE id = ?";
-  // const query1 = "DELETE FROM comments WHERE postId = ?";
+Post.hidePost = async function (id,isDeleted) {
+  const query = `update posts set isdeleted = '${isDeleted}' WHERE id = ?`;
   const value = [id];
   const deletePost = await executeQuery(query, value);
-  // const deleteComments = await executeQuery(query1, value);
+  return deletePost;
+};
+
+Post.deletePost = async function (id) {
+  const query = "DELETE FROM posts WHERE id = ?";
+  const value = [id];
+  const deletePost = await executeQuery(query, value);
   return deletePost;
 };
 

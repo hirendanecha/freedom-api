@@ -24,6 +24,7 @@ router.post("/upload-post", utilsController.uploadPostImage);
 router.post("/update-views/:id", postController.updateViewCount);
 router.get("/files/:folder/:id", utilsController.getFiles);
 router.get("/:folder/:id/:filename", utilsController.readFile);
+router.delete("/hide-post/:id", postController.hidePost);
 router.delete("/:id", postController.deletePost);
 router.delete("/comments/:id", postController.deletePostComment);
 router.delete("/delete-all/:id", postController.deleteAllData);

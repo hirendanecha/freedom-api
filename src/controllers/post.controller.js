@@ -140,11 +140,27 @@ exports.getMeta = async function (req, res) {
 
 exports.deletePost = function (req, res) {
   if (req.params.id) {
-    const data = Post.delete(req.params.id);
+    const data = Post.deletePost(req.params.id);
     if (data) {
       res.send({
         error: false,
-        message: "Post deleted sucessfully",
+        message: "Post deleted successfully",
+      });
+    } else {
+      return utils.send500(res, err);
+    }
+  } else {
+    return utils.send404(res, err);
+  }
+};
+exports.hidePost = function (req, res) {
+  if (req.params.id) {
+    const isDeleted = req.query.isDeleted;
+    const data = Post.hidePost(req.params.id, isDeleted);
+    if (data) {
+      res.send({
+        error: false,
+        message: "Post hide successfully",
       });
     } else {
       return utils.send500(res, err);
