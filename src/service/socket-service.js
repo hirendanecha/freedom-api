@@ -87,18 +87,20 @@ const getPost = async function (params) {
   // AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?)
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
-  // if (posts.length > 0) {
-  //   for (const key in posts) {
-  //     if (Object.hasOwnProperty.call(posts, key)) {
-  //       const post = posts[key];
-  //       const query =
-  //         "select c.*,pr.ProfilePicName, pr.Username, pr.FirstName from comments as c left join profile as pr on pr.ID = c.profileId where c.postId = ?";
-  //       const value = [post.id];
-  //       const comment = await executeQuery(query, value);
-  //       post.commentList = comment;
-  //     }
-  //   }
-  // }
+  if (posts.length > 0) {
+    for (const key in posts) {
+      if (Object.hasOwnProperty.call(posts, key)) {
+        const post = posts[key];
+        const query = `select * from post_media where postId = ${post.id}`;
+        const postMedia = await executeQuery(query);
+        const imagesList = [];
+        for (const media of postMedia) {
+          imagesList.push({ imageUrl: media.imageUrl, id: media.id });
+        }
+        post["imagesList"] = imagesList || [];
+      }
+    }
+  }
   return posts;
 };
 
@@ -129,12 +131,41 @@ const createNewPost = async function (data) {
   };
   postData.isdeleted = "N";
 
-  console.log("postData", postData);
+  console.log("postData", data?.imagesList?.length);
   const query = data?.id
     ? `update posts set ? where id= ?`
     : `INSERT INTO posts set ?`;
   const values = data?.id ? [postData, data?.id] : [postData];
   const post = await executeQuery(query, values);
+  if (data?.imagesList?.length) {
+    for (const key in data?.imagesList) {
+      if (Object.hasOwnProperty.call(data?.imagesList, key)) {
+        const image = data?.imagesList[key];
+        console.log("image==>", image);
+        if (!image?.id) {
+          const query = `insert into post_media set ?`;
+          const values = [
+            {
+              postId: post?.insertId,
+              imageUrl: image?.imageUrl,
+              pdfUrl: image?.pdfUrl,
+            },
+          ];
+          await executeQuery(query, values);
+        } else {
+          const query = `update post_media set ? where id = ${image?.id}`;
+          const values = [
+            {
+              postId: post?.insertId,
+              imageUrl: image?.imageUrl,
+              pdfUrl: image?.pdfUrl,
+            },
+          ];
+          await executeQuery(query, values);
+        }
+      }
+    }
+  }
 
   const notifications = [];
   if (post) {
@@ -183,6 +214,20 @@ const createNewPost = async function (data) {
     const query1 = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.isdeleted ='N' and p.id =? ;`;
     const values1 = [data?.id || post.insertId];
     const posts = await executeQuery(query1, values1);
+    const query2 = `select * from post_media where postId = ${
+      data?.id || post.insertId
+    }`;
+    const postMedia = await executeQuery(query2);
+    const imagesList = [];
+    for (const media of postMedia) {
+      imagesList.push({
+        imageUrl: media.imageUrl,
+        id: media.id,
+        pdfUrl: media.pdfUrl,
+      });
+    }
+    posts[0]["imagesList"] = imagesList || [];
+    console.log("new-post", posts);
     return { notifications, posts };
   }
 };

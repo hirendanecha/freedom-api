@@ -75,38 +75,36 @@ exports.createPost = async function (req, res) {
 };
 
 exports.uploadVideo = async function (req, res) {
-  console.log("req file ==>", req.file);
-  const { roomId, groupId } = req.query;
-  const url = await s3.uploadFileToWasabi(
-    req.file,
-    req.file?.originalname.replace(" ", "-")
-  );
-  console.log(url);
-  if (url) {
-    return res.json({
-      error: false,
-      url: url,
-      roomId: +roomId || null,
-      groupId: +groupId || null,
-    });
-  } else {
-    return utils.send500(res, err);
+  try {
+    console.log("req file ==>", req.files);
+    const { roomId, groupId } = req.query;
+    const imageList = [];
+
+    for (const file of req.files) {
+      const url = await s3.uploadFileToWasabi(
+        file,
+        file.originalname.replace(" ", "-")
+      );
+      console.log("url", url);
+      file?.mimetype?.includes("application")
+        ? imageList.push({ pdfUrl: url })
+        : imageList.push({ imageUrl: url });
+    }
+    console.log("imagesList", imageList);
+
+    if (imageList?.length > 0) {
+      return res.json({
+        error: false,
+        // url: url,
+        imagesList: imageList,
+        roomId: +roomId || null,
+        groupId: +groupId || null,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return utils.send500(res, error);
   }
-  // if (Object.keys(req.body).length === 0) {
-  //   res.status(400).send({ error: true, message: "Error in application" });
-  // } else {
-  // Post.create(postData, function (err, post) {
-  //   if (err) {
-  //     return utils.send500(res, err);
-  //   } else {
-  //     return res.json({
-  //       error: false,
-  //       mesage: "Post created",
-  //       data: post,
-  //     });
-  //   }
-  // });
-  // }
 };
 
 const ogPromise = (url) =>

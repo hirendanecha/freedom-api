@@ -64,6 +64,22 @@ Post.findAll = async function (params) {
   p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
   const values = [profileId, profileId, profileId, limit, offset];
   const posts = await executeQuery(query, values);
+  for (const key in posts) {
+    if (Object.hasOwnProperty.call(posts, key)) {
+      const post = posts[key];
+      const query = `select * from post_media where postId = ${post.id}`;
+      const postMedia = await executeQuery(query);
+      const imagesList = [];
+      for (const media of postMedia) {
+        imagesList.push({
+          imageUrl: media.imageUrl,
+          id: media.id,
+          pdfUrl: media.pdfUrl,
+        });
+      }
+      post["imagesList"] = imagesList || [];
+    }
+  }
 
   return getPaginationData(
     {
@@ -90,6 +106,22 @@ Post.getPostByProfileId = async function (params) {
   const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.profileid =? and p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
   const values = [profileId, limit, offset];
   const postData = await executeQuery(query, values);
+  for (const key in postData) {
+    if (Object.hasOwnProperty.call(postData, key)) {
+      const post = postData[key];
+      const query = `select * from post_media where postId = ${post.id}`;
+      const postMedia = await executeQuery(query);
+      const imagesList = [];
+      for (const media of postMedia) {
+        imagesList.push({
+          imageUrl: media.imageUrl,
+          id: media.id,
+          pdfUrl: media.pdfUrl,
+        });
+      }
+      post["imagesList"] = imagesList || [];
+    }
+  }
   // return postData;
   return getPaginationData(
     {
@@ -118,6 +150,22 @@ Post.getAllPosts = async function (params) {
   const postData = await executeQuery(query, values);
   const postCount = await executeQuery("select count(id) as count from posts");
   console.log(postCount);
+  for (const key in postData) {
+    if (Object.hasOwnProperty.call(postData, key)) {
+      const post = postData[key];
+      const query = `select * from post_media where postId = ${post.id}`;
+      const postMedia = await executeQuery(query);
+      const imagesList = [];
+      for (const media of postMedia) {
+        imagesList.push({
+          imageUrl: media.imageUrl,
+          id: media.id,
+          pdfUrl: media.pdfUrl,
+        });
+      }
+      post["imagesList"] = imagesList || [];
+    }
+  }
   // return postData;
   return getPaginationData(
     {
@@ -134,12 +182,28 @@ Post.getPostByPostId = function (profileId, result) {
     // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
     "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.isdeleted ='N' and p.id =? ;",
     profileId,
-    function (err, res) {
+    async function (err, res) {
       if (err) {
         console.log("error", err);
         result(err, null);
       } else {
-        // console.log("post: ", res);
+        console.log("post: ", res);
+        for (const key in res) {
+          if (Object.hasOwnProperty.call(res, key)) {
+            const post = res[key];
+            const query = `select * from post_media where postId = ${post.id}`;
+            const postMedia = await executeQuery(query);
+            const imagesList = [];
+            for (const media of postMedia) {
+              imagesList.push({
+                imageUrl: media.imageUrl,
+                id: media.id,
+                pdfUrl: media.pdfUrl,
+              });
+            }
+            post["imagesList"] = imagesList || [];
+          }
+        }
         result(null, res);
       }
     }
@@ -208,7 +272,7 @@ Post.create = async function (postData) {
   return post;
 };
 
-Post.hidePost = async function (id,isDeleted) {
+Post.hidePost = async function (id, isDeleted) {
   const query = `update posts set isdeleted = '${isDeleted}' WHERE id = ?`;
   const value = [id];
   const deletePost = await executeQuery(query, value);

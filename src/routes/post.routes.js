@@ -17,7 +17,7 @@ router.get("/get-pdfs/:id", postController.getPdfsFile);
 router.post("/create-post", postController.createPost);
 router.post(
   "/upload",
-  uploadFileMiddleware.single("file"),
+  uploadFileMiddleware.array("files", 4),
   postController.uploadVideo
 );
 router.post("/upload-post", utilsController.uploadPostImage);
