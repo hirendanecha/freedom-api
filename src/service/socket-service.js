@@ -146,23 +146,22 @@ const createNewPost = async function (data) {
           const query = `insert into post_media set ?`;
           const values = [
             {
-              postId: post?.insertId,
-              imageUrl: image?.imageUrl,
-              pdfUrl: image?.pdfUrl,
-            },
-          ];
-          await executeQuery(query, values);
-        } else {
-          const query = `update post_media set ? where id = ${image?.id}`;
-          const values = [
-            {
-              postId: post?.insertId,
+              postId: post?.insertId || data?.id,
               imageUrl: image?.imageUrl,
               pdfUrl: image?.pdfUrl,
             },
           ];
           await executeQuery(query, values);
         }
+      }
+    }
+  }
+  if (data?.removeImagesList) {
+    for (const key in data?.removeImagesList) {
+      if (Object.hasOwnProperty.call(data?.removeImagesList, key)) {
+        const image = data?.removeImagesList[key];
+        const query = `delete from post_media where id = ${image?.id}`;
+        await executeQuery(query);
       }
     }
   }
