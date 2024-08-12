@@ -213,7 +213,7 @@ Post.getPostByPostId = function (profileId, result) {
 Post.getPdfsFile = function (profileId, result) {
   db.query(
     // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName from posts as p left join profile as pr on p.profileid = pr.ID where p.isdeleted ='N' and p.pdfUrl is not null and p.profileid =? order by p.postcreationdate desc;",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,pm.pdfUrl from posts as p left join profile as pr on p.profileid = pr.ID left join post_media as pm on pm.postId = p.id where p.isdeleted ='N' and pm.pdfUrl is not null and p.profileid =? order by p.postcreationdate desc;",
     +profileId,
     function (err, res) {
       if (err) {
