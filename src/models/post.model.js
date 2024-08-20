@@ -210,17 +210,26 @@ Post.getPostByPostId = function (profileId, result) {
   );
 };
 
-Post.getPdfsFile = function (profileId, result) {
+Post.getPdfsFile = async function (profileId, result) {
   db.query(
-    // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,pm.pdfUrl from posts as p left join profile as pr on p.profileid = pr.ID left join post_media as pm on pm.postId = p.id where p.isdeleted ='N' and pm.pdfUrl is not null and p.profileid =? order by p.postcreationdate desc;",
+    `SELECT p.*, 
+       pr.ProfilePicName, 
+       pr.Username, 
+       pr.FirstName 
+      FROM posts AS p 
+      LEFT JOIN profile AS pr ON p.profileid = pr.ID 
+      LEFT JOIN post_media AS pm ON pm.postId = p.id 
+      WHERE p.isdeleted = 'N' 
+        AND (p.pdfUrl IS NOT NULL OR pm.pdfUrl IS NOT NULL) 
+        AND p.profileid = ? 
+      ORDER BY p.postcreationdate DESC;`,
     +profileId,
     function (err, res) {
       if (err) {
         console.log("error", err);
         result(err, null);
       } else {
-        // console.log("post: ", res);
+        console.log("post: ", res);
         result(null, res);
       }
     }
