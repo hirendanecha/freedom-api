@@ -215,7 +215,8 @@ Post.getPdfsFile = async function (profileId, result) {
     `SELECT p.*, 
        pr.ProfilePicName, 
        pr.Username, 
-       pr.FirstName 
+       pr.FirstName,
+       pm.pdfUrl
       FROM posts AS p 
       LEFT JOIN profile AS pr ON p.profileid = pr.ID 
       LEFT JOIN post_media AS pm ON pm.postId = p.id 
