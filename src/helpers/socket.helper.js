@@ -1006,6 +1006,22 @@ socket.config = (server) => {
         cb(error);
       }
     });
+
+    socket.on("logout", async (params) => {
+      logger.info("logout", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "logout",
+      });
+      try {
+        if (params) {
+          io.to(`${params.profileId}`).emit("logout-check", params);
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
   });
 };
 
