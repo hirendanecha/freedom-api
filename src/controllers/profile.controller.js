@@ -77,7 +77,7 @@ exports.updateProfile = async function (req, res) {
         .json({ error: true, message: "Username is already exist" });
     }
 
-    if (req.body.profileId === req.user.id || req.body.Id === req.user.id) {
+    if (profileId === req.user.id) {
       if (req.body.UserID) {
         const updateUserData = {
           Username: reqBody?.Username,
