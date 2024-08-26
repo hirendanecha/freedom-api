@@ -64,7 +64,7 @@ exports.updateProfile = async function (req, res) {
   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
     res.status(400).send({ error: true, message: "Error in application" });
   } else {
-    const profileId = req.params.id;
+    const profileId = +req.params.id;
     const reqBody = req.body;
     const profile = new Profile({ ...reqBody });
     const existingUsername = req.user.username;
