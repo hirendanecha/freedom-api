@@ -24,8 +24,9 @@ var Profile = function (profile) {
   this.ProfilePicName = profile.ProfilePicName;
   this.IsActivated = profile.IsActive;
   this.CreatedOn = new Date();
-  this.callSound = profile.callSound;
-  this.messageSound = profile.messageSound;
+  this.callNotificationSound = profile.callNotificationSound;
+  this.messageNotificationSound = profile.messageNotificationSound;
+  this.tagNotificationSound = profile.tagNotificationSound;
 };
 
 Profile.create = function (profileData, result) {
