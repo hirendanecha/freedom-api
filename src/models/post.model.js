@@ -92,7 +92,7 @@ Post.findAll = async function (params) {
 };
 
 Post.getPostByProfileId = async function (params) {
-  const { page, size, profileId, startDate, endDate } = params;
+  const { page, size, profileId, startDate, endDate, searchText } = params;
   const { limit, offset } = getPagination(page, size);
   let whereCondition = "";
   if (startDate && endDate) {
@@ -102,6 +102,9 @@ Post.getPostByProfileId = async function (params) {
     whereCondition += `AND p.postcreationdate >= '${startDate}'`;
   } else if (endDate) {
     whereCondition += `AND p.postcreationdate <= '${endDate}'`;
+  }
+  if (searchText) {
+    whereCondition += `AND p.postdescription LIKE '%${searchText}%'`;
   }
   const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.profileid =? and p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
   const values = [profileId, limit, offset];
