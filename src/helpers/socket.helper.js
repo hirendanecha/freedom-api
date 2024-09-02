@@ -78,7 +78,7 @@ socket.config = (server) => {
         method: "join",
       });
     });
-    
+
     socket.on("online-users", async (cb) => {
       logger.info("online user", {
         id: socket.id,
@@ -465,6 +465,7 @@ socket.config = (server) => {
         if (params) {
           const data = await chatService.createChatRoom(params);
           if (data?.room) {
+            // io.to(`${params.profileId2}`).emit("new-room", data.id);
             if (data?.notification) {
               if (data?.notification) {
                 io.to(`${data.notification?.notificationToProfileId}`).emit(
@@ -496,7 +497,7 @@ socket.config = (server) => {
           console.log("new-message", data);
           if (data.newMessage) {
             if (params?.groupId) {
-              socket.broadcast.to(`${params.groupId}`).emit("new-message", data.newMessage);
+              socket.to(`${params.groupId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
                 io.to(`${params.groupId}`).emit(
                   "notification",
@@ -505,7 +506,7 @@ socket.config = (server) => {
               }
             } else {
               console.log("in=========>");
-              socket.broadcast.to(`${params?.roomId}`).emit("new-message", data.newMessage);
+              socket.to(`${params?.roomId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
                 io.to(`${data?.notification?.notificationToProfileId}`).emit(
                   "notification",
@@ -886,9 +887,10 @@ socket.config = (server) => {
           };
           data["Username"] = await chatService.getUserDetails(data.profileId);
           if (params.roomId) {
-            socket.broadcast.to(`${data?.roomId}`).emit("typing", data);
+            socket.to(`${data?.roomId}`).emit("typing", data);
+            // socket.to(`${data?.roomId}`).emit("typing", data);
           } else {
-            socket.broadcast.to(`${data?.groupId}`).emit("typing", data);
+            socket.to(`${data?.groupId}`).emit("typing", data);
           }
           if (cb) {
             return cb();
