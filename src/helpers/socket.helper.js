@@ -506,7 +506,11 @@ socket.config = (server) => {
               }
             } else {
               console.log("in=========>");
-              io.to(`${params.roomId}`).emit("new-message", data.newMessage);
+              io.to(
+                `${
+                  data?.notification?.notificationToProfileId || params?.roomId
+                }`
+              ).emit("new-message", data.newMessage);
               if (data?.notification) {
                 io.to(
                   `${
