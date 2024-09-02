@@ -78,6 +78,7 @@ socket.config = (server) => {
         method: "join",
       });
     });
+    
     socket.on("online-users", async (cb) => {
       logger.info("online user", {
         id: socket.id,
@@ -464,8 +465,6 @@ socket.config = (server) => {
         if (params) {
           const data = await chatService.createChatRoom(params);
           if (data?.room) {
-            // io.to(`${params.profileId2}`).emit("new-room", data.id);
-            socket.join(`${data.room.id}`);
             if (data?.notification) {
               if (data?.notification) {
                 io.to(`${data.notification?.notificationToProfileId}`).emit(
@@ -497,7 +496,7 @@ socket.config = (server) => {
           console.log("new-message", data);
           if (data.newMessage) {
             if (params?.groupId) {
-              io.to(`${params.groupId}`).emit("new-message", data.newMessage);
+              socket.broadcast.to(`${params.groupId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
                 io.to(`${params.groupId}`).emit(
                   "notification",
@@ -506,18 +505,12 @@ socket.config = (server) => {
               }
             } else {
               console.log("in=========>");
-              io.to(
-                `${
-                  data?.notification?.notificationToProfileId || params?.roomId
-                }`
-              ).emit("new-message", data.newMessage);
+              socket.broadcast.to(`${params?.roomId}`).emit("new-message", data.newMessage);
               if (data?.notification) {
-                io.to(
-                  `${
-                    data?.notification?.notificationToProfileId ||
-                    params?.roomId
-                  }`
-                ).emit("notification", data?.notification);
+                io.to(`${data?.notification?.notificationToProfileId}`).emit(
+                  "notification",
+                  data?.notification
+                );
               }
             }
             // if (data?.notifications) {
@@ -893,9 +886,9 @@ socket.config = (server) => {
           };
           data["Username"] = await chatService.getUserDetails(data.profileId);
           if (params.roomId) {
-            io.to(`${data?.roomId}`).emit("typing", data);
+            socket.broadcast.to(`${data?.roomId}`).emit("typing", data);
           } else {
-            io.to(`${data?.groupId}`).emit("typing", data);
+            socket.broadcast.to(`${data?.groupId}`).emit("typing", data);
           }
           if (cb) {
             return cb();
