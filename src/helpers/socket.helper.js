@@ -465,6 +465,7 @@ socket.config = (server) => {
           const data = await chatService.createChatRoom(params);
           if (data?.room) {
             // io.to(`${params.profileId2}`).emit("new-room", data.id);
+            socket.join(`${data.room.id}`);
             if (data?.notification) {
               if (data?.notification) {
                 io.to(`${data.notification?.notificationToProfileId}`).emit(
