@@ -44,7 +44,7 @@ exports.registrationMail = async (userData, userId) => {
       email: userData.Email,
     },
     jwtSecretKey,
-    { expiresIn: "730 days" }
+    { expiresIn: "1d" }
   );
 
   let registerUrl = `${environment.API_URL}customers/user/verification/${token}`;
