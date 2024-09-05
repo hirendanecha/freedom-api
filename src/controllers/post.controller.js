@@ -172,9 +172,7 @@ async function getYouTubeMeta(url) {
           url: url,
           type: data.items[0]?.kind || "website",
           image:
-            snippet.thumbnails?.default?.url ||
-            snippet.thumbnails?.medium?.url ||
-            "",
+            snippet.thumbnails?.default || snippet.thumbnails?.medium || "",
         };
 
         return { meta };
