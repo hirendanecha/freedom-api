@@ -124,7 +124,6 @@ exports.getMeta = async function (req, res) {
   try {
     if (url) {
       const metaData = await ogPromise(url);
-      console.log("meta===>", metaData);
       if (metaData) {
         const meta = {
           title: metaData?.title || "",
@@ -134,6 +133,8 @@ exports.getMeta = async function (req, res) {
           type: metaData?.type || "website",
           image: metaData?.image || "",
         };
+
+        console.log("meta===>", meta);
         return res.json({ meta });
       }
       return res.json({});
