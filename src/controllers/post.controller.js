@@ -123,9 +123,18 @@ exports.getMeta = async function (req, res) {
   console.log(url);
   try {
     if (url) {
-      const meta = await ogPromise(url);
-      console.log("meta===>", meta);
-      if (meta) {
+      const metaData = await ogPromise(url);
+      console.log("meta===>", metaData);
+      if (metaData) {
+        const meta = {
+          title: metaData["og:title"] || metaData["title"] || "",
+          description:
+            metaData["og:description"] || metaData["description"] || "",
+          site_name: metaData["og:site_name"] || metaData["site_name"] || "",
+          url: metaData["og:url"] || url,
+          type: metaData["og:type"] || metaData["type"] || "website",
+          image: metaData["og:image"] || metaData["image"] || "",
+        };
         return res.json({ meta });
       }
       return res.json({});
