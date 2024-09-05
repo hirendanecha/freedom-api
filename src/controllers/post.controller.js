@@ -1,11 +1,12 @@
 const Post = require("../models/post.model");
 const utils = require("../helpers/utils");
 const s3 = require("../helpers/aws-s3.helper");
-const og = require("open-graph");
+// const og = require("open-graph");
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 // const socket = require("../helpers/socket.helper");
 const io = require("socket.io-client");
 const util = require("util");
+const { getMetadata } = require("../service/meta-service");
 
 exports.findAll = async function (req, res) {
   const postData = await Post.findAll(req.body);
@@ -123,18 +124,18 @@ exports.getMeta = async function (req, res) {
   console.log(url);
   try {
     if (url) {
-      const metaData = await ogPromise(url);
-      if (metaData) {
-        const meta = {
-          title: metaData?.title || "",
-          description: metaData?.description || "",
-          site_name: metaData?.site_name || "",
-          url: url,
-          type: metaData?.type || "website",
-          image: metaData?.image || "",
-        };
+      const meta = await getMetadata(url);
+      if (meta) {
+        // const meta = {
+        //   title: metaData?.title || "",
+        //   description: metaData?.description || "",
+        //   site_name: metaData?.site_name || "",
+        //   url: url,
+        //   type: metaData?.type || "website",
+        //   image: metaData?.image || "",
+        // };
 
-        console.log("meta===>", meta);
+        // console.log("meta===>", meta);
         return res.json({ meta });
       }
       return res.json({});
