@@ -1,12 +1,9 @@
 const Post = require("../models/post.model");
 const utils = require("../helpers/utils");
 const s3 = require("../helpers/aws-s3.helper");
-// const og = require("open-graph");
-const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
-// const socket = require("../helpers/socket.helper");
-const io = require("socket.io-client");
-const util = require("util");
-const { getMetadata } = require("../service/meta-service");
+const og = require("open-graph");
+const axios = require("axios");
+const environment = require("../environments/environment");
 
 exports.findAll = async function (req, res) {
   const postData = await Post.findAll(req.body);
@@ -121,30 +118,77 @@ const ogPromise = (url) =>
 
 exports.getMeta = async function (req, res) {
   const url = req.body.url;
-  console.log(url);
-  try {
-    if (url) {
-      const meta = await getMetadata(url);
-      if (meta) {
-        // const meta = {
-        //   title: metaData?.title || "",
-        //   description: metaData?.description || "",
-        //   site_name: metaData?.site_name || "",
-        //   url: url,
-        //   type: metaData?.type || "website",
-        //   image: metaData?.image || "",
-        // };
+  if (url) {
+    const isYouTube =
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i.test(
+        url
+      );
+    console.log(isYouTube);
+    if (isYouTube) {
+      const data = await getYouTubeMeta(url);
+      if (data) {
+        res.json(data);
+      }
+    } else {
+      const metaData = await ogPromise(url);
+      if (metaData) {
+        const meta = {
+          title: metaData?.title || "",
+          description: metaData?.description || "",
+          site_name: metaData?.site_name || "",
+          url: url,
+          type: metaData?.type || "website",
+          image: metaData?.image || "",
+        };
 
-        // console.log("meta===>", meta);
+        console.log("meta===>", meta);
         return res.json({ meta });
       }
-      return res.json({});
     }
-  } catch (error) {
-    console.error(error);
-    return utils.send500(res, error);
+  } else {
+    return res.json({});
   }
 };
+
+async function getYouTubeMeta(url) {
+  const regex =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = regex.exec(url);
+
+  if (match) {
+    const videoId = match[1];
+    const apiKey = environment.google_api_key; // Ensure environment.google_api_key is set
+    const apiUrl = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet`;
+
+    try {
+      const { data } = await axios.get(apiUrl);
+
+      if (data.items.length >= 0) {
+        const snippet = data.items[0].snippet;
+        const meta = {
+          title: snippet.title || "",
+          description: snippet.description || "",
+          site_name: "YouTube",
+          url: url,
+          type: data.items[0]?.kind || "website",
+          image:
+            snippet.thumbnails?.default?.url ||
+            snippet.thumbnails?.medium?.url ||
+            "",
+        };
+
+        return { meta };
+      } else {
+        throw new Error("No video data found");
+      }
+    } catch (error) {
+      console.error("Error fetching YouTube data:", error);
+      return { meta: {} };
+    }
+  }
+
+  return { meta: {} }; // Default return if URL is not a YouTube URL or extraction fails
+}
 
 exports.deletePost = function (req, res) {
   if (req.params.id) {
