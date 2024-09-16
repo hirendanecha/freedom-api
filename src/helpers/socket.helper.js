@@ -1018,6 +1018,23 @@ socket.config = (server) => {
       }
     });
 
+    socket.on("end-call", async (params) => {
+      logger.info("end-call", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "end-call",
+      });
+      try {
+        if (params) {
+          const data = await chatService.endCall(params);
+          console.log(data);
+        }
+      } catch (error) {
+        return error;
+      }
+    });
+
     socket.on("logout", async (params) => {
       logger.info("logout", {
         ...params,

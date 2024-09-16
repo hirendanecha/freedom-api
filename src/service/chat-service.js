@@ -103,6 +103,9 @@ exports.getMessages = async function (data) {
 exports.getRoomByProfileId = async function (data) {
   return await getRoomByProfileId(data);
 };
+exports.endCall = async function (data) {
+  return await endCall(data);
+};
 
 const getChatList = async function (params) {
   try {
@@ -1057,6 +1060,16 @@ const getRoomByProfileId = async function (data) {
     profile as p on p.ID = ${data.profileId2} where r.isDeleted = 'N' and (r.profileId1 = ${data.profileId1} and r.profileId2 = ${data.profileId2} OR r.profileId1 = ${data.profileId2} and r.profileId2 = ${data.profileId1})`;
     const rooms = await executeQuery(query);
     return rooms;
+  } catch (error) {
+    return error;
+  }
+};
+
+const endCall = async function (data) {
+  try {
+    const query = `update calls_logs set isOnCall = 'N', endDate = NOW() where profileId = ${data?.profileId} and (groupId = ${data?.groupId} or roomId = ${data?.roomId}) and endDate is null`;
+    const callData = await executeQuery(query);
+    return callData;
   } catch (error) {
     return error;
   }
