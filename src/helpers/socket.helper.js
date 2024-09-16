@@ -1018,6 +1018,25 @@ socket.config = (server) => {
       }
     });
 
+    socket.on("check-call", async (params, cb) => {
+      logger.info("check-call", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "check-call",
+      });
+      try {
+        if (params) {
+          const data = await chatService.checkCall(params);
+          if (cb) {
+            return cb(data);
+          }
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
     socket.on("end-call", async (params) => {
       logger.info("end-call", {
         ...params,

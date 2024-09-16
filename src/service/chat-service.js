@@ -107,6 +107,10 @@ exports.endCall = async function (data) {
   return await endCall(data);
 };
 
+exports.checkCall = async function (data) {
+  return await checkCall(data);
+};
+
 const getChatList = async function (params) {
   try {
     const query = `SELECT
@@ -630,6 +634,7 @@ const startCall = async function (params) {
         isOnCall: "Y",
         roomId: params?.roomId || null,
         groupId: params?.groupId || null,
+        callLink: params?.link || null,
       };
       if (callLogsData) {
         const query = `insert into calls_logs set ?`;
@@ -715,6 +720,7 @@ const pickUpCall = async function (params) {
         isOnCall: "Y",
         roomId: params?.roomId || null,
         groupId: params?.groupId || null,
+        callLink: params?.link || null,
       };
       if (callLogs) {
         const query = `insert into calls_logs set ?`;
@@ -1069,6 +1075,16 @@ const endCall = async function (data) {
   try {
     const query = `update calls_logs set isOnCall = 'N', endDate = NOW() where profileId = ${data?.profileId} and (groupId = ${data?.groupId} or roomId = ${data?.roomId}) and endDate is null`;
     const callData = await executeQuery(query);
+    return callData;
+  } catch (error) {
+    return error;
+  }
+};
+
+const checkCall = async function (data) {
+  try {
+    const query = `select * from calls_logs where profileId = ${data?.profileId} and isOnCall = 'Y' and endDate is null`;
+    const [callData] = await executeQuery(query);
     return callData;
   } catch (error) {
     return error;
