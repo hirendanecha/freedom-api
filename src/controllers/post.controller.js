@@ -105,16 +105,17 @@ exports.uploadVideo = async function (req, res) {
   }
 };
 
-const ogPromise = (url) =>
-  new Promise((resolve, reject) => {
+function getMetaData(url) {
+  return new Promise((resolve, reject) => {
     og(url, (err, meta) => {
       if (err) {
-        reject(err);
+        reject(new Error(`Failed to fetch metadata for ${url}`));
       } else {
         resolve(meta);
       }
     });
   });
+}
 
 exports.getMeta = async function (req, res) {
   const url = req.body.url;
@@ -130,20 +131,25 @@ exports.getMeta = async function (req, res) {
         res.json(data);
       }
     } else {
-      const metaData = await ogPromise(url);
-      if (metaData) {
-        const meta = {
-          title: metaData?.title || "",
-          description: metaData?.description || "",
-          site_name: metaData?.site_name || "",
-          url: url,
-          type: metaData?.type || "website",
-          image: metaData?.image || "",
-        };
+      getMetaData(url)
+        .then((metaData) => {
+          if (metaData) {
+            const meta = {
+              title: metaData?.title || "",
+              description: metaData?.description || "",
+              site_name: metaData?.site_name || "",
+              url: url,
+              type: metaData?.type || "website",
+              image: metaData?.image || "",
+            };
 
-        console.log("meta===>", meta);
-        return res.json({ meta });
-      }
+            console.log("meta===>", meta);
+            return res.json({ meta });
+          }
+        })
+        .catch((err) => {
+          return res.json(err);
+        });
     }
   } else {
     return res.json({});
