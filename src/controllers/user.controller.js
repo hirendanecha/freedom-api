@@ -32,12 +32,12 @@ exports.login = async function (req, res) {
           }
           return res.status(400).send({ error: true, message: err });
         } else {
-          res.cookie("auth-user", token, {
-            // expire: new Date(Date.now() + 900000),
-            secure: true,
-            sameSite: "none",
-            domain: environments.domain,
-          });
+          // res.cookie("auth-user", token, {
+          //   // expire: new Date(Date.now() + 900000),
+          //   secure: true,
+          //   sameSite: "none",
+          //   domain: environments.domain,
+          // });
           return res.json(token);
         }
       });
@@ -471,11 +471,11 @@ exports.logout = function (req, res) {
   console.log("innn==>");
   const token = req.headers.authorization.split(" ")[1];
   authorize.setTokenInList(token);
-  res.clearCookie("auth-user", {
-    sameSite: "none",
-    secure: true,
-    domain: environments.domain,
-  });
+  // res.clearCookie("auth-user", {
+  //   sameSite: "none",
+  //   secure: true,
+  //   domain: environments.domain,
+  // });
   // res.cookie("auth-user", 'Hello', {
   //   expire: new Date(Date.now() - 900000),
   //   secure: true,
