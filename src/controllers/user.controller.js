@@ -84,6 +84,7 @@ exports.login = async function (req, res) {
 };
 exports.getToken = async function (req, res) {
   try {
+    console.log('login user==>', req.user);
     const [user] = await Profile.FindById(req.user.id);
     console.log("user", user);
     if (user) {
@@ -489,6 +490,8 @@ exports.verifyToken = async function (req, res) {
   try {
     const token = req.params.token;
     const decoded = jwt.verify(token, environments.JWT_SECRET_KEY);
+    console.log(decoded.user);
+
     if (decoded.user) {
       res.status(200).send({ message: "Authorized User", verifiedToken: true });
     } else {
