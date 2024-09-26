@@ -627,8 +627,12 @@ const deleteRoom = async function (params) {
 const startCall = async function (params) {
   try {
     if (params) {
-      const query = `select * from calls_logs where profileId = ${params.notificationToProfileId} and isOnCall = 'Y' and endDate is null`;
+      const notificationToProfileId = params?.notificationToProfileId ?? null;
+      const groupId = params?.groupId ?? null;
+      const query = `select * from calls_logs where (profileId = '${notificationToProfileId}' or groupId = '${groupId}') and isOnCall = 'Y' and endDate is null`;
       const [callLogs] = await executeQuery(query);
+      console.log("callLogs", callLogs);
+
       const callLogsData = {
         profileId: params?.notificationByProfileId,
         isOnCall: "Y",
@@ -641,7 +645,6 @@ const startCall = async function (params) {
         const values = [callLogsData];
         await executeQuery(query, values);
       }
-      console.log("callLogs", callLogs);
 
       if (params?.roomId) {
         const data = {
