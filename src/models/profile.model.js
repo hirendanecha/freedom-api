@@ -285,12 +285,16 @@ Profile.getGroups = async () => {
 };
 
 Profile.getGroupBasicDetails = async (uniqueLink) => {
-  const groupsResult = await executeQuery(
-    'SELECT * FROM profile WHERE AccountType = "G" AND IsDeleted = "N" AND IsActivated = "Y" AND UniqueLink=? ORDER BY FirstName',
-    [uniqueLink]
-  );
+  const query =
+    'SELECT p.*,count(rm.id) as groupMembers FROM profile as p left join researchMembers as rm on rm.researchProfileId = p.ID WHERE p.AccountType = "G" AND p.IsDeleted = "N" AND p.IsActivated = "Y" AND p.UniqueLink=? GROUP BY p.ID ORDER BY p.FirstName';
+  const [groupsResult] = await executeQuery(query, [uniqueLink]);
+  const query1 =
+    "select p.ID as profileId, p.profilePicName,p.Username,p.FirstName,p.LastName,rm.researchProfileId from profile as p left join researchMembers as rm on rm.profileId = p.ID where rm.researchProfileId = ?";
+  const groupMembers = await executeQuery(query1, groupsResult.ID);
+  groupsResult["groupMembersList"] = groupMembers;
+  console.log("groupsResult", groupsResult);
 
-  return groupsResult?.[0] || {};
+  return groupsResult || {};
 };
 
 Profile.getGroupPostById = async (id, limit, offset) => {
@@ -311,6 +315,20 @@ Profile.getGroupFileResourcesById = async (id) => {
   );
 
   return posts || [];
+};
+
+Profile.joinGroup = async (profileId, researchProfileId) => {
+  const query = `INSERT INTO researchMembers (profileId, researchProfileId) VALUES (?, ?)`;
+  const values = [profileId, researchProfileId];
+  const result = await executeQuery(query, values);
+  return result;
+};
+
+Profile.leaveGroup = async (profileId, researchProfileId) => {
+  const query = `DELETE FROM researchMembers WHERE profileId = ? AND researchProfileId = ?`;
+  const values = [profileId, researchProfileId];
+  const result = await executeQuery(query, values);
+  return result;
 };
 
 module.exports = Profile;

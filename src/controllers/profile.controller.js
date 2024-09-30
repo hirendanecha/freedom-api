@@ -238,3 +238,25 @@ exports.getGroupFileResourcesById = async function (req, res) {
     return utils.send500(res, error);
   }
 };
+
+exports.joinGroup = async function (req, res) {
+  try {
+    const { id } = req.user;
+    const { researchProfileId } = req.body;
+    const group = await Profile.joinGroup(id, researchProfileId);
+    return res.send(group);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+
+exports.leaveGroup = async function (req, res) {
+  try {
+    const { id } = req.user;
+    const { researchProfileId } = req.body;
+    const group = await Profile.leaveGroup(id, researchProfileId);
+    return res.send(group);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};

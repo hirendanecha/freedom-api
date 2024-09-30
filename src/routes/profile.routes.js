@@ -15,5 +15,7 @@ router.get(
   "/getGroupFileResourcesById/:id",
   profileController.getGroupFileResourcesById
 );
+router.post("/join-group", profileController.joinGroup);
+router.post("/leave-group", profileController.leaveGroup);
 
 module.exports = router;
