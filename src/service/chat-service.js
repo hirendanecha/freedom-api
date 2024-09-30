@@ -1076,7 +1076,7 @@ const getRoomByProfileId = async function (data) {
 
 const endCall = async function (data) {
   try {
-    const query = `update calls_logs set isOnCall = 'N', endDate = NOW() where profileId = ${data?.profileId} and (groupId = ${data?.groupId} or roomId = ${data?.roomId}) and endDate is null`;
+    const query = `update calls_logs set isOnCall = 'N', endDate = NOW() where profileId = ${data?.profileId} and (groupId = ${data?.groupId || null} or roomId = ${data?.roomId || null}) and endDate is null`;
     const callData = await executeQuery(query);
     return callData;
   } catch (error) {
