@@ -1,5 +1,9 @@
 const { executeQuery } = require("../helpers/utils");
-const { notificationMailOnInvite } = require("../helpers/utils");
+const {
+  notificationMailOnInvite,
+  notificationMail,
+} = require("../helpers/utils");
+
 const { getPagination, getCount, getPaginationData } = require("../helpers/fn");
 const moment = require("moment");
 
@@ -109,6 +113,10 @@ exports.endCall = async function (data) {
 
 exports.checkCall = async function (data) {
   return await checkCall(data);
+};
+
+exports.sendNotificationEmail = async function (data) {
+  return await sendNotificationEmail(data);
 };
 
 const getChatList = async function (params) {
@@ -277,6 +285,40 @@ const sendMessage = async function (params) {
             actionType: "M",
             msg: "sent you a message in group",
           });
+          if (params?.tags?.length > 0) {
+            const notifications = [];
+            for (const key in params?.tags) {
+              if (Object.hasOwnProperty.call(params?.tags, key)) {
+                const tag = params?.tags[key];
+
+                const notification = await createNotification({
+                  notificationToProfileId: tag?.id,
+                  groupId: data?.groupId,
+                  notificationByProfileId: data?.sentBy,
+                  actionType: "T",
+                  msg: "",
+                });
+                const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.messageNotificationEmail = 'Y' and p.ID = ?`;
+                const values = [tag?.id];
+                const userData = await executeQuery(findUser, values);
+                if (userData?.length) {
+                  const senderData = await getGroup({ groupId: data?.groupId });
+                  notifications.push(notification);
+                  if (tag?.id) {
+                    const userDetails = {
+                      email: userData[0].Email,
+                      userName: userData[0].Username,
+                      senderUsername: senderData.groupName,
+                      ProfilePicName: senderData.profileImage,
+                      type: "message",
+                      groupId: senderData?.id,
+                    };
+                    await notificationMail(userDetails);
+                  }
+                }
+              }
+            }
+          }
           return { newMessage, notification };
         }
       }
@@ -1076,7 +1118,11 @@ const getRoomByProfileId = async function (data) {
 
 const endCall = async function (data) {
   try {
-    const query = `update calls_logs set isOnCall = 'N', endDate = NOW() where profileId = ${data?.profileId} and (groupId = ${data?.groupId || null} or roomId = ${data?.roomId || null}) and endDate is null`;
+    const query = `update calls_logs set isOnCall = 'N', endDate = NOW() where profileId = ${
+      data?.profileId
+    } and (groupId = ${data?.groupId || null} or roomId = ${
+      data?.roomId || null
+    }) and endDate is null`;
     const callData = await executeQuery(query);
     return callData;
   } catch (error) {
@@ -1089,6 +1135,30 @@ const checkCall = async function (data) {
     const query = `select * from calls_logs where profileId = ${data?.profileId} and isOnCall = 'Y' and endDate is null`;
     const [callData] = await executeQuery(query);
     return callData;
+  } catch (error) {
+    return error;
+  }
+};
+
+const sendNotificationEmail = async function (data) {
+  try {
+    const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.messageNotificationEmail = 'Y' and p.ID = ?`;
+    const values = [data?.profileId];
+    const userData = await executeQuery(findUser, values);
+    if (userData?.length) {
+      const senderData = await getRoom(data?.roomId);
+      console.log(senderData);
+      const userDetails = {
+        email: userData[0].Email,
+        userName: userData[0].Username,
+        senderUsername: senderData.Username,
+        type: "message",
+        roomId: senderData?.roomId,
+      };
+      await notificationMail(userDetails);
+    } else {
+      return true;
+    }
   } catch (error) {
     return error;
   }

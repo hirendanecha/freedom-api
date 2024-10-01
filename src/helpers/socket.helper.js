@@ -1069,6 +1069,22 @@ socket.config = (server) => {
         cb(error);
       }
     });
+
+    socket.on("send-notification-email", async (params) => {
+      logger.info("notification-email", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "notification-email",
+      });
+      try {
+        if (params) {
+          const data = await chatService.sendNotificationEmail(params);
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
   });
 };
 

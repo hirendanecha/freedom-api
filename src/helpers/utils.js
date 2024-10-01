@@ -94,7 +94,9 @@ exports.notificationMail = async (userData) => {
     `You were tagged in ${userData.senderUsername}'s ${userData.type}.`;
   let redirectUrl = userData.postId
     ? `${environment.FRONTEND_URL}post/${userData.postId}`
-    : `${environment.FRONTEND_URL}`;
+    : userData?.type === "message"
+    ? `${environment.FRONTEND_URL}profile-chats`
+    : "";
 
   const mailObj = {
     email: userData.email,

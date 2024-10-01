@@ -27,6 +27,8 @@ var Profile = function (profile) {
   this.callNotificationSound = profile.callNotificationSound;
   this.messageNotificationSound = profile.messageNotificationSound;
   this.tagNotificationSound = profile.tagNotificationSound;
+  this.messageNotificationEmail = profile.messageNotificationEmail;
+  this.postNotificationEmail = profile.postNotificationEmail;
 };
 
 Profile.create = function (profileData, result) {
@@ -106,7 +108,9 @@ Profile.FindById = async function (profileId) {
             p.userStatus,
             p.messageNotificationSound,
             p.callNotificationSound,
-            p.tagNotificationSound
+            p.tagNotificationSound,
+            p.messageNotificationEmail,
+            p.postNotificationEmail
         FROM users as u left join profile as p on p.UserID = u.Id AND p.AccountType in ('I','M') WHERE p.ID=?`;
   const values = profileId;
   let profile = await executeQuery(query, values);

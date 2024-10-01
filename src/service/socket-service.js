@@ -187,24 +187,26 @@ const createNewPost = async function (data) {
             notificationByProfileId: postData?.profileid,
             actionType: "T",
           });
-          const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+          const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.postNotificationEmail = 'Y' p.ID = ?`;
           const values = [tag?.id];
           const userData = await executeQuery(findUser, values);
-          const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
-          const values1 = [postData?.profileid];
-          const senderData = await executeQuery(findSenderUser, values1);
-          notifications.push(notification);
-          if (tag?.id) {
-            const userDetails = {
-              email: userData[0].Email,
-              profileId: senderData[0].ID,
-              userName: userData[0].Username,
-              senderUsername: senderData[0].Username,
-              firstName: userData[0].FirstName,
-              type: "post",
-              postId: notification?.postId || postData?.id,
-            };
-            await notificationMail(userDetails);
+          if (userData?.length) {
+            const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
+            const values1 = [postData?.profileid];
+            const senderData = await executeQuery(findSenderUser, values1);
+            notifications.push(notification);
+            if (tag?.id) {
+              const userDetails = {
+                email: userData[0].Email,
+                profileId: senderData[0].ID,
+                userName: userData[0].Username,
+                senderUsername: senderData[0].Username,
+                firstName: userData[0].FirstName,
+                type: "post",
+                postId: notification?.postId || postData?.id,
+              };
+              await notificationMail(userDetails);
+            }
           }
         }
       }
@@ -496,24 +498,26 @@ const createComments = async function (params) {
             commentId: params?.id || commentData.insertId,
           });
           console.log("notification", notification);
-          const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.ID = ?`;
+          const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.postNotificationEmail = 'Y' and p.ID = ?`;
           const values = [tag?.id];
           const userData = await executeQuery(findUser, values);
-          const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
-          const values1 = [data?.profileId];
-          const senderData = await executeQuery(findSenderUser, values1);
-          notifications.push(notification);
-          if (tag?.id) {
-            const userDetails = {
-              email: userData[0].Email,
-              profileId: senderData[0].ID,
-              userName: userData[0].Username,
-              firstName: userData[0].FirstName,
-              senderUsername: senderData[0].Username,
-              type: "comment",
-              postId: notification?.postId || postData?.id,
-            };
-            await notificationMail(userDetails);
+          if (userData?.length) {
+            const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
+            const values1 = [data?.profileId];
+            const senderData = await executeQuery(findSenderUser, values1);
+            notifications.push(notification);
+            if (tag?.id) {
+              const userDetails = {
+                email: userData[0].Email,
+                profileId: senderData[0].ID,
+                userName: userData[0].Username,
+                firstName: userData[0].FirstName,
+                senderUsername: senderData[0].Username,
+                type: "comment",
+                postId: notification?.postId || postData?.id,
+              };
+              await notificationMail(userDetails);
+            }
           }
         }
       }
