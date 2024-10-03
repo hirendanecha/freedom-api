@@ -72,6 +72,10 @@ exports.readNotification = function (data) {
   return readNotification(data);
 };
 
+exports.suspendUser = function (data) {
+  return suspendUser(data);
+};
+
 const getPost = async function (params) {
   const { page, size, profileId, communityId } = params;
   const { limit, offset } = getPagination(page, size);
@@ -615,5 +619,16 @@ const getMetaD = async function (params) {
     return await ogPromise(url);
   } else {
     return null;
+  }
+};
+
+const suspendUser = async function (params) {
+  try {
+    const query = "UPDATE users SET IsSuspended = ? WHERE Id= ?";
+    const values = [params.isSuspended, params.id];
+    const user = await executeQuery(query, values);
+    return user;
+  } catch (error) {
+    return error;
   }
 };

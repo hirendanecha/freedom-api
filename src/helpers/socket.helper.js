@@ -29,19 +29,22 @@ socket.config = (server) => {
           return next(err);
         }
         socket.user = decoded.user;
+
         // Function to join existing rooms
-        const chatData = await chatService.getRoomsIds(socket.user.id);
-        if (chatData) {
-          for (const roomId of chatData.roomsIds) {
-            const chat = roomId;
-            socket.join(`${chat.roomId}`);
+        if (socket.user.id) {
+          const chatData = await chatService.getRoomsIds(socket.user.id);
+          if (chatData) {
+            for (const roomId of chatData?.roomsIds) {
+              const chat = roomId;
+              socket.join(`${chat.roomId}`);
+            }
+            for (const groupId of chatData?.groupsIds) {
+              const chat = groupId;
+              socket.join(`${chat.groupId}`);
+            }
           }
-          for (const groupId of chatData?.groupsIds) {
-            const chat = groupId;
-            socket.join(`${chat.groupId}`);
-          }
+          socket.join(`${socket.user?.id}`);
         }
-        socket.join(`${socket.user?.id}`);
         next();
       });
     } catch (error) {
@@ -1080,6 +1083,41 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.sendNotificationEmail(params);
+        }
+      } catch (error) {
+        cb(error);
+      }
+    });
+
+    socket.on("suspend-user", async (params, cb) => {
+      logger.info("suspend-user", {
+        ...params,
+        address,
+        id: socket.id,
+        method: "suspend-user",
+      });
+      try {
+        if (params) {
+          const data = await socketService.suspendUser(params);
+          const notificationData = {
+            actionType: "S",
+            notificationDesc: "Your account has been suspended by Admin",
+          };
+          if (data) {
+            if (params.isSuspended === "Y") {
+              io.to(`${params.profileId}`).emit(
+                "notification",
+                notificationData
+              );
+            }
+            cb({
+              error: false,
+              message:
+                params.isSuspended === "Y"
+                  ? "User suspend successfully"
+                  : "User unsuspend successfully",
+            });
+          }
         }
       } catch (error) {
         cb(error);
