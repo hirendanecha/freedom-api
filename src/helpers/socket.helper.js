@@ -1050,7 +1050,14 @@ socket.config = (server) => {
       try {
         if (params) {
           const data = await chatService.endCall(params);
-          console.log(data);
+          if (params.roomId) {
+            return io.to(`${params.roomId}`).emit("notification", {
+              actionType: "EC",
+              roomId: params.roomId,
+              notificationByProfileId: params.profileId,
+            });
+          }
+          return;
         }
       } catch (error) {
         return error;
