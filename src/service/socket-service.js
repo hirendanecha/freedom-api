@@ -191,14 +191,20 @@ const createNewPost = async function (data) {
             notificationByProfileId: postData?.profileid,
             actionType: "T",
           });
-          const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.postNotificationEmail = 'Y' p.ID = ?`;
+          const findUser = `SELECT u.Email, p.FirstName, p.LastName, p.Username 
+                  FROM users AS u 
+                  LEFT JOIN profile AS p ON p.UserID = u.Id 
+                  WHERE p.postNotificationEmail = 'Y' 
+                  AND p.ID = ?`;
           const values = [tag?.id];
           const userData = await executeQuery(findUser, values);
+
           if (userData?.length) {
             const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
             const values1 = [postData?.profileid];
             const senderData = await executeQuery(findSenderUser, values1);
             notifications.push(notification);
+
             if (tag?.id) {
               const userDetails = {
                 email: userData[0].Email,
