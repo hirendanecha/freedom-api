@@ -395,6 +395,9 @@ const createNotification = async function (params) {
     "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
   const values = [notificationByProfileId];
   const userData = await executeQuery(query, values);
+  if (!userData[0]) {
+    return;
+  }
   let desc = "";
   if (channelId) {
     desc = `${
