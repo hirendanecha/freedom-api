@@ -30,9 +30,11 @@ exports.FindProfieById = async function (req, res) {
       const profile = await Profile.FindById(id);
       if (!profile) {
         return utils.send500({ error: true, message: "not found" });
-      } else if (profile[0]?.IsSuspended === "Y") {
-        return res.status(401).json({ message: "This user has been suspended by admin", data: {} });
-      } else {
+      }
+      //  else if (profile[0]?.IsSuspended === "Y") {
+      //   return res.status(401).json({ message: "This user has been suspended by admin", data: {} });
+      // }
+       else {
         return res.json({ data: profile, error: false });
       }
     } else {
