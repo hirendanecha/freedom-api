@@ -86,7 +86,11 @@ exports.getToken = async function (req, res) {
   try {
     const [user] = await Profile.FindById(req.user.id);
     console.log("user", user);
+
     if (user) {
+      if (user.IsSuspended === "Y") {
+        return res.status(401).json({ message: "user suspended", data: {} });
+      }
       // const data = req?.cookies;
       // const token = data["auth-user"];
       return res.json(user);
