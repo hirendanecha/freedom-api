@@ -296,7 +296,7 @@ const sendMessage = async function (params) {
                   groupId: data?.groupId,
                   notificationByProfileId: data?.sentBy,
                   actionType: "T",
-                  msg: "",
+                  msg: "tagged you in message",
                 });
                 const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.messageNotificationEmail = 'Y' and p.ID = ?`;
                 const values = [tag?.id];
