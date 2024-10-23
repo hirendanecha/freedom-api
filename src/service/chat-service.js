@@ -291,19 +291,19 @@ const sendMessage = async function (params) {
               if (Object.hasOwnProperty.call(params?.tags, key)) {
                 const tag = params?.tags[key];
 
-                const notification = await createNotification({
-                  notificationToProfileId: tag?.id,
-                  groupId: data?.groupId,
-                  notificationByProfileId: data?.sentBy,
-                  actionType: "T",
-                  msg: "tagged you in message",
-                });
+                // const notification = await createNotification({
+                //   notificationToProfileId: tag?.id,
+                //   groupId: data?.groupId,
+                //   notificationByProfileId: data?.sentBy,
+                //   actionType: "T",
+                //   msg: "tagged you in message",
+                // });
                 const findUser = `select u.Email,p.FirstName,p.LastName,p.Username from users as u left join profile as p on p.UserID = u.Id where p.messageNotificationEmail = 'Y' and p.ID = ?`;
                 const values = [tag?.id];
                 const userData = await executeQuery(findUser, values);
                 if (userData?.length) {
                   const senderData = await getGroup({ groupId: data?.groupId });
-                  notifications.push(notification);
+                  // notifications.push(notification);
                   if (tag?.id) {
                     const userDetails = {
                       email: userData[0].Email,
