@@ -496,7 +496,16 @@ exports.verifyToken = async function (req, res) {
     console.log(decoded.user);
 
     if (decoded.user) {
-      res.status(200).send({ message: "Authorized User", verifiedToken: true });
+      const [profile] = await Profile.FindById(decoded.user.id);
+      if (profile?.IsSuspended === "Y") {
+        res
+          .status(401)
+          .send({ message: "user has been suspended", verifiedToken: false });
+      } else {
+        res
+          .status(200)
+          .send({ message: "Authorized User", verifiedToken: true });
+      }
     } else {
       res
         .status(401)
