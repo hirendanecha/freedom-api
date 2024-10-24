@@ -108,6 +108,25 @@ exports.CreateSubAdmin = function (req, res) {
   });
 };
 
+exports.createChannelApplication = async function (req, res) {
+  const data = { ...req.body };
+  if (data) {
+    const application = await featuredChannels.createChannelApplication(data);
+    if (application) {
+      res.send({
+        error: false,
+        data: application,
+        message: "Thank you! well get with you shortly",
+      });
+    }
+  } else {
+    res.status(400).send({
+      error: true,
+      message: "data not found",
+    });
+  }
+};
+
 exports.getPostDetails = async function (req, res) {
   const { id } = req.params;
   const { profileId } = req.query;

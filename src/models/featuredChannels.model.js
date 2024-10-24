@@ -135,6 +135,15 @@ featuredChannels.CreateSubAdmin = async function (data, result) {
     result("Already assigned", null);
   }
 };
+
+featuredChannels.createChannelApplication = async function (data) {
+  const query = "insert into channel_application set ?";
+  const values = data;
+  const application = await executeQuery(query, values);
+  if (application) {
+    return application;
+  }
+};
 featuredChannels.getPostDetails = async function (id, profileId) {
   const query = `SELECT p.*, fc.firstname, fc.unique_link, fc.profile_pic_name, fc.created, fc.id AS channelId, MAX(pl.ActionType) AS react
 FROM posts AS p 

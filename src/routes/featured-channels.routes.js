@@ -17,6 +17,7 @@ router.get("/activate-channel", featuredChannels.channelsApprove);
 router.get("/feature/:id", featuredChannels.updateChannleFeature);
 router.post("/search-all", featuredChannels.searchAllData);
 router.post("/create-admin", featuredChannels.CreateSubAdmin);
+router.post("/create-application", featuredChannels.createChannelApplication);
 router.post("/get", featuredChannels.getAllChannels);
 router.post("/create-channel", featuredChannels.createChannel);
 router.put("/edit-channel/:id", featuredChannels.editChannel);
