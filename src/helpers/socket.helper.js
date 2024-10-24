@@ -3,6 +3,7 @@ const socket = {};
 const socketService = require("../service/socket-service");
 const chatService = require("../service/chat-service");
 const environment = require("../environments/environment");
+const Profile = require("../models/profile.model");
 const jwt = require("jsonwebtoken");
 
 socket.config = (server) => {
@@ -29,7 +30,11 @@ socket.config = (server) => {
           return next(err);
         }
         socket.user = decoded.user;
-
+        const [profile] = await Profile.FindById(decoded.user.id);
+        if (profile?.IsSuspended === "Y") {
+          const err = new Error("user has been suspended");
+          return next(err);
+        }
         // Function to join existing rooms
         if (socket.user.id) {
           const chatData = await chatService.getRoomsIds(socket.user.id);
