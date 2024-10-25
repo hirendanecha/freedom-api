@@ -76,25 +76,27 @@ exports.deleteBugs = async (req, res) => {
 exports.supportContact = async (req, res) => {
   try {
     const data = req.body;
-    const adminMail = environment.ADMIN_EMAIL;
     const name = data?.name;
-    const email = data?.email;
+    const userEmail = data?.email;
     const media = data?.media || null;
     console.log(data);
     let msg = `${data.description}`;
-    const mailObj = {
-      email: adminMail,
-      subject: "New Contact has been registered",
-      root: "../email-templates/support-contact.ejs",
-      templateData: {
-        name: name,
+    const Emails = ["freedombuzz@proton.me", "support@freedom.buzz"];
+    for (const email of Emails) {
+      const mailObj = {
         email: email,
-        media: media,
-        msg: msg,
-      },
-      // url: redirectUrl,
-    };
-    await ejsEmail.sendMail(mailObj);
+        subject: "New Contact has been registered",
+        root: "../email-templates/support-contact.ejs",
+        templateData: {
+          name: name,
+          email: userEmail,
+          media: media,
+          msg: msg,
+        },
+        // url: redirectUrl,
+      };
+      await ejsEmail.sendMail(mailObj);
+    }
     return res.send({ error: false, message: "Email sent successfully" });
   } catch (error) {
     return res.send({ error: true, message: error });
