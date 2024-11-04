@@ -15,14 +15,18 @@ exports.authorization = async function (req, res, next) {
     try {
       const decoded = jwt.verify(token, env.JWT_SECRET_KEY);
       req.user = decoded.user;
-      const [profile] = await Profile.FindById(decoded.user.id);
-      if (profile?.IsSuspended === "Y") {
-        res
-          .status(401)
-          .send({ message: "user has been suspended", verifiedToken: false });
+      if (decoded.user.username !== "admin") {
+        const [profile] = await Profile.FindById(decoded.user.id);
+
+        if (profile?.IsSuspended === "Y") {
+          res
+            .status(401)
+            .send({ message: "user has been suspended", verifiedToken: false });
+        }
       }
       next();
     } catch (err) {
+      console.log(err);
       res.status(401).json({ message: "not valid token" });
     }
   } else {
