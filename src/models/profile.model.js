@@ -143,7 +143,7 @@ Profile.update = function (profileId, profileData, result) {
 
 Profile.getUsersByUsername = async function (searchText) {
   if (searchText) {
-    const query = `select p.ID as Id, p.Username,p.ProfilePicName from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin ='N' AND u.IsSuspended ='N' AND u.IsActive = 'Y' AND p.Username LIKE ? AND p.AccountType in ('I','M') order by p.Username limit 500`;
+    const query = `select p.ID as Id, p.Username,p.ProfilePicName,p.UserID from profile as p left join users as u on u.Id = p.UserID WHERE u.IsAdmin ='N' AND u.IsSuspended ='N' AND u.IsActive = 'Y' AND p.Username LIKE ? AND p.AccountType in ('I','M') order by p.Username limit 500`;
     const values = [`${searchText}%`];
     const searchData = await executeQuery(query, values);
     return searchData;
@@ -280,6 +280,27 @@ Profile.groupsAndPosts = async () => {
   return groupedPosts;
 };
 
+Profile.createGroup = async (data) => {
+  const groupsResult = await executeQuery("insert into profile set ?", [data]);
+  return groupsResult;
+};
+Profile.editGroups = async (id, data, membersIds) => {
+  const groupsResult = await executeQuery("update profile set ? where ID = ?", [
+    data,
+    id,
+  ]);
+  if (membersIds) {
+    for (const memberId of membersIds) {
+      console.log(memberId, id);
+
+      const members = await executeQuery(
+        `insert into researchMembers (profileId, researchProfileId) values (${memberId}, ${id})`
+      );
+    }
+  }
+
+  return groupsResult;
+};
 Profile.getGroups = async () => {
   const groupsResult = await executeQuery(
     'SELECT ID, UniqueLink, FirstName FROM profile WHERE AccountType = "G" AND IsDeleted = "N" AND IsActivated = "Y" ORDER BY FirstName'
@@ -288,15 +309,48 @@ Profile.getGroups = async () => {
   return groupsResult;
 };
 
+Profile.groupsLists = async (
+  limit,
+  offset,
+  search,
+  pageType,
+  startDate,
+  endDate
+) => {
+  let whereCondition = `p.AccountType = "G" AND p.IsDeleted = "N" AND p.IsActivated = "Y" ${
+    search ? `AND p.FirstName LIKE '%${search}%'` : ""
+  }`;
+  if (startDate && endDate) {
+    whereCondition += `AND p.CreatedOn >= '${startDate}' AND p.CreatedOn <= '${endDate}'`;
+    console.log(whereCondition);
+  } else if (startDate) {
+    whereCondition += `AND p.CreatedOn >= '${startDate}'`;
+  } else if (endDate) {
+    whereCondition += `AND p.CreatedOn <= '${endDate}'`;
+  }
+  const searchCount = await executeQuery(
+    `SELECT count(p.ID) as count FROM profile as p WHERE ${whereCondition}`
+  );
+  const groupsResult = await executeQuery(
+    `SELECT p.*,pr.ID as createdBy,pr.ProfilePicName as createUserProfilePic, pr.Username as createUsername, pr.FirstName as createUserFirstName FROM profile as p left join profile as pr on pr.UserID = p.UserID and pr.AccountType in ('I','M') WHERE ${whereCondition} ORDER BY p.ID desc limit ? offset ?`,
+    [limit, offset]
+  );
+  return {
+    count: searchCount?.[0]?.count || 0,
+    data: groupsResult,
+  };
+};
+
 Profile.getGroupBasicDetails = async (uniqueLink) => {
-  const query =
-    'SELECT p.*,count(rm.id) as groupMembers FROM profile as p left join researchMembers as rm on rm.researchProfileId = p.ID WHERE p.AccountType = "G" AND p.IsDeleted = "N" AND p.IsActivated = "Y" AND p.UniqueLink=? GROUP BY p.ID ORDER BY p.FirstName';
+  const query = `SELECT p.*,COUNT(rm.id) AS groupMembers FROM profile as p LEFT JOIN researchMembers as rm ON rm.researchProfileId = p.ID WHERE p.AccountType = 'G' AND p.IsDeleted = 'N' AND p.IsActivated = 'Y' AND p.UniqueLink = ? GROUP BY p.ID ORDER BY p.FirstName`;
   const [groupsResult] = await executeQuery(query, [uniqueLink]);
-  const query1 =
-    "select p.ID as profileId, p.profilePicName,p.Username,p.FirstName,p.LastName,rm.researchProfileId from profile as p left join researchMembers as rm on rm.profileId = p.ID where rm.researchProfileId = ?";
-  const groupMembers = await executeQuery(query1, groupsResult.ID);
-  groupsResult["groupMembersList"] = groupMembers;
-  console.log("groupsResult", groupsResult);
+  if (groupsResult) {
+    const query1 =
+      "select p.ID as profileId, p.profilePicName,p.Username,p.FirstName,p.LastName,rm.researchProfileId from profile as p left join researchMembers as rm on rm.profileId = p.ID where rm.researchProfileId = ?";
+    const groupMembers = await executeQuery(query1, groupsResult?.ID);
+    groupsResult["groupMembersList"] = groupMembers || [];
+    console.log("groupsResult", groupsResult);
+  }
 
   return groupsResult || {};
 };
@@ -332,6 +386,15 @@ Profile.leaveGroup = async (profileId, researchProfileId) => {
   const query = `DELETE FROM researchMembers WHERE profileId = ? AND researchProfileId = ?`;
   const values = [profileId, researchProfileId];
   const result = await executeQuery(query, values);
+  return result;
+};
+
+Profile.deleteGroup = async (id) => {
+  const query = `DELETE FROM profile WHERE ID = ${id}`;
+  const result = await executeQuery(query);
+  await executeQuery(
+    `DELETE FROM researchMembers WHERE researchProfileId = ${id}`
+  );
   return result;
 };
 

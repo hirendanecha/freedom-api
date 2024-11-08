@@ -34,7 +34,7 @@ exports.FindProfieById = async function (req, res) {
       //  else if (profile[0]?.IsSuspended === "Y") {
       //   return res.status(401).json({ message: "This user has been suspended by admin", data: {} });
       // }
-       else {
+      else {
         return res.json({ data: profile, error: false });
       }
     } else {
@@ -197,6 +197,51 @@ exports.groupsAndPosts = async function (req, res) {
   }
 };
 
+exports.groupsLists = async function (req, res) {
+  try {
+    const { page, size, search, pageType, startDate, endDate } = req.body;
+    const { limit, offset } = getPagination(page, size);
+    const groupedPosts = await Profile.groupsLists(
+      limit,
+      offset,
+      search,
+      pageType,
+      startDate,
+      endDate
+    );
+
+    return res.send(
+      getPaginationData(
+        { count: groupedPosts.count, docs: groupedPosts.data },
+        page,
+        limit
+      )
+    );
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+
+exports.createGroup = async function (req, res) {
+  try {
+    const data = req.body;
+    const groups = await Profile.createGroup(data);
+    return res.send(groups);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+exports.editGroups = async function (req, res) {
+  try {
+    const { id } = req.params;
+    const data = req.body.groupData;
+    const membersIds = req.body.selectedMembers;
+    const groups = await Profile.editGroups(id, data, membersIds);
+    return res.send(groups);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
 exports.getGroups = async function (req, res) {
   try {
     const groups = await Profile.getGroups();
@@ -213,6 +258,8 @@ exports.getGroupBasicDetails = async function (req, res) {
 
     return res.send(groupDetails);
   } catch (error) {
+    console.log("error : ", error);
+
     return utils.send500(res, error);
   }
 };
@@ -256,9 +303,20 @@ exports.joinGroup = async function (req, res) {
 
 exports.leaveGroup = async function (req, res) {
   try {
-    const { id } = req.user;
-    const { researchProfileId } = req.body;
-    const group = await Profile.leaveGroup(id, researchProfileId);
+    // const { id } = req.user;
+    const { researchProfileId, profileId } = req.body;
+    const group = await Profile.leaveGroup(profileId, researchProfileId);
+    return res.send(group);
+  } catch (error) {
+    return utils.send500(res, error);
+  }
+};
+
+exports.deleteGroup = async function (req, res) {
+  try {
+    // const { id } = req.user;
+    const { id } = req.params;
+    const group = await Profile.deleteGroup(id);
     return res.send(group);
   } catch (error) {
     return utils.send500(res, error);
