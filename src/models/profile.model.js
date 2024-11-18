@@ -24,11 +24,11 @@ var Profile = function (profile) {
   this.ProfilePicName = profile.ProfilePicName;
   this.IsActivated = profile.IsActive;
   this.CreatedOn = new Date();
-  this.callNotificationSound = profile.callNotificationSound;
-  this.messageNotificationSound = profile.messageNotificationSound;
-  this.tagNotificationSound = profile.tagNotificationSound;
-  this.messageNotificationEmail = profile.messageNotificationEmail;
-  this.postNotificationEmail = profile.postNotificationEmail;
+  this.callNotificationSound = profile?.callNotificationSound || 'Y';
+  this.messageNotificationSound = profile?.messageNotificationSound || 'Y';
+  this.tagNotificationSound = profile?.tagNotificationSound || 'Y';
+  this.messageNotificationEmail = profile?.messageNotificationEmail || 'Y';
+  this.postNotificationEmail = profile?.postNotificationEmail || 'Y';
 };
 
 Profile.create = function (profileData, result) {
