@@ -58,9 +58,11 @@ Post.findAll = async function (params) {
     : "p.posttype in ('S', 'R','V') AND";
     // : "p.communityId IS NULL AND p.posttype in ('S', 'R','V') AND";
 
-  const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName, groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink
+  const query = `SELECT p.*, pl.ActionType as react, pr.ProfilePicName, pr.Username, pr.FirstName, groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink,
+  c.CommunityName as communityName, c.slug as slug
   from 
-  posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID 
+  posts as p left join postlikedislike as pl on pl.ProfileID = ? and pl.PostID = p.id left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID
+  left join community as c on p.communityId = c.id 
   where ${communityCondition}
   p.profileid not in (SELECT UnsubscribeProfileId FROM unsubscribe_profiles where ProfileId = ?) AND p.isdeleted ='N' order by p.profileid in (SELECT SeeFirstProfileId from see_first_profile where ProfileId=?) DESC, p.id DESC limit ? offset ?`;
   const values = [profileId, profileId, profileId, limit, offset];
@@ -107,7 +109,7 @@ Post.getPostByProfileId = async function (params) {
   if (searchText) {
     whereCondition += `AND p.postdescription LIKE '%${searchText}%'`;
   }
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.profileid =? and p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink, c.CommunityName as communityName from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID left join community as c on p.communityId = c.id where p.profileid =? and p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
   const values = [profileId, limit, offset];
   const postData = await executeQuery(query, values);
   for (const key in postData) {
@@ -149,7 +151,7 @@ Post.getAllPosts = async function (params) {
   } else if (endDate) {
     whereCondition += `AND p.postcreationdate <= '${endDate}'`;
   }
-  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
+  const query = `SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink, c.CommunityName as communityName, c.slug as slug from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID left join community as c on p.communityId = c.id where p.posttype in ('S', 'R','V') ${whereCondition} order by p.postcreationdate DESC limit ? offset ?;`;
   const values = [limit, offset];
   const postData = await executeQuery(query, values);
   const postCount = await executeQuery("select count(id) as count from posts");
@@ -184,7 +186,7 @@ Post.getAllPosts = async function (params) {
 Post.getPostByPostId = function (profileId, result) {
   db.query(
     // "SELECT * from posts where isdeleted ='N' order by postcreationdate DESC limit 15 ",
-    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID where p.isdeleted ='N' and p.id =? ;",
+    "SELECT p.*, pr.ProfilePicName, pr.Username, pr.FirstName,groupPr.FirstName as groupName, groupPr.UniqueLink as groupLink, c.CommunityName as communityName, c.slug as slug from posts as p left join profile as pr on p.profileid = pr.ID left join profile as groupPr on p.posttoprofileid = groupPr.ID left join community as c on p.communityId = c.id where p.isdeleted ='N' and p.id =? ;",
     profileId,
     async function (err, res) {
       if (err) {
