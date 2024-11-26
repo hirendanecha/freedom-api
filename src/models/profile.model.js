@@ -154,12 +154,14 @@ Profile.getUsersByUsername = async function (searchText) {
 
 Profile.getNotificationById = async function (id, limit, offset) {
   if (id) {
-    const query = `select n.*,p.Username,p.FirstName,p.ProfilePicName from notifications as n left join profile as p on p.ID = n.notificationByProfileId left join groupMembers as g on g.groupId = n.groupId and g.profileId != n.notificationByProfileId where g.profileId = ? OR n.notificationToProfileId =? order by n.createDate desc limit ${limit} offset ${offset}`;
+    const query = `select n.*,p.Username,p.FirstName,p.ProfilePicName from notifications as n left join profile as p on p.ID = n.notificationByProfileId left join groupMembers as g on g.groupId = n.groupId and g.profileId = n.notificationToProfileId where g.profileId = ? OR n.notificationToProfileId =? order by n.createDate desc limit ${limit} offset ${offset}`;
     const values = [id, id];
     const searchCount = await executeQuery(
       `SELECT count(id) as count FROM notifications as n WHERE n.notificationToProfileId = ${id}`
     );
     const notificationData = await executeQuery(query, values);
+    console.log("notificationData", notificationData);
+    
     // return notificationData;
     return {
       count: searchCount?.[0]?.count || 0,

@@ -819,6 +819,11 @@ socket.config = (server) => {
                   "notification",
                   notification
                 );
+              } else {
+                io.to(`${notification?.groupId}`).emit(
+                  "notification",
+                  notification
+                );
               }
             }
           } else {
