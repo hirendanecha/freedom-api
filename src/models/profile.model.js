@@ -178,14 +178,18 @@ Profile.getNotificationById = async function (id, limit, offset) {
       SELECT n.*, 
              p.Username, 
              p.FirstName, 
-             p.ProfilePicName
+             p.ProfilePicName,
+             g.groupName,
+             g.profileImage
       FROM notifications AS n
       LEFT JOIN profile AS p 
         ON p.ID = n.notificationByProfileId
-      LEFT JOIN groupMembers AS g 
-        ON g.groupId = n.groupId 
-           AND g.profileId = ?
-      WHERE g.profileId != n.notificationByProfileId AND g.profileId = ? 
+      LEFT JOIN chatGroups AS g 
+        ON g.id = n.groupId
+      LEFT JOIN groupMembers AS gm 
+        ON gm.groupId = n.groupId 
+           AND gm.profileId = ?
+      WHERE gm.profileId != n.notificationByProfileId AND gm.profileId = ? 
          OR n.notificationToProfileId = ?
       GROUP BY n.id
       ORDER BY n.createDate DESC
