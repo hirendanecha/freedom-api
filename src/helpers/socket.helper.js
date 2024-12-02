@@ -371,7 +371,7 @@ socket.config = (server) => {
       });
       if (params.id) {
         const data = await socketService.deletePost(params);
-        io.emit("deletePost", data);
+        io.emit("deleted-post", { id: params.id });
       }
     });
 

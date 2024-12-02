@@ -302,14 +302,18 @@ Post.deletePost = async function (id) {
 };
 
 Post.deletePostComment = function (id, result) {
-  db.query("DELETE FROM comments WHERE id = ?", [id], function (err, res) {
-    if (err) {
-      console.log("error", err);
-      result(err, null);
-    } else {
-      result(null, res);
+  db.query(
+    "DELETE FROM comments WHERE parentCommentId = ? or id = ?",
+    [id, id],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
 };
 Post.deleteAllData = async function (id) {
   const query = "delete from comments where profileId = ?";
