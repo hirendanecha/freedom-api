@@ -138,6 +138,14 @@ exports.editNotifications = async function (req, res) {
   });
 };
 
+exports.readAllNotifications = async function (req, res) {
+  const { id } = req.params;
+  Profile.readAllNotifications(id, function (err) {
+    if (err) return utils.send500(res, err);
+    res.json({ error: false, message: "Notification updated successfully" });
+  });
+};
+
 exports.editNotificationSound = async function (req, res) {
   try {
     const { id } = req.user;
@@ -182,6 +190,13 @@ exports.getNotification = async function (req, res) {
 
 exports.deleteNotification = function (req, res) {
   Profile.deleteNotification(req.params.id, function (err, result) {
+    if (err) return utils.send500(res, err);
+    res.json({ error: false, message: "Notification deleted successfully" });
+  });
+};
+
+exports.deleteAllNotification = function (req, res) {
+  Profile.deleteAllNotification(req.params.id, function (err, result) {
     if (err) return utils.send500(res, err);
     res.json({ error: false, message: "Notification deleted successfully" });
   });

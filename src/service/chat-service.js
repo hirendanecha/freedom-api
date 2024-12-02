@@ -749,8 +749,8 @@ const declineCall = async function (params) {
         actionType: "DC",
         msg: params.message || "call decline...",
       };
-      const notification = await createNotification(data);
-      return notification;
+      // const notification = await createNotification(data);
+      return data;
     }
   } catch (error) {
     return error;
@@ -779,10 +779,11 @@ const pickUpCall = async function (params) {
         notificationByProfileId: params?.notificationByProfileId || null,
         actionType: "SC",
         msg: "call start...",
+        link: params?.link,
       };
-      const notification = await createNotification(data);
-      notification["link"] = params?.link;
-      return notification;
+      // const notification = await createNotification(data);
+      // notification["link"] = params?.link;
+      return data;
     }
   } catch (error) {
     return error;

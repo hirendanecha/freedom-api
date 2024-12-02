@@ -175,25 +175,26 @@ Profile.getUsersByUsername = async function (searchText) {
 Profile.getNotificationById = async function (id, limit, offset) {
   if (id) {
     const query = `
-      SELECT n.*, 
-             p.Username, 
-             p.FirstName, 
-             p.ProfilePicName,
-             g.groupName,
-             g.profileImage
-      FROM notifications AS n
-      LEFT JOIN profile AS p 
-        ON p.ID = n.notificationByProfileId
-      LEFT JOIN chatGroups AS g 
-        ON g.id = n.groupId
-      LEFT JOIN groupMembers AS gm 
-        ON gm.groupId = n.groupId 
-           AND gm.profileId = ?
-      WHERE gm.profileId != n.notificationByProfileId AND gm.profileId = ? 
-         OR n.notificationToProfileId = ?
-      GROUP BY n.id
-      ORDER BY n.createDate DESC
-      LIMIT ? OFFSET ?`;
+      SELECT 
+    n.*, 
+    p.Username, 
+    p.FirstName, 
+    p.ProfilePicName,
+    g.groupName,
+    g.profileImage
+FROM notifications AS n
+LEFT JOIN profile AS p 
+    ON p.ID = n.notificationByProfileId
+LEFT JOIN chatGroups AS g 
+    ON g.id = n.groupId
+LEFT JOIN groupMembers AS gm 
+    ON gm.groupId = n.groupId AND gm.profileId = ?
+WHERE 
+    (gm.profileId = ? AND gm.profileId != n.notificationByProfileId)
+    OR n.notificationToProfileId = ?
+ORDER BY n.createDate DESC
+LIMIT ? OFFSET ?;
+`;
 
     const values = [id, id, id, limit, offset];
 
@@ -204,7 +205,7 @@ Profile.getNotificationById = async function (id, limit, offset) {
       LEFT JOIN groupMembers AS g 
         ON g.groupId = n.groupId 
            AND g.profileId = ?
-      WHERE g.profileId = ? 
+      WHERE (g.profileId = ? AND g.profileId != n.notificationByProfileId)
          OR n.notificationToProfileId = ?`;
     const searchCountValues = [id, id, id];
 
@@ -250,6 +251,28 @@ Profile.editNotifications = function (id, isRead, result) {
     }
   );
 };
+
+Profile.readAllNotifications = function (id, result) {
+  db.query(
+    `UPDATE notifications n
+     LEFT JOIN groupMembers gm ON gm.groupId = n.groupId AND gm.profileId = ? 
+     LEFT JOIN chatRooms r ON r.id = n.roomId AND (r.profileId1 = ? OR r.profileId2 = ?)
+     SET n.isRead = 'Y'
+     WHERE n.isRead = 'N' 
+     AND (gm.profileId IS NOT NULL OR n.notificationToProfileId = ?);
+    `,
+    [id, id, id, id],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("notification updated", res);
+        result(null, res);
+      }
+    }
+  );
+};
 Profile.editNotificationSound = function (id, key, value) {
   try {
     const query = `update profile set ${key} = '${value}' where ID = ${id}`;
@@ -265,6 +288,29 @@ Profile.deleteNotification = function (user_id, result) {
   db.query(
     "DELETE FROM notifications WHERE Id = ?",
     [user_id],
+    function (err, res) {
+      if (err) {
+        console.log("error", err);
+        result(err, null);
+      } else {
+        console.log("notification deleted", res);
+        result(null, res);
+      }
+    }
+  );
+};
+
+Profile.deleteAllNotification = function (user_id, result) {
+  db.query(
+    `DELETE n
+     FROM notifications n
+     LEFT JOIN groupMembers gm ON gm.groupId = n.groupId
+     LEFT JOIN chatRooms r ON r.id = n.roomId
+     WHERE (r.profileId1 = ? OR r.profileId2 = ?)
+     OR gm.profileId = ?
+     OR n.notificationToProfileId = ?
+    `,
+    [user_id, user_id, user_id, user_id],
     function (err, res) {
       if (err) {
         console.log("error", err);
