@@ -263,14 +263,29 @@ const sendMessage = async function (params) {
             "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
           const values = [data.messageText, date, data.roomId];
           const updatedRoom = await executeQuery(query, values);
-          const notification = await createNotification({
-            notificationToProfileId: params?.profileId,
-            roomId: data?.roomId,
-            notificationByProfileId: data?.sentBy,
-            actionType: "M",
-            msg: "sent you a message",
-          });
-          return { newMessage, notification };
+          if (params.messageType === "C" || params.messageType === "D") {
+            const notification = await createNotification({
+              notificationToProfileId: params?.profileId,
+              roomId: data?.roomId,
+              notificationByProfileId: data?.sentBy,
+              actionType: "M",
+              msg:
+                params.messageType === "C"
+                  ? "You have missed call from"
+                  : "has declined your call",
+              messageType: params.messageType,
+            });
+            return { newMessage, notification };
+          } else {
+            const notification = await createNotification({
+              notificationToProfileId: params?.profileId,
+              roomId: data?.roomId,
+              notificationByProfileId: data?.sentBy,
+              actionType: "M",
+              msg: "sent you a message",
+            });
+            return { newMessage, notification };
+          }
         }
         if (data.groupId) {
           const date = new Date();
@@ -278,13 +293,25 @@ const sendMessage = async function (params) {
             "update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?";
           const values = [data.messageText, date, data.groupId];
           const updatedGroup = await executeQuery(query, values);
-          const notification = await createNotification({
-            // notificationToProfileId: params.profileId,
-            groupId: data?.groupId,
-            notificationByProfileId: data?.sentBy,
-            actionType: "M",
-            msg: "sent you a message in group",
-          });
+          let notification = {};
+          if (params.messageType === "C") {
+            notification = await createNotification({
+              notificationToProfileId: params?.profileId,
+              roomId: data?.roomId,
+              notificationByProfileId: data?.sentBy,
+              actionType: "M",
+              msg: "You have missed call from",
+              messageType: params.messageType,
+            });
+          } else {
+            notification = await createNotification({
+              // notificationToProfileId: params.profileId,
+              groupId: data?.groupId,
+              notificationByProfileId: data?.sentBy,
+              actionType: "M",
+              msg: "sent you a message in group",
+            });
+          }
           if (params?.tags?.length > 0) {
             const notifications = [];
             for (const key in params?.tags) {
@@ -394,12 +421,20 @@ const createNotification = async function (params) {
       notificationByProfileId,
       actionType,
       msg,
+      messageType = "",
     } = params;
     const query =
       "SELECT ID,ProfilePicName, Username, FirstName,LastName from profile where ID = ?";
     const values = [notificationByProfileId];
     const userData = await executeQuery(query, values);
-    let desc = `${userData[0]?.Username || userData[0]?.FirstName} ${msg}`;
+    console.log("come=====>");
+
+    let desc;
+    if (messageType === "C") {
+      desc = `${msg} ${userData[0]?.Username || userData[0]?.FirstName}`;
+    } else {
+      desc = `${userData[0]?.Username || userData[0]?.FirstName} ${msg}`;
+    }
 
     const data = {
       notificationToProfileId: notificationToProfileId || null,
