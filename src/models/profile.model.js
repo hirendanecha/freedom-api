@@ -121,7 +121,6 @@ Profile.FindById = async function (profileId) {
   if (channelId?.length) {
     profile[0]["channelId"] = channelId[0]?.channelId || null;
   }
-  console.log("test", profile);
   return profile;
 };
 

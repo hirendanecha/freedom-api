@@ -706,18 +706,19 @@ const startCall = async function (params) {
     if (params) {
       const notificationToProfileId = params?.notificationToProfileId ?? null;
       const groupId = params?.groupId ?? null;
-      const query = `select * from calls_logs where (profileId = '${notificationToProfileId}' or groupId = '${groupId}') and isOnCall = 'Y' and endDate is null`;
+      const query = `select * from calls_logs where (roomId = '${params?.roomId}' or groupId = '${groupId}') and isOnCall = 'Y' and endDate is null`;
       const [callLogs] = await executeQuery(query);
       console.log("callLogs", callLogs);
 
       const callLogsData = {
-        profileId: params?.notificationByProfileId,
+        // profileId: params?.notificationByProfileId,
         isOnCall: "Y",
         roomId: params?.roomId || null,
         groupId: params?.groupId || null,
         callLink: params?.link || null,
+        members: callLogs?.members || 1,
       };
-      if (callLogsData) {
+      if (!callLogs) {
         const query = `insert into calls_logs set ?`;
         const values = [callLogsData];
         await executeQuery(query, values);
@@ -759,6 +760,7 @@ const startCall = async function (params) {
         const group = await getGroup({ groupId: data.groupId });
         notification["ProfilePicName"] = group?.profileImage;
         notification["groupName"] = group?.groupName;
+        notification["members"] = callLogsData?.members;
         if (callLogs?.isOnCall === "Y") {
           notification["isOnCall"] = callLogs?.isOnCall;
         } else {
@@ -775,14 +777,15 @@ const startCall = async function (params) {
 const declineCall = async function (params) {
   try {
     if (params) {
-      let query = "";
-      if (params?.roomId) {
-        query = `update calls_logs set endDate = now(), isOnCall = 'N' where roomId = ${params.roomId} and isOnCall = 'Y' and endDate is null`;
-      } else {
-        query = `update calls_logs set endDate = now(), isOnCall = 'N' where groupId = ${params.groupId} and profileId = ${params.notificationByProfileId} and isOnCall = 'Y' and endDate is null`;
+      if (params) {
+        let query = "";
+        query = `update calls_logs set endDate = now(), isOnCall = 'N',members = ${params?.members} where (roomId = ${params?.roomId} or groupId = ${params?.groupId}) and isOnCall = 'Y' and members >=  1 and endDate is null`;
+        await executeQuery(query);
       }
+      // else {
+      //   query = `update calls_logs set endDate = now(), isOnCall = 'N' where groupId = ${params.groupId} and isOnCall = 'Y' and endDate is null`;
+      // }
       // const query = `update calls_logs set endDate = now(), isOnCall = 'N' where (roomId = ${params.roomId} or groupId = ${params.groupId}) and isOnCall = 'Y'`;
-      await executeQuery(query);
       const data = {
         notificationToProfileId: params?.notificationToProfileId || null,
         roomId: params?.roomId,
@@ -802,17 +805,30 @@ const declineCall = async function (params) {
 const pickUpCall = async function (params) {
   try {
     if (params) {
+      // const notificationToProfileId = params?.notificationToProfileId ?? null;
+      const groupId = params?.groupId ?? null;
+      const query = `select * from calls_logs where (roomId = '${params?.roomId}' or groupId = '${groupId}') and isOnCall = 'Y' and endDate is null`;
+      const [existingCall] = await executeQuery(query);
+
       const callLogs = {
-        profileId: params?.notificationByProfileId,
+        // profileId: params?.notificationByProfileId,
         isOnCall: "Y",
         roomId: params?.roomId || null,
         groupId: params?.groupId || null,
         callLink: params?.link || null,
+        members: existingCall.members + 1,
       };
-      if (callLogs) {
-        const query = `insert into calls_logs set ?`;
+      console.log("callLogs", existingCall);
+      if (existingCall) {
+        const query = `update calls_logs set members = ${callLogs?.members}, callLink = '${callLogs?.callLink}' where id = ${existingCall?.id}`;
         const values = [callLogs];
         await executeQuery(query, values);
+      } else {
+        if (callLogs) {
+          const query = `insert into calls_logs set ?`;
+          const values = [callLogs];
+          await executeQuery(query, values);
+        }
       }
       const data = {
         notificationToProfileId: params?.notificationToProfileId || null,
@@ -1165,22 +1181,59 @@ const getRoomByProfileId = async function (data) {
 
 const endCall = async function (data) {
   try {
-    const query = `update calls_logs set isOnCall = 'N', endDate = NOW() where profileId = ${
-      data?.profileId
-    } and (groupId = ${data?.groupId || null} or roomId = ${
-      data?.roomId || null
-    }) and endDate is null`;
-    const callData = await executeQuery(query);
+    console.log("data==?", data);
+    // const query = `
+    //   UPDATE calls_logs
+    //   SET
+    //     isOnCall = ?,
+    //     ${data.members > 0  ? 'endDate = NOW(),' :''}
+    //     members = ?
+    //   WHERE
+    //     (groupId = ? OR roomId = ?)
+    //     AND endDate IS NULL
+    // `;
+
+    let query = `
+    UPDATE calls_logs
+    SET 
+      isOnCall = ?
+  `;
+    if (data.members === 0) {
+      query += `,
+      endDate = NOW()
+    `;
+    }
+    query += `,
+      members = ?
+    WHERE 
+      (groupId = ? OR roomId = ?)
+      AND callLink = ?
+      AND endDate IS NULL
+  `;
+    const params = [
+      data.isOnCall,
+      data.members,
+      data.groupId || null,
+      data.roomId || null,
+      data.callLink
+    ];
+    const callData = await executeQuery(query, params);
+    console.log("endCallData====>", callData);
+
     return callData;
   } catch (error) {
-    return error;
+    console.error("Error in endCallData:", error); // Log the error for debugging
+    throw error; // Throw the error to ensure it can be handled by the caller
   }
 };
 
 const checkCall = async function (data) {
   try {
-    const query = `select * from calls_logs where profileId = ${data?.profileId} and isOnCall = 'Y' and endDate is null`;
+    console.log("params==>", data);
+    const query = `select * from calls_logs where (groupId = ${data?.groupId} or roomId = ${data?.roomId}) and isOnCall = 'Y' and members >=  1 and endDate is null`;
     const [callData] = await executeQuery(query);
+    console.log("callData", callData);
+
     return callData;
   } catch (error) {
     return error;

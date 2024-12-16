@@ -457,6 +457,7 @@ const createComments = async function (params) {
       for (const key in params?.tags) {
         if (Object.hasOwnProperty.call(params?.tags, key)) {
           const tag = params?.tags[key];
+          console.log("tag user==>", tag);
 
           const notification = await createNotification({
             notificationToProfileId: tag?.id,
@@ -604,4 +605,3 @@ const suspendUser = async function (params) {
     return error;
   }
 };
-
