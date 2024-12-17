@@ -134,7 +134,8 @@ const getChatList = async function (params) {
                   p.Username,
                   p.FirstName,
                   p.LastName,
-                  p.ProfilePicName
+                  p.ProfilePicName,
+                  m.sentBy
 FROM
     chatRooms AS r
 JOIN
