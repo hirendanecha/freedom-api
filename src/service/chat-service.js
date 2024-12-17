@@ -148,7 +148,7 @@ LEFT JOIN
 WHERE
     (r.profileId1 = ? OR r.profileId2 = ?) AND r.isDeleted = 'N'
 GROUP BY
-    r.id, r.profileId1, r.isAccepted,r.updatedDate, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
+    r.id, r.profileId1, r.isAccepted,r.updatedDate, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName, m.sentBy
 ORDER BY
 r.updatedDate desc;`;
     const values = [params.profileId, params.profileId];
