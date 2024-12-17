@@ -130,6 +130,7 @@ const getChatList = async function (params) {
                   r.updatedDate,
                   r.createdDate,
                   r.isDeleted,
+                  r.sentBy,
                   p.ID AS profileId,
                   p.Username,
                   p.FirstName,
@@ -147,7 +148,7 @@ LEFT JOIN
 WHERE
     (r.profileId1 = ? OR r.profileId2 = ?) AND r.isDeleted = 'N'
 GROUP BY
-    r.id, r.profileId1, r.isAccepted,r.updatedDate, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
+    r.id, r.profileId1, r.isAccepted,r.updatedDate,r.sentBy, p.ID, p.Username, p.FirstName, p.LastName, p.ProfilePicName
 ORDER BY
 r.updatedDate desc;`;
     const values = [params.profileId, params.profileId];
@@ -260,8 +261,8 @@ const sendMessage = async function (params) {
         if (data.roomId) {
           const date = new Date();
           const query =
-            "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
-          const values = [data.messageText, date, data.roomId];
+            "update chatRooms set lastMessageText = ?,updatedDate = ?,sentBy = ? where id = ?";
+          const values = [data.messageText, date, data?.sentBy, data.roomId];
           const updatedRoom = await executeQuery(query, values);
           if (params.messageType === "C" || params.messageType === "D") {
             const notification = await createNotification({
@@ -290,8 +291,8 @@ const sendMessage = async function (params) {
         if (data.groupId) {
           const date = new Date();
           const query =
-            "update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?";
-          const values = [data.messageText, date, data.groupId];
+            "update chatGroups set lastMessageText = ?,updatedDate = ?,sentBy = ? where id = ?";
+          const values = [data.messageText, date, data?.sentBy, data.groupId];
           const updatedGroup = await executeQuery(query, values);
           let notification = {};
           if (params.messageType === "C") {
@@ -548,15 +549,15 @@ const editMessage = async function (params) {
     if (data.roomId) {
       const date = new Date();
       const query =
-        "update chatRooms set lastMessageText = ?,updatedDate = ? where id = ?";
-      const values = [data.messageText, date, data.roomId];
+        "update chatRooms set lastMessageText = ?,updatedDate = ?,sentBy = ? where id = ?";
+      const values = [data.messageText, date, data?.sentBy, data.roomId];
       const updatedRoom = await executeQuery(query, values);
     }
     if (data.groupId) {
       const date = new Date();
       const query =
-        "update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?";
-      const values = [data.messageText, date, data.groupId];
+        "update chatGroups set lastMessageText = ?,updatedDate = ?,sentBy = ? where id = ?";
+      const values = [data.messageText, date, data?.sentBy, data.groupId];
       const updatedGroup = await executeQuery(query, values);
     }
     const query1 = "select * from messages where id = ?";
@@ -597,6 +598,7 @@ const deleteMessage = async function (params) {
         const values1 = [
           messageList?.messageText || null,
           messageList?.createdDate,
+          messageList?.sentBy,
           data.roomId,
         ];
         const updatedRoom = await executeQuery(query1, values1);
@@ -613,10 +615,11 @@ const deleteMessage = async function (params) {
         [messageList] = await executeQuery(query, values);
         // if (messageList) {
         // }
-        const query1 = `update chatGroups set lastMessageText = ?,updatedDate = ? where id = ?`;
+        const query1 = `update chatGroups set lastMessageText = ?,updatedDate = ?,sentBy = ? where id = ?`;
         const values1 = [
           messageList?.messageText || null,
           messageList?.createdDate,
+          messageList?.sentBy,
           data.groupId,
         ];
         const updatedRoom = await executeQuery(query1, values1);
@@ -795,7 +798,7 @@ const declineCall = async function (params) {
         msg: params.message || "call decline...",
       };
       // const notification = await createNotification(data);
-      return params?.roomId ? data : {};
+      return params?.members === 0 ? data : {};
     }
   } catch (error) {
     return error;
@@ -1215,7 +1218,7 @@ const endCall = async function (data) {
       data.members,
       data.groupId || null,
       data.roomId || null,
-      data.callLink
+      data.callLink,
     ];
     const callData = await executeQuery(query, params);
     console.log("endCallData====>", callData);
