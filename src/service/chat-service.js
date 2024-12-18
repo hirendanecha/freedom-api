@@ -560,7 +560,7 @@ const editMessage = async function (params) {
       const values = [data.messageText, date, data?.sentBy, data.groupId];
       const updatedGroup = await executeQuery(query, values);
     }
-    const query1 = "select * from messages where id = ?";
+    const query1 = "select m.*,p.Username,p.ProfilePicName,p.FirstName from messages as m left join profile as p on p.ID = m.sentBy where m.id = ?";
     const values1 = [data?.id];
     const [editMessage] = await executeQuery(query1, values1);
     editMessage["parentMessage"] = parentMessage;
