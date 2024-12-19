@@ -237,9 +237,8 @@ exports.editChannel = async function (req, res) {
     const { id } = req.params;
     if (data && id) {
       if (userName) {
-        const query = `UPDATE profile SET Username = '${userName}' where ID = ${data.profileid}`;
-        const query1 = `UPDATE users SET Username = '${userName}' where Id IN (select UserID from profile where ID = ${data.profileid})`;
-        console.log(query1);
+        const query = `UPDATE profile SET Username = "${userName}" where ID = ${data.profileid}`;
+        const query1 = `UPDATE users SET Username = "${userName}" where Id IN (select UserID from profile where ID = ${data.profileid})`;
         const profile = await utils.executeQuery(query);
         const user = await utils.executeQuery(query1);
         console.log(profile, user);

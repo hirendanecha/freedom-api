@@ -9,6 +9,7 @@ var featuredChannels = function (data) {
   this.firstname = data.firstname;
   this.unique_link = data.unique_link;
   this.profile_pic_name = data.profile_pic_name;
+  this.notificationEmail = data.notificationEmail;
 };
 
 featuredChannels.getChannels = async function () {

@@ -200,6 +200,10 @@ const createNewPost = async function (data) {
           const userData = await executeQuery(findUser, values);
 
           if (userData?.length) {
+            const findChannel = await executeQuery(
+              `select * from featured_channels where profileid = ?`,
+              [tag?.id]
+            );
             const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
             const values1 = [postData?.profileid];
             const senderData = await executeQuery(findSenderUser, values1);
@@ -207,13 +211,14 @@ const createNewPost = async function (data) {
 
             if (tag?.id) {
               const userDetails = {
-                email: userData[0].Email,
+                email: findChannel[0]?.notificationEmail || userData[0].Email,
                 profileId: senderData[0].ID,
                 userName: userData[0].Username,
                 senderUsername: senderData[0].Username,
                 firstName: userData[0].FirstName,
                 type: "post",
                 postId: notification?.postId || postData?.id,
+                isChannelTag: !!findChannel[0]?.notificationEmail,
               };
               await notificationMail(userDetails);
             }
@@ -471,19 +476,25 @@ const createComments = async function (params) {
           const values = [tag?.id];
           const userData = await executeQuery(findUser, values);
           if (userData?.length) {
+            const findChannel = await executeQuery(
+              `select * from featured_channels where profileid = ?`,
+              [tag?.id]
+            );
             const findSenderUser = `select p.ID,p.Username,p.FirstName,p.LastName from profile as p where p.ID = ?`;
             const values1 = [data?.profileId];
             const senderData = await executeQuery(findSenderUser, values1);
             notifications.push(notification);
+            
             if (tag?.id) {
               const userDetails = {
-                email: userData[0].Email,
+                email: findChannel[0]?.notificationEmail || userData[0].Email,
                 profileId: senderData[0].ID,
                 userName: userData[0].Username,
                 firstName: userData[0].FirstName,
                 senderUsername: senderData[0].Username,
                 type: "comment",
                 postId: notification?.postId || postData?.id,
+                isChannelTag: !!findChannel[0]?.notificationEmail,
               };
               await notificationMail(userDetails);
             }

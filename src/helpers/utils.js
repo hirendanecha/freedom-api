@@ -88,10 +88,18 @@ exports.forgotPasswordMail = async (user) => {
 };
 
 exports.notificationMail = async (userData) => {
+  console.log("userData==>", userData);
   let name = userData?.userName || userData.firstName;
-  let msg =
-    userData?.msg ||
-    `You were tagged in ${userData.senderUsername}'s ${userData.type}.`;
+  let msg = "";
+  if (userData?.isChannelTag) {
+    msg =
+      userData?.msg ||
+      `You have been tagged on a ${userData.senderUsername}'s ${userData.type}`;
+  } else {
+    msg =
+      userData?.msg ||
+      `You were tagged in ${userData.senderUsername}'s ${userData.type}.`;
+  }
   let redirectUrl = userData.postId
     ? `${environment.FRONTEND_URL}post/${userData.postId}`
     : userData?.type === "message"

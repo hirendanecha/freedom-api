@@ -154,7 +154,7 @@ WHERE
   AND u.IsSuspended = 'N' 
   AND u.IsActive = 'Y' 
   AND REPLACE(p.Username, ' ', '') LIKE ? 
-  AND p.AccountType IN ('I', 'M') 
+  AND p.AccountType IN ('I', 'M','C') 
 ORDER BY p.CreatedOn DESC 
 LIMIT 50;`;
     const values = [`${searchText}%`];

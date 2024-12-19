@@ -163,6 +163,8 @@ socket.config = (server) => {
       });
       try {
         const data = await socketService.createPost(params);
+        console.log("new-post-added", data?.posts);
+        
         if (data?.posts) {
           io.emit("new-post-added", data?.posts);
           console.log({ notifications: data?.notifications });
